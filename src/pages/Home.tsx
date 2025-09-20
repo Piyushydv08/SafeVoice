@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { toast } from 'react-hot-toast';
 import Slider from 'react-slick';
-import { FaChevronLeft, FaChevronRight } from "react-icons/fa";
+import { FaChevronLeft, FaChevronRight, FaArrowUp } from "react-icons/fa";
 import { useNavigate } from 'react-router-dom';
 
 // Firebase imports
@@ -119,6 +119,7 @@ export default function Home() {
   const [testimonialContent, setTestimonialContent] = useState('');
   const [loading, setLoading] = useState(false);
   const [expandedStoryId, setExpandedStoryId] = useState<string | null>(null);
+  const [showButton, setShowButton] = useState(false); 
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -133,6 +134,23 @@ export default function Home() {
     fetchTopStories();
     fetchTestimonials();
   }, []);
+  useEffect(() => {
+    const handleScroll = () => {
+      if (window.scrollY > 300) {
+        setShowButton(true);
+      } else {
+        setShowButton(false);
+      }
+    };
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
+
+  // ✅ Scroll to top function
+  const scrollToTop = () => {
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  };
+
 
   async function fetchTopStories() {
     try {
@@ -431,6 +449,15 @@ export default function Home() {
           </p>
         </div>
       </div>
+      {showButton && (
+        <button
+          onClick={scrollToTop}
+          className="fixed bottom-6 right-6 bg-pink-500 text-white p-3 rounded-full shadow-lg hover:bg-pink-600 transition duration-300 z-50"
+          aria-label="Back to top"
+        >
+          <FaArrowUp/>
+        </button>
+      )}
     </div>
   );
 }
