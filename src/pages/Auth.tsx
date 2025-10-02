@@ -10,15 +10,16 @@ import {
   sendPasswordResetEmail,
   setPersistence,
   browserLocalPersistence,
-  sendEmailVerification
+  sendEmailVerification,
+  updateProfile,
 } from 'firebase/auth';
 import { doc, setDoc, getFirestore, serverTimestamp } from 'firebase/firestore';
 import { auth } from '../lib/firebase';
 
-// Initialize Firestore
 const db = getFirestore();
 
 export default function Auth() {
+  const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
@@ -27,23 +28,24 @@ export default function Auth() {
   const navigate = useNavigate();
 
   // Validation helpers
-  const isValidEmail = (email: string) => {
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    return emailRegex.test(email);
-  };
+  const isValidEmail = (email: string) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+  const isValidName = (name: string) => name.trim().length >= 2 && name.trim().length <= 50;
 
   // Create user profile in Firestore
   const createUserProfile = async (user: any, additionalData = {}) => {
     try {
       const userRef = doc(db, 'profiles', user.uid);
-      await setDoc(userRef, {
-        email: user.email,
-        display_name: user.displayName || user.email?.split('@')[0] || 'Anonymous User',
-        phone: user.phoneNumber,
-        avatar_url: user.photoURL,
-        created_at: serverTimestamp(),
-        ...additionalData
-      }, { merge: true });
+      await setDoc(
+        userRef,
+        {
+          email: user.email,
+         
+          display_name: name || user.displayName || user.email?.split('@')[0],
+          created_at: serverTimestamp(),
+          ...additionalData,
+        },
+        { merge: true }
+      );
       return true;
     } catch (error) {
       console.error('Error creating user profile:', error);
@@ -51,133 +53,89 @@ export default function Auth() {
     }
   };
 
+  // Handle sign up
   const handleSignUp = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!isValidEmail(email)) {
-      toast.error('Please enter a valid email address.');
-      return;
-    }
-    // Password validation: at least 8 characters, alphanumeric
-    const passwordRegex = /^(?=.*[a-zA-Z])(?=.*[0-9])[A-Za-z0-9]{8,}$/;
-    if (!passwordRegex.test(password)) {
-      toast.error('Password must be at least 8 characters long and alphanumeric.');
-      return;
-    }
+    if (!isValidEmail(email)) return toast.error('Enter a valid email');
+    if (!isValidName(name)) return toast.error('Enter a valid name (2-50 chars)');
+    if (!/^(?=.*[a-zA-Z])(?=.*[0-9])[A-Za-z0-9]{8,}$/.test(password))
+      return toast.error('Password must be 8+ chars, alphanumeric');
+
     setLoading(true);
     try {
-      const userCredential = await createUserWithEmailAndPassword(auth, email, password);
-      const user = userCredential.user;
+      const { user } = await createUserWithEmailAndPassword(auth, email, password);
+
+      // ✅ Update Firebase Auth profile with displayName
+      await updateProfile(user, { displayName: name });
+
+      // ✅ Send verification email
       await sendEmailVerification(user);
-      const profileCreated = await createUserProfile(user, { provider: 'email' });
-      if (!profileCreated) {
-        throw new Error('Failed to create user profile');
-      }
-      toast.success('Signup successful! Please check your email to verify your account.');
-      setLoading(false);
-      navigate('/');
-    } catch (error: any) {
-      console.error('Error signing up:', error);
-      if (error.code === 'auth/email-already-in-use') {
-        toast.error('This email is already registered. Please sign in instead.');
-      } else {
-        toast.error('Failed to sign up. Please try again.');
-      }
-      setLoading(false);
-    }
-  };
 
-  const handleSignIn = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setLoading(true);
-    try {
-      await signInWithEmailAndPassword(auth, email, password);
-      toast.success('Sign in successful!');
-      setLoading(false);
-      navigate('/');
-    } catch (error: any) {
-      console.error('Error signing in:', error);
-      switch(error.code) {
-        case 'auth/user-not-found':
-          toast.error('No account found with this email.');
-          break;
-        case 'auth/wrong-password':
-          toast.error('Incorrect password.');
-          break;
-        case 'auth/too-many-requests':
-          toast.error('Too many failed login attempts. Please try again later.');
-          break;
-        case 'auth/user-disabled':
-          toast.error('This account has been disabled.');
-          break;
-        default:
-          toast.error('Failed to sign in. Please check your credentials.');
-      }
-      setLoading(false);
-    }
-  };
+      // ✅ Create user profile in Firestore
+      await createUserProfile(user, { provider: 'email' });
 
-  // Google Sign-In function
-  const handleGoogleSignIn = async () => {
-    setLoading(true);
-    const provider = new GoogleAuthProvider();
-    try {
-      const result = await signInWithPopup(auth, provider);
-      const user = result.user;
-      const profileCreated = await createUserProfile(user, { provider: 'google' });
-      if (!profileCreated) {
-        throw new Error('Failed to create user profile');
-      }
-      toast.success('Signed in with Google!');
+      toast.success('Signup successful! Verify your email.');
       navigate('/');
-    } catch (error: any) {
-      console.error('Error signing in with Google:', error);
-      toast.error(`Failed to sign in with Google: ${error.message}`);
+    } catch (err: any) {
+      console.error(err);
+      toast.error(err.code === 'auth/email-already-in-use' ? 'Email already registered' : 'Signup failed');
     } finally {
       setLoading(false);
     }
   };
 
-  // Password reset function
-  const handleForgotPassword = async () => {
-    if (!email) {
-      toast.error('Please enter your email first');
-      return;
-    }
+  // Handle sign in
+  const handleSignIn = async (e: React.FormEvent) => {
+    e.preventDefault();
     setLoading(true);
     try {
-      await sendPasswordResetEmail(auth, email);
-      toast.success('Password reset email sent! Check your inbox.');
-      setLoading(false);
-    } catch (error: any) {
-      console.error('Error sending reset email:', error);
-      toast.error(`Failed to send reset email: ${error.message}`);
+      await signInWithEmailAndPassword(auth, email, password);
+      toast.success('Signed in!');
+      navigate('/');
+    } catch (err: any) {
+      console.error(err);
+      toast.error('Failed to sign in: ' + err.message);
+    } finally {
       setLoading(false);
     }
   };
 
+  // Google Sign-In
+  const handleGoogleSignIn = async () => {
+    setLoading(true);
+    try {
+      const provider = new GoogleAuthProvider();
+      const { user } = await signInWithPopup(auth, provider);
+      await createUserProfile(user, { provider: 'google' });
+      toast.success('Signed in with Google!');
+      navigate('/');
+    } catch (err: any) {
+      console.error(err);
+      toast.error('Google sign-in failed');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Forgot password
+  const handleForgotPassword = async () => {
+    if (!email) return toast.error('Enter your email');
+    try {
+      await sendPasswordResetEmail(auth, email);
+      toast.success('Password reset email sent!');
+    } catch (err: any) {
+      console.error(err);
+      toast.error('Failed to send reset email');
+    }
+  };
+
+  // Persist session + listen to auth changes
   useEffect(() => {
-    setPersistence(auth, browserLocalPersistence)
-      .catch((error) => {
-        console.error("Error setting auth persistence:", error);
-      });
-    const unsubscribe = onAuthStateChanged(auth, (user) => {
-      if (user) {
-        if (user.providerData[0]?.providerId === 'password' && !user.emailVerified) {
-          toast('Please verify your email address for full access.', {
-            icon: '⚠️',
-            style: {
-              borderRadius: '10px',
-              background: '#FFF3CD',
-              color: '#856404',
-            },
-          });
-        }
-        navigate('/');
-      }
+    setPersistence(auth, browserLocalPersistence);
+    const unsub = onAuthStateChanged(auth, (user) => {
+      if (user) navigate('/');
     });
-    return () => {
-      unsubscribe();
-    };
+    return () => unsub();
   }, [navigate]);
 
   return (
@@ -186,146 +144,119 @@ export default function Auth() {
         <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
           {isSignUp ? 'Sign Up for SafeVoice' : 'Sign In to SafeVoice'}
         </h2>
-        <p className="mt-2 text-center text-sm text-gray-600">
-          {isSignUp
-            ? 'Already have an account?'
-            : "Don't have an account?"}{' '}
-          <button
-            type="button"
-            onClick={() => setIsSignUp(!isSignUp)}
-            className="font-medium text-pink-600 hover:text-pink-500"
-          >
-            {isSignUp ? 'Sign In' : 'Sign Up'}
-          </button>
-        </p>
       </div>
+
       <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
         <div className="bg-white py-8 px-4 shadow sm:rounded-lg sm:px-10">
-          {/* Authentication method tabs */}
-          <div className="flex justify-center mb-6 border-b border-gray-200">
+
+          {/* Toggle between Email / Google */}
+          <div className="flex justify-center space-x-2 mb-4">
             <button
               type="button"
               onClick={() => setAuthMethod('email')}
-              className={`px-4 py-2 flex items-center ${
-                authMethod === 'email' 
-                  ? 'border-b-2 border-pink-500 text-pink-600'
-                  : 'text-gray-500 hover:text-gray-700'
-              }`}
+              className={`px-3 py-1 rounded ${authMethod === 'email' ? 'bg-pink-500 text-white' : 'bg-gray-200'}`}
             >
-              <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-1" viewBox="0 0 20 20" fill="currentColor">
-                <path d="M2.003 5.884L10 9.882l7.997-3.998A2 2 0 0016 4H4a2 2 0 00-1.997 1.884z" />
-                <path d="M18 8.118l-8 4-8-4V14a2 2 0 002 2h12a2 2 0 002-2V8.118z" />
-              </svg>
               Email
             </button>
             <button
               type="button"
               onClick={() => setAuthMethod('google')}
-              className={`px-4 py-2 flex items-center ${
-                authMethod === 'google' 
-                  ? 'border-b-2 border-pink-500 text-pink-600'
-                  : 'text-gray-500 hover:text-gray-700'
-              }`}
+              className={`px-3 py-1 rounded ${authMethod === 'google' ? 'bg-pink-500 text-white' : 'bg-gray-200'}`}
             >
-              <svg className="h-5 w-5 mr-1" viewBox="0 0 24 24">
-                <path
-                  fill="currentColor"
-                  d="M21.35 11.1h-9.17v2.73h6.51c-.33 3.81-3.5 5.44-6.5 5.44C8.36 19.27 5 16.25 5 12c0-4.1 3.2-7.27 7.2-7.27 3.09 0 4.9 1.97 4.9 1.97L19 4.72S16.56 2 12.1 2C6.42 2 2.03 6.8 2.03 12c0 5.05 4.13 10 10.22 10 5.35 0 9.25-3.67 9.25-9.09 0-1.15-.15-1.81-.15-1.81z"
-                />
-              </svg>
               Google
             </button>
           </div>
-          <div className="mt-6">
-            {/* Email/Password Form */}
-            {authMethod === 'email' && (
-              <form onSubmit={isSignUp ? handleSignUp : handleSignIn} className="space-y-4">
-                <div>
-                  <label htmlFor="email" className="block text-sm font-medium text-gray-700">
-                    Email
-                  </label>
-                  <input
-                    type="email"
-                    id="email"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-pink-500 focus:ring-pink-500"
-                    required
-                  />
-                </div>
-                <div>
-                  <label htmlFor="password" className="block text-sm font-medium text-gray-700">
-                    Password
-                  </label>
-                  <input
-                    type="password"
-                    id="password"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-pink-500 focus:ring-pink-500"
-                    required
-                  />
-                </div>
-                <button
-                  type="submit"
-                  className="w-full bg-pink-500 text-white px-4 py-2 rounded-md hover:bg-pink-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-pink-500"
-                  disabled={loading}
-                >
-                  {loading ? (isSignUp ? 'Signing up...' : 'Signing in...') : isSignUp ? 'Sign Up' : 'Sign In'}
-                </button>
-                
-                {!isSignUp && (
-                  <div className="text-center mt-2">
-                    <button
-                      type="button"
-                      onClick={handleForgotPassword}
-                      className="text-sm font-medium text-pink-600 hover:text-pink-500"
-                    >
-                      Forgot Password?
-                    </button>
-                  </div>
-                )}
-              </form>
-            )}
 
-            {/* Google Sign-In */}
-            {authMethod === 'google' && (
-              <div className="text-center">
-                <p className="mb-4 text-sm text-gray-600">
-                  Click the button below to {isSignUp ? 'sign up' : 'sign in'} with your Google account
-                </p>
+          {/* Email Auth */}
+          {authMethod === 'email' && (
+            <form onSubmit={isSignUp ? handleSignUp : handleSignIn} className="space-y-4">
+              {isSignUp && (
+                <div>
+                  <label htmlFor="name" className="block text-sm font-medium text-gray-700">
+                    Full Name
+                  </label>
+                  <input
+                    type="text"
+                    id="name"
+                    value={name}
+                    onChange={(e) => setName(e.target.value)}
+                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-pink-500 focus:ring-pink-500"
+                    required
+                  />
+                </div>
+              )}
+
+              <div>
+                <label htmlFor="email" className="block text-sm font-medium text-gray-700">
+                  Email
+                </label>
+                <input
+                  type="email"
+                  id="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-pink-500 focus:ring-pink-500"
+                  required
+                />
+              </div>
+
+              <div>
+                <label htmlFor="password" className="block text-sm font-medium text-gray-700">
+                  Password
+                </label>
+                <input
+                  type="password"
+                  id="password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-pink-500 focus:ring-pink-500"
+                  required
+                />
+              </div>
+
+              {/* Forgot password only on sign-in */}
+              {!isSignUp && (
                 <button
                   type="button"
-                  onClick={handleGoogleSignIn}
-                  disabled={loading}
-                  className="w-full inline-flex justify-center items-center py-2 px-4 border border-gray-300 rounded-md shadow-sm bg-white text-sm font-medium text-gray-500 hover:bg-gray-50"
+                  onClick={handleForgotPassword}
+                  className="text-sm text-pink-500 hover:underline"
                 >
-                  <svg className="h-5 w-5 mr-2" viewBox="0 0 24 24">
-                    <path
-                      fill="currentColor"
-                      d="M21.35 11.1h-9.17v2.73h6.51c-.33 3.81-3.5 5.44-6.5 5.44C8.36 19.27 5 16.25 5 12c0-4.1 3.2-7.27 7.2-7.27 3.09 0 4.9 1.97 4.9 1.97L19 4.72S16.56 2 12.1 2C6.42 2 2.03 6.8 2.03 12c0 5.05 4.13 10 10.22 10 5.35 0 9.25-3.67 9.25-9.09 0-1.15-.15-1.81-.15-1.81z"
-                    />
-                  </svg>
-                  {isSignUp ? 'Sign up with Google' : 'Sign in with Google'}
+                  Forgot password?
                 </button>
-                
-                {/* Add Google Password Reset Note */}
-                {!isSignUp && (
-                  <div className="mt-4 text-sm text-gray-600">
-                    <p>Forgot your Google password?</p>
-                    <a 
-                      href="https://accounts.google.com/signin/recovery" 
-                      target="_blank" 
-                      rel="noopener noreferrer"
-                      className="text-pink-600 hover:text-pink-500"
-                    >
-                      Reset it on Google's website
-                    </a>
-                  </div>
-                )}
-              </div>
-            )}
-          </div>
+              )}
+
+              <button
+                type="submit"
+                className="w-full bg-pink-500 text-white px-4 py-2 rounded-md hover:bg-pink-600 focus:outline-none"
+                disabled={loading}
+              >
+                {loading ? 'Loading...' : isSignUp ? 'Sign Up' : 'Sign In'}
+              </button>
+            </form>
+          )}
+
+          {/* Google Auth */}
+          {authMethod === 'google' && (
+            <button
+              onClick={handleGoogleSignIn}
+              disabled={loading}
+              className="w-full bg-white border px-4 py-2 rounded-md"
+            >
+              {isSignUp ? 'Sign up with Google' : 'Sign in with Google'}
+            </button>
+          )}
+
+          {/* Switch between SignIn/SignUp */}
+          <p className="mt-4 text-center text-sm text-gray-600">
+            {isSignUp ? 'Already have an account?' : "Don't have an account?"}{' '}
+            <button
+              type="button"
+              onClick={() => setIsSignUp(!isSignUp)}
+              className="text-pink-500 hover:underline"
+            >
+              {isSignUp ? 'Sign In' : 'Sign Up'}
+            </button>
+          </p>
         </div>
       </div>
     </div>

@@ -1,25 +1,50 @@
 import React, { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Heart, Menu, X } from 'lucide-react';
-import { auth } from '../lib/firebase'; // Change this import
-import { onAuthStateChanged } from 'firebase/auth'; // Add this import
-import { toast } from 'react-hot-toast'; // Add for sign-out feedback
+import { auth } from '../lib/firebase';
+import { onAuthStateChanged, signOut } from 'firebase/auth';
+import { getFirestore, doc, getDoc } from 'firebase/firestore';
+import { toast } from 'react-hot-toast';
 
-// Define admin emails. This should be consistent with your AdminPendingNGOs page.
-const ADMIN_EMAILS = ['safevoiceforwomen@gmail.com', 'piyushydv011@gmail.com', 'aditiraj0205@gmail.com'];
+const db = getFirestore();
+
+// Define admin emails
+const ADMIN_EMAILS = [
+  'safevoiceforwomen@gmail.com',
+  'piyushydv011@gmail.com',
+  'aditiraj0205@gmail.com'
+];
 
 export default function Navbar() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [user, setUser] = useState<any>(null);
+  const [displayName, setDisplayName] = useState<string | null>(null);
   const navigate = useNavigate();
 
   useEffect(() => {
-    // Replace Supabase auth with Firebase auth
-    const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
+    // Subscribe to auth changes
+    const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
       setUser(currentUser);
+
+      if (currentUser) {
+        try {
+          // Fetch profile from Firestore
+          const userRef = doc(db, 'profiles', currentUser.uid);
+          const snap = await getDoc(userRef);
+          if (snap.exists()) {
+            const data = snap.data();
+            setDisplayName(data.display_name);
+          } else {
+            setDisplayName(currentUser.email);
+          }
+        } catch (err) {
+          console.error('Error fetching user profile:', err);
+        }
+      } else {
+        setDisplayName(null);
+      }
     });
 
-    // Clean up the subscription
     return () => unsubscribe();
   }, []);
 
@@ -27,7 +52,7 @@ export default function Navbar() {
 
   const handleSignOut = async () => {
     try {
-      await auth.signOut();
+      await signOut(auth);
       toast.success('Signed out successfully');
       navigate('/');
     } catch (error) {
@@ -37,9 +62,10 @@ export default function Navbar() {
   };
 
   return (
-    <nav className="fixed top-0 left-0 w-full z-50 bg-white shadow-lg ">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 ">
+    <nav className="fixed top-0 left-0 w-full z-50 bg-white shadow-lg">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between h-16">
+          {/* Logo */}
           <div className="flex items-center">
             <Link
               to="/"
@@ -63,14 +89,17 @@ export default function Navbar() {
             <Link to="/resources" className="text-gray-700 hover:text-pink-500 px-3 py-2 rounded-md">Resources</Link>
             <Link to="/faqs" className="text-gray-700 hover:text-pink-500 px-3 py-2 rounded-md">FAQs</Link>
             <Link to="/about" className="text-gray-700 hover:text-pink-500 px-3 py-2 rounded-md">About</Link>
+            
             {user ? (
               <div className="relative flex items-center space-x-4">
                 {isAdmin && (
-              <Link to="/admin" className="text-yellow-500 font-bold px-3 py-2 rounded-md hover:text-yellow-600">
+                  <Link to="/admin" className="text-yellow-500 font-bold px-3 py-2 rounded-md hover:text-yellow-600">
                     Admin Panel
                   </Link>
                 )}
-                <span className="text-gray-700">Anonymous_{user.uid.slice(0, 8)}</span>
+                <span className="text-gray-700 font-medium">
+                  Hello, {displayName || `User_${user.uid.slice(0, 6)}`} 👋
+                </span>
                 <button
                   onClick={handleSignOut}
                   className="bg-pink-500 text-white px-4 py-2 rounded-md hover:bg-pink-600"
@@ -112,11 +141,13 @@ export default function Navbar() {
               {user ? (
                 <>
                   {isAdmin && (
-                <Link to="/admin" className="block text-yellow-500 font-bold px-3 py-2 rounded-md hover:text-yellow-600">
+                    <Link to="/admin" className="block text-yellow-500 font-bold px-3 py-2 rounded-md hover:text-yellow-600">
                       Admin Panel
                     </Link>
                   )}
-                  <span className="block text-gray-700 px-3 py-2">Anonymous_{user.uid.slice(0, 8)}</span>
+                  <span className="block text-gray-700 px-3 py-2">
+                    {displayName || `User_${user.uid.slice(0, 6)}`}
+                  </span>
                   <button
                     onClick={handleSignOut}
                     className="block w-full text-left text-gray-700 hover:text-pink-500 px-3 py-2 rounded-md"
