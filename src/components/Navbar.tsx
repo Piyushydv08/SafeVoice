@@ -56,13 +56,14 @@ export default function Navbar() {
           </div>
 
           {/* Desktop menu */}
-          <div className="hidden md:flex items-center space-x-4">
-            <Link to="/" className="text-gray-700 hover:text-pink-500 px-3 py-2 rounded-md">Home</Link>
-            <Link to="/stories" className="text-gray-700 hover:text-pink-500 px-3 py-2 rounded-md">Stories</Link>
-            <Link to="/share-story" className="text-gray-700 hover:text-pink-500 px-3 py-2 rounded-md">Share your Story</Link>
-            <Link to="/resources" className="text-gray-700 hover:text-pink-500 px-3 py-2 rounded-md">Resources</Link>
-            <Link to="/faqs" className="text-gray-700 hover:text-pink-500 px-3 py-2 rounded-md">FAQs</Link>
-            <Link to="/about" className="text-gray-700 hover:text-pink-500 px-3 py-2 rounded-md">About</Link>
+         <div className="hidden md:flex items-center space-x-4">
+             <Link to="/" className="text-gray-700 hover:text-pink-500 transition-colors duration-300 hover:underline underline-offset-4 px-3 py-2 rounded-md">Home</Link> {/* added hover effect */}
+             <Link to="/stories" className="text-gray-700 hover:text-pink-500 transition-colors duration-300 hover:underline underline-offset-4 px-3 py-2 rounded-md">Stories</Link> {/* added hover effect */}
+            <Link to="/share-story" className="text-gray-700 hover:text-pink-500 transition-colors duration-300 hover:underline underline-offset-4 px-3 py-2 rounded-md">Share your Story</Link> {/*added hover effect */}
+            <Link to="/resources" className="text-gray-700 hover:text-pink-500 transition-colors duration-300 hover:underline underline-offset-4 px-3 py-2 rounded-md">Resources</Link> {/*  added hover effect */}
+            <Link to="/faqs" className="text-gray-700 hover:text-pink-500 transition-colors duration-300 hover:underline underline-offset-4 px-3 py-2 rounded-md">FAQs</Link> {/*  added hover effect */}
+            <Link to="/about" className="text-gray-700 hover:text-pink-500 transition-colors duration-300 hover:underline underline-offset-4 px-3 py-2 rounded-md">About</Link> {/*  added hover effect */}
+        </div> 
             {user ? (
               <div className="relative flex items-center space-x-4">
                 {isAdmin && (
@@ -99,16 +100,16 @@ export default function Navbar() {
           </div>
         </div>
 
-        {/* Mobile menu */}
-        {isMenuOpen && (
-          <div className="md:hidden">
-            <div className="px-2 pt-2 pb-3 space-y-1">
-              <Link to="/" className="block text-gray-700 hover:text-pink-500 px-3 py-2 rounded-md">Home</Link>
-              <Link to="/stories" className="block text-gray-700 hover:text-pink-500 px-3 py-2 rounded-md">Stories</Link>
-              <Link to="/share-story" className="block text-gray-700 hover:text-pink-500 px-3 py-2 rounded-md">Share your Story</Link>
-              <Link to="/resources" className="block text-gray-700 hover:text-pink-500 px-3 py-2 rounded-md">Resources</Link>
-              <Link to="/faqs" className="block text-gray-700 hover:text-pink-500 px-3 py-2 rounded-md">FAQs</Link>
-              <Link to="/about" className="block text-gray-700 hover:text-pink-500 px-3 py-2 rounded-md">About</Link>
+       {/* Mobile menu */}
+{isMenuOpen && (
+  <div className="md:hidden">
+    <div className="px-2 pt-2 pb-3 space-y-1">
+      <Link to="/" className="block text-gray-700 hover:text-pink-500 transition-colors duration-300 hover:underline underline-offset-4 px-3 py-2 rounded-md">Home</Link> {/*  added hover effect */}
+      <Link to="/stories" className="block text-gray-700 hover:text-pink-500 transition-colors duration-300 hover:underline underline-offset-4 px-3 py-2 rounded-md">Stories</Link> {/*  added hover effect */}
+      <Link to="/share-story" className="block text-gray-700 hover:text-pink-500 transition-colors duration-300 hover:underline underline-offset-4 px-3 py-2 rounded-md">Share your Story</Link> {/*  added hover effect */}
+      <Link to="/resources" className="block text-gray-700 hover:text-pink-500 transition-colors duration-300 hover:underline underline-offset-4 px-3 py-2 rounded-md">Resources</Link> {/*  added hover effect */}
+      <Link to="/faqs" className="block text-gray-700 hover:text-pink-500 transition-colors duration-300 hover:underline underline-offset-4 px-3 py-2 rounded-md">FAQs</Link> {/* added hover effect */}
+      <Link to="/about" className="block text-gray-700 hover:text-pink-500 transition-colors duration-300 hover:underline underline-offset-4 px-3 py-2 rounded-md">About</Link> {/* added hover effect */}
               {user ? (
                 <>
                   {isAdmin && (
