@@ -1,5 +1,5 @@
 import React from 'react';
-import { Users, Heart, Shield, MessageSquare } from 'lucide-react';
+import { Users, Heart, Shield, MessageSquare, Link as LinkIcon } from 'lucide-react';
 
 export default function About() {
   return (
@@ -94,6 +94,28 @@ export default function About() {
           </div>
         </div>
       </section>
+      
+      {/* Added Secondary Links Section */}
+      <section className="mb-16">
+        <div className="bg-gray-50 rounded-lg shadow-md p-8">
+          <h2 className="text-2xl font-bold text-gray-900 mb-6">Quick Links</h2>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <a href="/privacy" className="flex items-center gap-2 text-gray-700 hover-link">
+              <LinkIcon className="h-5 w-5 text-pink-500" /> Privacy Policy
+            </a>
+            <a href="/terms" className="flex items-center gap-2 text-gray-700 hover-link">
+              <LinkIcon className="h-5 w-5 text-pink-500" /> Terms & Conditions
+            </a>
+            <a href="/resources" className="flex items-center gap-2 text-gray-700 hover-link">
+              <LinkIcon className="h-5 w-5 text-pink-500" /> Resources
+            </a>
+            <a href="/faq" className="flex items-center gap-2 text-gray-700 hover-link">
+              <LinkIcon className="h-5 w-5 text-pink-500" /> FAQs
+            </a>
+          </div>
+        </div>
+      </section>
+      {/* End Secondary Links */}
 
       {/* Owners Section */}
       <section>
