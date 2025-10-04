@@ -26,6 +26,19 @@ export default function Auth() {
   const [authMethod, setAuthMethod] = useState<'email' | 'google'>('email');
   const navigate = useNavigate();
 
+    // ADDED: toggle for show/hide password
+  const [showPassword, setShowPassword] = useState(false); 
+
+  // ADDED: password validation checks
+  const passwordChecks = {
+    length: password.length >= 8,
+    upper: /[A-Z]/.test(password),
+    lower: /[a-z]/.test(password),
+    number: /\d/.test(password),
+    special: /[^A-Za-z0-9]/.test(password),
+  };
+  const isPasswordValid = Object.values(passwordChecks).every(Boolean);
+
   // Validation helpers
   const isValidEmail = (email: string) => {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -57,12 +70,13 @@ export default function Auth() {
       toast.error('Please enter a valid email address.');
       return;
     }
-    // Password validation: at least 8 characters, alphanumeric
-    const passwordRegex = /^(?=.*[a-zA-Z])(?=.*[0-9])[A-Za-z0-9]{8,}$/;
-    if (!passwordRegex.test(password)) {
-      toast.error('Password must be at least 8 characters long and alphanumeric.');
+
+     // CHANGED: use strong password validation
+    if (!isPasswordValid) {
+      toast.error('Password must be at least 8 chars, with uppercase, lowercase, number & special character.');
       return;
     }
+    
     setLoading(true);
     try {
       const userCredential = await createUserWithEmailAndPassword(auth, email, password);
@@ -257,15 +271,37 @@ export default function Auth() {
                   <label htmlFor="password" className="block text-sm font-medium text-gray-700">
                     Password
                   </label>
-                  <input
-                    type="password"
-                    id="password"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-pink-500 focus:ring-pink-500"
-                    required
-                  />
+                  <div className="relative">
+                    {/* CHANGED: show/hide toggle + validation */}
+                    <input
+                      type={showPassword ? "text" : "password"} // ⭐ ADDED
+                      id="password"
+                      value={password}
+                      onChange={(e) => setPassword(e.target.value)}
+                      className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-pink-500 focus:ring-pink-500 pr-10" // ⭐ ADDED pr-10
+                      required
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowPassword((prev) => !prev)} //  ADDED
+                      className="absolute inset-y-0 right-2 flex items-center text-gray-500"
+                    >
+                      {showPassword ? "🙈" : "👁️"} {/* simple toggle icon */}
+                    </button>
+                  </div>
+
+                  {/* ⭐ ADDED: live password feedback */}
+                  {isSignUp && (
+                    <ul className="mt-2 text-sm space-y-1">
+                      <li className={passwordChecks.length ? "text-green-600" : "text-red-600"}>• Minimum 8 characters</li>
+                      <li className={passwordChecks.upper ? "text-green-600" : "text-red-600"}>• At least one uppercase letter</li>
+                      <li className={passwordChecks.lower ? "text-green-600" : "text-red-600"}>• At least one lowercase letter</li>
+                      <li className={passwordChecks.number ? "text-green-600" : "text-red-600"}>• At least one number</li>
+                      <li className={passwordChecks.special ? "text-green-600" : "text-red-600"}>• At least one special character</li>
+                    </ul>
+                  )}
                 </div>
+
                 <button
                   type="submit"
                   className="w-full bg-pink-500 text-white px-4 py-2 rounded-md hover:bg-pink-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-pink-500"
