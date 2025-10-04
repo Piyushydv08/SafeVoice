@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { Heart, Menu, X } from 'lucide-react';
 import { auth } from '../lib/firebase';
 import { onAuthStateChanged } from 'firebase/auth';
@@ -11,8 +11,12 @@ export default function Navbar() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [user, setUser] = useState<any>(null);
   const navigate = useNavigate();
+  const location = useLocation();
 
-  newFunction();
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, (currentUser) => setUser(currentUser));
+    return () => unsubscribe();
+  }, []);
 
   const isAdmin = user && ADMIN_EMAILS.includes(user.email || '');
 
@@ -27,10 +31,20 @@ export default function Navbar() {
     }
   };
 
+  const navLinks = [
+    { to: '/', label: 'Home' },
+    { to: '/stories', label: 'Stories' },
+    { to: '/share-story', label: 'Share your Story' },
+    { to: '/resources', label: 'Resources' },
+    { to: '/faqs', label: 'FAQs' },
+    { to: '/about', label: 'About' },
+  ];
+
   return (
     <nav className="fixed top-0 left-0 w-full z-50 bg-gradient-to-r from-pink-100 via-white to-pink-200 shadow-xl border-b border-pink-200 backdrop-blur-lg transition-all duration-300">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between h-16">
+          {/* Logo */}
           <div className="flex items-center">
             <Link
               to="/"
@@ -51,16 +65,20 @@ export default function Navbar() {
 
           {/* Desktop menu */}
           <div className="hidden md:flex items-center space-x-4">
-            <Link to="/" className="nav-link">Home</Link>
-            <Link to="/stories" className="nav-link">Stories</Link>
-            <Link to="/share-story" className="nav-link">Share your Story</Link>
-            <Link to="/resources" className="nav-link">Resources</Link>
-            <Link to="/faqs" className="nav-link">FAQs</Link>
-            <Link to="/about" className="nav-link">About</Link>
+            {navLinks.map(({ to, label }) => (
+              <Link
+                key={to}
+                to={to}
+                className={`nav-link ${location.pathname === to ? 'active' : ''}`}
+              >
+                {label}
+              </Link>
+            ))}
+
             {user ? (
               <div className="relative flex items-center space-x-4">
                 {isAdmin && (
-                  <Link to="/admin" className="admin-link">
+                  <Link to="/admin" className={`admin-link ${location.pathname === '/admin' ? 'active-admin' : ''}`}>
                     Admin Panel
                   </Link>
                 )}
@@ -77,7 +95,7 @@ export default function Navbar() {
             ) : (
               <Link
                 to="/auth"
-                className="bg-gradient-to-r from-pink-500 to-pink-400 text-white px-4 py-2 rounded-md shadow-md hover:from-pink-600 hover:to-pink-500 transition-all duration-200 font-semibold"
+                className={`bg-gradient-to-r from-pink-500 to-pink-400 text-white px-4 py-2 rounded-md shadow-md hover:from-pink-600 hover:to-pink-500 transition-all duration-200 font-semibold ${location.pathname === '/auth' ? 'ring-2 ring-pink-400' : ''}`}
               >
                 Sign In
               </Link>
@@ -99,16 +117,20 @@ export default function Navbar() {
         {isMenuOpen && (
           <div className="md:hidden bg-white/90 rounded-lg shadow-lg mt-2 border border-pink-100 animate-fade-in-down">
             <div className="px-2 pt-2 pb-3 space-y-1">
-              <Link to="/" className="mobile-link">Home</Link>
-              <Link to="/stories" className="mobile-link">Stories</Link>
-              <Link to="/share-story" className="mobile-link">Share your Story</Link>
-              <Link to="/resources" className="mobile-link">Resources</Link>
-              <Link to="/faqs" className="mobile-link">FAQs</Link>
-              <Link to="/about" className="mobile-link">About</Link>
+              {navLinks.map(({ to, label }) => (
+                <Link
+                  key={to}
+                  to={to}
+                  className={`mobile-link ${location.pathname === to ? 'active-mobile' : ''}`}
+                >
+                  {label}
+                </Link>
+              ))}
+
               {user ? (
                 <>
                   {isAdmin && (
-                    <Link to="/admin" className="mobile-admin-link">
+                    <Link to="/admin" className={`mobile-admin-link ${location.pathname === '/admin' ? 'active-admin' : ''}`}>
                       Admin Panel
                     </Link>
                   )}
@@ -125,7 +147,7 @@ export default function Navbar() {
               ) : (
                 <Link
                   to="/auth"
-                  className="block text-white bg-gradient-to-r from-pink-500 to-pink-400 hover:from-pink-600 hover:to-pink-500 px-3 py-2 rounded-md font-semibold shadow"
+                  className={`block text-white bg-gradient-to-r from-pink-500 to-pink-400 hover:from-pink-600 hover:to-pink-500 px-3 py-2 rounded-md font-semibold shadow ${location.pathname === '/auth' ? 'ring-2 ring-pink-400' : ''}`}
                 >
                   Sign In
                 </Link>
@@ -134,7 +156,8 @@ export default function Navbar() {
           </div>
         )}
       </div>
-      {/* Custom styles for nav links */}
+
+      {/* Custom styles */}
       <style>{`
         .nav-link {
           position: relative;
@@ -142,69 +165,32 @@ export default function Navbar() {
           font-weight: 500;
           padding: 0.5rem 1rem;
           border-radius: 0.375rem;
-          transition: background 0.2s, color 0.2s, box-shadow 0.2s;
+          transition: all 0.2s;
         }
         .nav-link:hover {
           background: linear-gradient(90deg, #f9a8d4 0%, #f472b6 100%);
           color: #fff;
-          box-shadow: 0 2px 8px 0 #f472b633;
         }
-        .admin-link {
-          color: #f59e42;
-          font-weight: bold;
-          padding: 0.5rem 1rem;
-          border-radius: 0.375rem;
-          background: linear-gradient(90deg, #fef08a 0%, #fde68a 100%);
-          box-shadow: 0 2px 8px 0 #fde68a33;
-          transition: background 0.2s, color 0.2s;
+        .nav-link.active {
+          background: linear-gradient(90deg, #ec4899 0%, #db2777 100%);
+          color: white;
+          box-shadow: 0 2px 10px #ec489966;
         }
-        .admin-link:hover {
-          background: linear-gradient(90deg, #fbbf24 0%, #f59e42 100%);
-          color: #fff;
+
+        .mobile-link.active-mobile {
+          background: linear-gradient(90deg, #ec4899 0%, #db2777 100%);
+          color: white;
+          font-weight: 600;
         }
-        .mobile-link {
-          display: block;
-          color: #be185d;
-          font-weight: 500;
-          padding: 0.75rem 1rem;
-          border-radius: 0.375rem;
-          transition: background 0.2s, color 0.2s;
-        }
-        .mobile-link:hover {
-          background: linear-gradient(90deg, #f9a8d4 0%, #f472b6 100%);
-          color: #fff;
-        }
-        .mobile-admin-link {
-          display: block;
-          color: #f59e42;
-          font-weight: bold;
-          padding: 0.75rem 1rem;
-          border-radius: 0.375rem;
-          background: linear-gradient(90deg, #fef08a 0%, #fde68a 100%);
-          box-shadow: 0 2px 8px 0 #fde68a33;
-          transition: background 0.2s, color 0.2s;
-        }
-        .mobile-admin-link:hover {
-          background: linear-gradient(90deg, #fbbf24 0%, #f59e42 100%);
-          color: #fff;
-        }
-        @keyframes fade-in-down {
-          0% { opacity: 0; transform: translateY(-10px);}
-          100% { opacity: 1; transform: translateY(0);}
-        }
-        .animate-fade-in-down {
-          animation: fade-in-down 0.3s ease;
+
+        .admin-link.active-admin,
+        .mobile-admin-link.active-admin {
+          background: linear-gradient(90deg, #f59e42 0%, #d97706 100%);
+          color: white;
+          box-shadow: 0 2px 10px #fbbf2433;
         }
       `}</style>
     </nav>
   );
-
-  function newFunction() {
-    useEffect(() => {
-      const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
-        setUser(currentUser);
-      });
-      return () => unsubscribe();
-    }, []);
-  }
 }
+
