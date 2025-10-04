@@ -2,3 +2,11 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Added global hover effect for links */
+.hover-link {
+  transition: all 0.2s ease-in-out;
+}
+.hover-link:hover {
+  color: #db2777; /* Tailwind pink-600 */
+  transform: translateX(4px);
+}
