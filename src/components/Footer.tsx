@@ -3,10 +3,10 @@ import { Link } from 'react-router-dom';
 import { Heart } from 'lucide-react';
 
 export default function Footer() {
-  const [email, setEmail] = useState(''); // ✅ State to store email
+  const [email, setEmail] = useState('');
   const handleSubscribe = (e: React.FormEvent) => {
     e.preventDefault();
-    // ✅ TODO: Add backend logic (Netlify function or Firebase) to save email
+    // TODO: Add backend logic (Netlify function or Firebase) to save email
     alert(`Subscribed with: ${email}`);
     setEmail('');
   };
@@ -68,9 +68,8 @@ export default function Footer() {
               </li>
             </ul>
           </div>
-        </div>
 
-        {/* ✅ Newsletter Subscription Section Added */}
+          {/* Newsletter Subscription Section */}
           <div>
             <h3 className="text-lg font-semibold mb-4">Subscribe to Our Newsletter</h3>
             <form onSubmit={handleSubscribe} className="flex flex-col space-y-2">
