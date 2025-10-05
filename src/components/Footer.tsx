@@ -1,8 +1,15 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Heart } from 'lucide-react';
 
 export default function Footer() {
+  const [email, setEmail] = useState(''); // ✅ State to store email
+  const handleSubscribe = (e: React.FormEvent) => {
+    e.preventDefault();
+    // ✅ TODO: Add backend logic (Netlify function or Firebase) to save email
+    alert(`Subscribed with: ${email}`);
+    setEmail('');
+  };
   return (
     <footer className="bg-gray-900 text-white">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
@@ -60,6 +67,40 @@ export default function Footer() {
                 Emergency: 1800-SAFE-NOW
               </li>
             </ul>
+          </div>
+        </div>
+
+        {/* ✅ Newsletter Subscription Section Added */}
+          <div>
+            <h3 className="text-lg font-semibold mb-4">Subscribe to Our Newsletter</h3>
+            <form onSubmit={handleSubscribe} className="flex flex-col space-y-2">
+              <input
+                type="email"
+                placeholder="Enter your email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                required
+                className="p-2 rounded bg-gray-800 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-pink-500"
+              />
+              <div className="flex space-x-2">
+                <button
+                  type="submit"
+                  className="flex-1 bg-pink-500 hover:bg-pink-600 text-white font-semibold py-2 px-4 rounded"
+                >
+                  Subscribe
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setEmail('')}
+                  className="flex-1 bg-gray-700 hover:bg-gray-600 text-white font-semibold py-2 px-4 rounded"
+                >
+                  No Thanks
+                </button>
+              </div>
+            </form>
+            <p className="text-gray-400 text-xs mt-2">
+              By subscribing, you agree to our <Link to="/termsandconditions" className="underline">Terms of Service</Link> and <Link to="/PrivacyPolicy" className="underline">Privacy Policy</Link>.
+            </p>
           </div>
         </div>
 
