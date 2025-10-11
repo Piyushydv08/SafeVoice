@@ -93,9 +93,9 @@ const NGOCard = ({ ngo, isAdmin, handleDeleteNGO }: { ngo: NGO, isAdmin: boolean
             <span className="text-xs font-medium px-2 py-0.5 bg-pink-100 text-pink-600 rounded-full">{ngo.category}</span>
         </div>
         <div className="flex items-center text-sm font-semibold text-green-600 mb-4">
-            <CheckCircle className="h-4 w-4 mr-1.5" />
-            Verified Partner
-        </div>
+            <CheckCircle className="h-4 w-4 mr-1.5" />
+            Verified Partner
+        </div>
         <p className="text-gray-600 text-sm mb-4 line-clamp-3 min-h-[48px]">{ngo.description}</p>
         
         <div className="space-y-2 text-sm text-gray-700 border-t pt-4">
@@ -106,8 +106,8 @@ const NGOCard = ({ ngo, isAdmin, handleDeleteNGO }: { ngo: NGO, isAdmin: boolean
                     {ngo.contact}
                 </a>
             )}
-            {/* 2. Official Email */}
-            {ngo.email && (
+            {/* 2. Official Email */}
+            {ngo.email && (
                 <a href={`mailto:${ngo.email}`} className="flex items-center gap-2 hover:text-pink-600 transition truncate">
                     <Mail className="h-4 w-4 text-pink-500 flex-shrink-0" />
                     {ngo.email}
@@ -125,13 +125,13 @@ const NGOCard = ({ ngo, isAdmin, handleDeleteNGO }: { ngo: NGO, isAdmin: boolean
                     Visit Website
                 </a>
             )}
-            {/* 4. Registration Number (Admin Only) */}
-            {isAdmin && ngo.registration_number && (
-                <div className="flex items-center gap-2 text-xs text-gray-500 pt-2 border-t mt-2">
-                    <Users className="h-3 w-3 flex-shrink-0" />
-                    Reg No: <span className="font-mono">{ngo.registration_number}</span>
-                </div>
-            )}
+            {/* 4. Registration Number (Admin Only) */}
+            {isAdmin && ngo.registration_number && (
+                <div className="flex items-center gap-2 text-xs text-gray-500 pt-2 border-t mt-2">
+                    <Users className="h-3 w-3 flex-shrink-0" />
+                    Reg No: <span className="font-mono">{ngo.registration_number}</span>
+                </div>
+            )}
         </div>
     </div>
 );
@@ -208,6 +208,7 @@ export default function Resources() {
     return matchesSearch && matchesCategory;
   });
 
+  // FIX: Only update UI after successful delete and handle rollback if error occurs
   const handleDeleteNGO = async (ngoId: string, ngoName: string) => {
     if (!window.confirm(`Delete "${ngoName}"? This cannot be undone.`)) return;
 
@@ -215,6 +216,7 @@ export default function Resources() {
     try {
       const ngoRef = doc(db, "ngos", ngoId);
       await deleteDoc(ngoRef);
+      // Only update UI after successful delete
       setNGOs((prev) => prev.filter((ngo) => ngo.id !== ngoId));
       toast.success(`${ngoName} deleted.`, { id: toastId });
     } catch (error) {

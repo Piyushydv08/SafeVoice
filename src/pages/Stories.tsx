@@ -499,7 +499,10 @@ export default function Stories() {
                     </button>
                   </div>
                   <div className="flex items-center space-x-2">
-                    <span className="text-xs italic">By Anon_{story.author_id?.slice(0, 6) || '...'}</span>
+                    {/* FIX: Ensure .slice is only called on strings */}
+                    <span className="text-xs italic">
+                      By Anon_{typeof story.author_id === 'string' ? story.author_id.slice(0, 6) : '...'}
+                    </span>
                     {/* Report Button */}
                     <button
                       onClick={() => handleReport(story.id)}
