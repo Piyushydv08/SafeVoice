@@ -9,6 +9,8 @@ export default function ContactPage() {
     body: ''
   });
 
+  const your_formspree_id = "paste-your-formspree-id-here";
+
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     setFormData({
       ...formData,
@@ -40,14 +42,14 @@ export default function ContactPage() {
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
         {/* Contact Form */}
-        <div className="bg-white rounded-2xl shadow-lg p-8 hover:shadow-2xl hover:scale-[1.01] transition duration-500">
+        <div className="bg-white rounded-2xl shadow-lg p-8 transition duration-500">
           <h2 className="text-3xl font-bold text-gray-900 mb-2">Send us a Message</h2>
           <p className="text-gray-600 mb-8">
             Fill out the form below and we'll get back to you as soon as possible.
           </p>
 
           <form 
-            action="https://formspree.io/f/{your-formspree-id}" 
+            action={`https://formspree.io/f/${your_formspree_id}`} 
             method="POST"
             onSubmit={handleSubmit}
             className="space-y-6"
@@ -119,7 +121,7 @@ export default function ContactPage() {
                   rows={6}
                   value={formData.body}
                   onChange={handleChange}
-                  className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-pink-500 focus:border-transparent transition-all duration-200 resize-none"
+                  className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-pink-500 focus:border-transparent transition-all duration-100 resize-none"
                   placeholder="Tell us how we can help you..."
                 />
               </div>
@@ -127,7 +129,7 @@ export default function ContactPage() {
 
             <button
               type="submit"
-              className="w-full bg-gradient-to-r from-pink-500 to-purple-600 text-white py-3 px-6 rounded-lg font-semibold shadow-lg hover:from-pink-600 hover:to-purple-700 transform hover:scale-[1.02] transition-all duration-200 flex items-center justify-center space-x-2"
+              className="w-full bg-gradient-to-r from-pink-500 to-purple-600 text-white py-3 px-6 rounded-lg font-semibold shadow-lg hover:from-pink-600 hover:to-purple-700 transform transition-all duration-200 flex items-center justify-center space-x-2"
             >
               <Send className="h-5 w-5" />
               <span>Send Message</span>
@@ -138,7 +140,7 @@ export default function ContactPage() {
         {/* Team Information */}
         <div className="space-y-8">
           {/* Team Members */}
-          <div className="bg-gradient-to-r from-pink-500 to-purple-600 text-white rounded-2xl shadow-lg p-8 transition-all duration-500 hover:scale-[1.02] hover:shadow-pink-400/40">
+          <div className="bg-gradient-to-r from-pink-500 to-purple-600 text-white rounded-2xl shadow-lg p-8 transition-all duration-500 hover:shadow-pink-400/40">
             <h2 className="text-3xl font-bold mb-6">Our Team</h2>
             <p className="text-lg mb-8 opacity-90">
               Meet the dedicated individuals behind SafeVoice who are committed to creating a safe space for women.
@@ -202,7 +204,7 @@ export default function ContactPage() {
           </div>
 
           {/* Additional Contact Info */}
-          <div className="bg-white rounded-2xl shadow-lg p-8 hover:shadow-2xl hover:scale-[1.01] transition duration-500">
+          <div className="bg-white rounded-2xl shadow-lg p-8 hover:shadow-2xl hover:scale-[1.01] transition duration-400">
             <h3 className="text-2xl font-bold text-gray-900 mb-4">Other Ways to Reach Us</h3>
             <div className="space-y-4">
               <div className="flex items-center space-x-3">
