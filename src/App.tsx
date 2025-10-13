@@ -14,6 +14,7 @@ import AdminDashboard from './pages/AdminDashboard';
 import FAQs from './pages/FAQs';
 import PrivacyPolicy from './pages/Privacypolicy';
 import Termsandconditions from './pages/termsandconditions';
+import ContactPage from './pages/ContactPage';
 
 
 
@@ -36,6 +37,7 @@ function App() {
             <Route path="/admin" element={<AdminDashboard />} />
             <Route path="/PrivacyPolicy" element={<PrivacyPolicy />} />
             <Route path="/termsandconditions" element={<Termsandconditions />} />
+            <Route path="/contact" element={<ContactPage />} />
 
           </Routes>
         </main>
