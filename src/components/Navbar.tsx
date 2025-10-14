@@ -25,16 +25,21 @@ export default function Navbar() {
       await auth.signOut();
       toast.success('Signed out successfully');
       navigate('/');
+      setIsMenuOpen(false);
     } catch (error) {
       console.error('Error signing out:', error);
       toast.error('Failed to sign out');
     }
   };
 
+  const handleLinkClick = () => {
+    setIsMenuOpen(false);
+  };
+
   const navLinks = [
     { to: '/', label: 'Home' },
     { to: '/stories', label: 'Stories' },
-    { to: '/share-story', label: 'Share your Story' },
+    { to: '/share-story', label: 'Share Story' },
     { to: '/resources', label: 'Resources' },
     { to: '/faqs', label: 'FAQs' },
     { to: '/about', label: 'About' },
@@ -42,20 +47,23 @@ export default function Navbar() {
 
   return (
     <nav className="fixed top-0 left-0 w-full z-50 bg-gradient-to-r from-pink-100 via-white to-pink-200 shadow-xl border-b border-pink-200 backdrop-blur-lg transition-all duration-300">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex justify-between h-16">
-          {/* Logo */}
-          <div className="flex items-center">
+      <div className="max-w-7xl mx-auto px-3 sm:px-4 lg:px-6">
+        <div className="flex justify-between items-center h-16 min-h-[4rem]">
+          {/* Logo - Optimized for mobile */}
+          <div className="flex items-center flex-shrink-0">
             <Link
               to="/"
-              className="flex items-center group transform transition-transform duration-300 hover:scale-110"
+              className="flex items-center group transform transition-transform duration-300 hover:scale-105"
+              onClick={handleLinkClick}
             >
-              <span className="relative">
+              <span className="relative flex items-center">
                 <Heart className="h-8 w-8 text-pink-500 animate-bounce drop-shadow-lg" />
                 <span className="absolute -top-2 -right-2 w-3 h-3 bg-pink-400 rounded-full animate-ping opacity-70"></span>
               </span>
               <div className="ml-2">
-                <span className="text-2xl font-extrabold text-pink-600 drop-shadow-sm tracking-wide font-serif">SafeVoice</span>
+                <span className="text-2xl font-extrabold text-pink-600 drop-shadow-sm tracking-wide font-serif">
+                  SafeVoice
+                </span>
                 <p className="text-xs text-gray-600 hidden md:block animate-fade-in italic font-light">
                   Your story. Your strength.
                 </p>
@@ -63,31 +71,36 @@ export default function Navbar() {
             </Link>
           </div>
 
-          {/* Desktop menu */}
-          <div className="hidden md:flex items-center space-x-4">
+          {/* Desktop menu - Updated breakpoint to 830px */}
+          <div className="hidden custom-lg:flex items-center space-x-1 xl:space-x-2">
             {navLinks.map(({ to, label }) => (
               <Link
                 key={to}
                 to={to}
-                className={`nav-link ${location.pathname === to ? 'active' : ''}`}
+                onClick={handleLinkClick}
+                className={`nav-link px-2 py-2 xl:text-base ${location.pathname === to ? 'active' : ''}`}
               >
                 {label}
               </Link>
             ))}
 
             {user ? (
-              <div className="relative flex items-center space-x-4">
+              <div className="flex items-center space-x-1 xl:space-x-2 ml-1">
                 {isAdmin && (
-                  <Link to="/admin" className={`admin-link ${location.pathname === '/admin' ? 'active-admin' : ''}`}>
-                    Admin Panel
+                  <Link
+                    to="/admin"
+                    onClick={handleLinkClick}
+                    className={`admin-link px-2 py-2 text-sm ${location.pathname === '/admin' ? 'active-admin' : ''}`}
+                  >
+                    Admin
                   </Link>
                 )}
-                <span className="text-gray-700 font-mono bg-pink-100 px-2 py-1 rounded shadow-inner">
-                  Anonymous_{user.uid.slice(0, 8)}
+                <span className="text-gray-700 font-mono bg-pink-100 px-2 py-1 rounded text-xs xl:text-sm shadow-inner max-w-[100px] xl:max-w-[120px] truncate">
+                  Anonymous_{user.uid.slice(0, 6)}
                 </span>
                 <button
                   onClick={handleSignOut}
-                  className="bg-gradient-to-r from-pink-500 to-pink-400 text-white px-4 py-2 rounded-md shadow-md hover:from-pink-600 hover:to-pink-500 transition-all duration-200 font-semibold"
+                  className="bg-gradient-to-r from-pink-500 to-pink-400 text-white px-2 py-2 rounded-md shadow-md hover:from-pink-600 hover:to-pink-500 transition-all duration-200 font-semibold text-sm whitespace-nowrap"
                 >
                   Sign Out
                 </button>
@@ -95,63 +108,91 @@ export default function Navbar() {
             ) : (
               <Link
                 to="/auth"
-                className={`bg-gradient-to-r from-pink-500 to-pink-400 text-white px-4 py-2 rounded-md shadow-md hover:from-pink-600 hover:to-pink-500 transition-all duration-200 font-semibold ${location.pathname === '/auth' ? 'ring-2 ring-pink-400' : ''}`}
+                onClick={handleLinkClick}
+                className={`bg-gradient-to-r from-pink-500 to-pink-400 text-white px-3 py-2 rounded-md shadow-md hover:from-pink-600 hover:to-pink-500 transition-all duration-200 font-semibold text-sm xl:text-base whitespace-nowrap ${location.pathname === '/auth' ? 'ring-2 ring-pink-400' : ''}`}
               >
                 Sign In
               </Link>
             )}
           </div>
 
-          {/* Mobile menu button */}
-          <div className="md:hidden flex items-center">
+          {/* Mobile menu button - Shows at 830px and below */}
+          <div className="custom-lg:hidden flex items-center">
             <button
               onClick={() => setIsMenuOpen(!isMenuOpen)}
-              className="text-pink-500 hover:text-pink-700 transition-colors duration-200"
+              className="text-pink-500 hover:text-pink-700 transition-colors duration-200 p-2 rounded-lg hover:bg-pink-50"
+              aria-label="Toggle menu"
             >
-              {isMenuOpen ? <X className="h-7 w-7" /> : <Menu className="h-7 w-7" />}
+              {isMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
             </button>
           </div>
         </div>
 
-        {/* Mobile menu */}
+        {/* Simplified Mobile Menu */}
         {isMenuOpen && (
-          <div className="md:hidden bg-white/90 rounded-lg shadow-lg mt-2 border border-pink-100 animate-fade-in-down">
-            <div className="px-2 pt-2 pb-3 space-y-1">
-              {navLinks.map(({ to, label }) => (
-                <Link
-                  key={to}
-                  to={to}
-                  className={`mobile-link ${location.pathname === to ? 'active-mobile' : ''}`}
-                >
-                  {label}
-                </Link>
-              ))}
-
-              {user ? (
-                <>
-                  {isAdmin && (
-                    <Link to="/admin" className={`mobile-admin-link ${location.pathname === '/admin' ? 'active-admin' : ''}`}>
-                      Admin Panel
-                    </Link>
-                  )}
-                  <span className="block text-gray-700 px-3 py-2 font-mono bg-pink-100 rounded shadow-inner">
-                    Anonymous_{user.uid.slice(0, 8)}
-                  </span>
-                  <button
-                    onClick={handleSignOut}
-                    className="block w-full text-left text-pink-600 hover:text-pink-800 px-3 py-2 rounded-md font-semibold"
+          <div className="custom-lg:hidden fixed inset-0 top-16 z-40 animate-fade-in bg-white">
+            <div className="flex flex-col h-full w-full bg-white">
+              {/* Navigation Links - Simplified */}
+              <div className="flex-1 px-4 pt-4 space-y-1 bg-white">
+                {navLinks.map(({ to, label }) => (
+                  <Link
+                    key={to}
+                    to={to}
+                    onClick={handleLinkClick}
+                    className={`block w-full text-left px-4 py-3 rounded-lg text-base font-medium transition-all duration-200 ${
+                      location.pathname === to 
+                        ? 'bg-pink-500 text-white shadow-sm' 
+                        : 'text-gray-700 hover:bg-pink-50'
+                    }`}
                   >
-                    Sign Out
-                  </button>
-                </>
-              ) : (
-                <Link
-                  to="/auth"
-                  className={`block text-white bg-gradient-to-r from-pink-500 to-pink-400 hover:from-pink-600 hover:to-pink-500 px-3 py-2 rounded-md font-semibold shadow ${location.pathname === '/auth' ? 'ring-2 ring-pink-400' : ''}`}
-                >
-                  Sign In
-                </Link>
-              )}
+                    {label}
+                  </Link>
+                ))}
+              </div>
+
+              {/* User Section */}
+              <div className="px-4 space-y-3 border-t border-gray-200 pt-4 pb-6 bg-white">
+                {user ? (
+                  <>
+                    {isAdmin && (
+                      <Link 
+                        to="/admin" 
+                        onClick={handleLinkClick}
+                        className={`block w-full text-left px-4 py-3 rounded-lg text-base font-medium transition-all duration-200 ${
+                          location.pathname === '/admin'
+                            ? 'bg-amber-500 text-white shadow-sm'
+                            : 'text-gray-700 hover:bg-amber-50'
+                        }`}
+                      >
+                        Admin
+                      </Link>
+                    )}
+                    
+                    <div className="px-4 py-2 bg-gray-100 rounded-lg">
+                      <p className="text-gray-600 font-mono text-sm break-all">
+                        Anonymous_{user.uid.slice(0, 8)}
+                      </p>
+                    </div>
+                    
+                    <button
+                      onClick={handleSignOut}
+                      className="w-full bg-pink-500 text-white px-4 py-3 rounded-lg font-medium text-base hover:bg-pink-600 transition-all duration-200"
+                    >
+                      Sign Out
+                    </button>
+                  </>
+                ) : (
+                  <Link
+                    to="/auth"
+                    onClick={handleLinkClick}
+                    className={`block w-full text-center bg-pink-500 text-white px-4 py-3 rounded-lg font-medium text-base hover:bg-pink-600 transition-all duration-200 ${
+                      location.pathname === '/auth' ? 'ring-2 ring-pink-300' : ''
+                    }`}
+                  >
+                    Sign In
+                  </Link>
+                )}
+              </div>
             </div>
           </div>
         )}
@@ -163,34 +204,66 @@ export default function Navbar() {
           position: relative;
           color: #be185d;
           font-weight: 500;
-          padding: 0.5rem 1rem;
-          border-radius: 0.375rem;
-          transition: all 0.2s;
+          border-radius: 0.75rem;
+          transition: all 0.3s ease;
+          white-space: nowrap;
         }
         .nav-link:hover {
           background: linear-gradient(90deg, #f9a8d4 0%, #f472b6 100%);
           color: #fff;
+          transform: translateY(-1px);
         }
         .nav-link.active {
           background: linear-gradient(90deg, #ec4899 0%, #db2777 100%);
           color: white;
-          box-shadow: 0 2px 10px #ec489966;
+          box-shadow: 0 4px 15px #ec489966;
         }
 
-        .mobile-link.active-mobile {
-          background: linear-gradient(90deg, #ec4899 0%, #db2777 100%);
+        .admin-link {
+          position: relative;
+          color: #d97706;
+          font-weight: 500;
+          border-radius: 0.75rem;
+          transition: all 0.3s ease;
+          white-space: nowrap;
+        }
+        .admin-link:hover {
+          background: linear-gradient(90deg, #fbbf24 0%, #f59e0b 100%);
+          color: #fff;
+          transform: translateY(-1px);
+        }
+        .admin-link.active-admin {
+          background: linear-gradient(90deg, #f59e0b 0%, #d97706 100%);
           color: white;
-          font-weight: 600;
+          box-shadow: 0 4px 15px #fbbf2433;
         }
 
-        .admin-link.active-admin,
-        .mobile-admin-link.active-admin {
-          background: linear-gradient(90deg, #f59e42 0%, #d97706 100%);
-          color: white;
-          box-shadow: 0 2px 10px #fbbf2433;
+        /* Custom breakpoint for 830px */
+        @media (min-width: 830px) {
+          .custom-lg\\:flex {
+            display: flex !important;
+          }
+          .custom-lg\\:hidden {
+            display: none !important;
+          }
         }
-      `}</style>
+
+        /* Mobile animations */
+        @keyframes fade-in {
+          from { opacity: 0; transform: translateY(-10px); }
+          to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .animate-fade-in {
+          animation: fade-in 0.3s ease-out;
+        }
+
+        /* Backdrop for mobile menu */
+        .backdrop-blur-lg {
+          backdrop-filter: blur(16px);
+        }
+      `}
+      </style>
     </nav>
   );
 }
-
