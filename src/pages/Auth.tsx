@@ -195,35 +195,35 @@ export default function Auth() {
   }, [navigate]);
 
   return (
-    <div className="min-h-screen bg-gray-50 flex flex-col justify-center py-12 mt-10 sm:px-6 lg:px-8">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex flex-col justify-center py-12 mt-10 sm:px-6 lg:px-8">
       <div className="sm:mx-auto sm:w-full sm:max-w-md">
-        <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
+        <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900 dark:text-white">
           {isSignUp ? 'Sign Up for SafeVoice' : 'Sign In to SafeVoice'}
         </h2>
-        <p className="mt-2 text-center text-sm text-gray-600">
+        <p className="mt-2 text-center text-sm text-gray-600 dark:text-gray-400">
           {isSignUp
             ? 'Already have an account?'
             : "Don't have an account?"}{' '}
           <button
             type="button"
             onClick={() => setIsSignUp(!isSignUp)}
-            className="font-medium text-pink-600 hover:text-pink-500"
+            className="font-medium text-pink-600 hover:text-pink-500 dark:text-pink-400 dark:hover:text-pink-300"
           >
             {isSignUp ? 'Sign In' : 'Sign Up'}
           </button>
         </p>
       </div>
       <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
-        <div className="bg-white py-8 px-4 shadow sm:rounded-lg sm:px-10">
+        <div className="bg-white dark:bg-gray-800 py-8 px-4 shadow sm:rounded-lg sm:px-10">
           {/* Authentication method tabs */}
-          <div className="flex justify-center mb-6 border-b border-gray-200">
+          <div className="flex justify-center mb-6 border-b border-gray-200 dark:border-gray-700">
             <button
               type="button"
               onClick={() => setAuthMethod('email')}
               className={`px-4 py-2 flex items-center ${
                 authMethod === 'email' 
-                  ? 'border-b-2 border-pink-500 text-pink-600'
-                  : 'text-gray-500 hover:text-gray-700'
+                  ? 'border-b-2 border-pink-500 text-pink-600 dark:text-pink-400'
+                  : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300'
               }`}
             >
               <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-1" viewBox="0 0 20 20" fill="currentColor">
@@ -237,8 +237,8 @@ export default function Auth() {
               onClick={() => setAuthMethod('google')}
               className={`px-4 py-2 flex items-center ${
                 authMethod === 'google' 
-                  ? 'border-b-2 border-pink-500 text-pink-600'
-                  : 'text-gray-500 hover:text-gray-700'
+                  ? 'border-b-2 border-pink-500 text-pink-600 dark:text-pink-400'
+                  : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300'
               }`}
             >
               <svg className="h-5 w-5 mr-1" viewBox="0 0 24 24">
@@ -255,7 +255,7 @@ export default function Auth() {
             {authMethod === 'email' && (
               <form onSubmit={isSignUp ? handleSignUp : handleSignIn} className="space-y-4">
                 <div>
-                  <label htmlFor="email" className="block text-sm font-medium text-gray-700">
+                  <label htmlFor="email" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
                     Email
                   </label>
                   <input
@@ -263,12 +263,12 @@ export default function Auth() {
                     id="email"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
-                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-pink-500 focus:ring-pink-500"
+                    className="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 shadow-sm focus:border-pink-500 focus:ring-pink-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
                     required
                   />
                 </div>
                 <div>
-                  <label htmlFor="password" className="block text-sm font-medium text-gray-700">
+                  <label htmlFor="password" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
                     Password
                   </label>
                   <div className="relative">
@@ -278,13 +278,13 @@ export default function Auth() {
                       id="password"
                       value={password}
                       onChange={(e) => setPassword(e.target.value)}
-                      className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-pink-500 focus:ring-pink-500 pr-10" // ⭐ ADDED pr-10
+                      className="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 shadow-sm focus:border-pink-500 focus:ring-pink-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white pr-10" // ⭐ ADDED pr-10
                       required
                     />
                     <button
                       type="button"
                       onClick={() => setShowPassword((prev) => !prev)} //  ADDED
-                      className="absolute inset-y-0 right-2 flex items-center text-gray-500"
+                      className="absolute inset-y-0 right-2 flex items-center text-gray-500 dark:text-gray-400"
                     >
                       {showPassword ? "🙈" : "👁️"} {/* simple toggle icon */}
                     </button>
@@ -293,18 +293,18 @@ export default function Auth() {
                   {/* ⭐ ADDED: live password feedback */}
                   {isSignUp && (
                     <ul className="mt-2 text-sm space-y-1">
-                      <li className={passwordChecks.length ? "text-green-600" : "text-red-600"}>• Minimum 8 characters</li>
-                      <li className={passwordChecks.upper ? "text-green-600" : "text-red-600"}>• At least one uppercase letter</li>
-                      <li className={passwordChecks.lower ? "text-green-600" : "text-red-600"}>• At least one lowercase letter</li>
-                      <li className={passwordChecks.number ? "text-green-600" : "text-red-600"}>• At least one number</li>
-                      <li className={passwordChecks.special ? "text-green-600" : "text-red-600"}>• At least one special character</li>
+                      <li className={passwordChecks.length ? "text-green-600 dark:text-green-400" : "text-red-600 dark:text-red-400"}>• Minimum 8 characters</li>
+                      <li className={passwordChecks.upper ? "text-green-600 dark:text-green-400" : "text-red-600 dark:text-red-400"}>• At least one uppercase letter</li>
+                      <li className={passwordChecks.lower ? "text-green-600 dark:text-green-400" : "text-red-600 dark:text-red-400"}>• At least one lowercase letter</li>
+                      <li className={passwordChecks.number ? "text-green-600 dark:text-green-400" : "text-red-600 dark:text-red-400"}>• At least one number</li>
+                      <li className={passwordChecks.special ? "text-green-600 dark:text-green-400" : "text-red-600 dark:text-red-400"}>• At least one special character</li>
                     </ul>
                   )}
                 </div>
 
                 <button
                   type="submit"
-                  className="w-full bg-pink-500 text-white px-4 py-2 rounded-md hover:bg-pink-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-pink-500"
+                  className="w-full bg-pink-500 text-white px-4 py-2 rounded-md hover:bg-pink-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-pink-500 disabled:opacity-50"
                   disabled={loading}
                 >
                   {loading ? (isSignUp ? 'Signing up...' : 'Signing in...') : isSignUp ? 'Sign Up' : 'Sign In'}
@@ -315,7 +315,7 @@ export default function Auth() {
                     <button
                       type="button"
                       onClick={handleForgotPassword}
-                      className="text-sm font-medium text-pink-600 hover:text-pink-500"
+                      className="text-sm font-medium text-pink-600 hover:text-pink-500 dark:text-pink-400 dark:hover:text-pink-300"
                     >
                       Forgot Password?
                     </button>
@@ -327,14 +327,14 @@ export default function Auth() {
             {/* Google Sign-In */}
             {authMethod === 'google' && (
               <div className="text-center">
-                <p className="mb-4 text-sm text-gray-600">
+                <p className="mb-4 text-sm text-gray-600 dark:text-gray-400">
                   Click the button below to {isSignUp ? 'sign up' : 'sign in'} with your Google account
                 </p>
                 <button
                   type="button"
                   onClick={handleGoogleSignIn}
                   disabled={loading}
-                  className="w-full inline-flex justify-center items-center py-2 px-4 border border-gray-300 rounded-md shadow-sm bg-white text-sm font-medium text-gray-500 hover:bg-gray-50"
+                  className="w-full inline-flex justify-center items-center py-2 px-4 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm bg-white dark:bg-gray-700 text-sm font-medium text-gray-500 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-600 disabled:opacity-50"
                 >
                   <svg className="h-5 w-5 mr-2" viewBox="0 0 24 24">
                     <path
@@ -347,13 +347,13 @@ export default function Auth() {
                 
                 {/* Add Google Password Reset Note */}
                 {!isSignUp && (
-                  <div className="mt-4 text-sm text-gray-600">
+                  <div className="mt-4 text-sm text-gray-600 dark:text-gray-400">
                     <p>Forgot your Google password?</p>
                     <a 
                       href="https://accounts.google.com/signin/recovery" 
                       target="_blank" 
                       rel="noopener noreferrer"
-                      className="text-pink-600 hover:text-pink-500"
+                      className="text-pink-600 hover:text-pink-500 dark:text-pink-400 dark:hover:text-pink-300"
                     >
                       Reset it on Google's website
                     </a>

@@ -236,15 +236,15 @@ export default function AdminDashboard() {
   };
 
   if (loading) {
-    return <div className="text-center p-10">Loading Admin Panel...</div>;
+    return <div className="text-center p-10 text-gray-900 dark:text-white">Loading Admin Panel...</div>;
   }
 
   if (!isAuthorized) {
     return (
-      <div className="text-center p-10 max-w-md mx-auto">
+      <div className="text-center p-10 max-w-md mx-auto bg-white dark:bg-gray-900">
         <Shield className="h-16 w-16 text-red-500 mx-auto mb-4" />
-        <h1 className="text-2xl font-bold text-red-600">Access Denied</h1>
-        <p className="text-gray-600 mt-2">You do not have permission to view this page. Please sign in with an admin account.</p>
+        <h1 className="text-2xl font-bold text-red-600 dark:text-red-500">Access Denied</h1>
+        <p className="text-gray-600 dark:text-gray-300 mt-2">You do not have permission to view this page. Please sign in with an admin account.</p>
         <button onClick={() => navigate('/auth')} className="mt-6 bg-pink-500 text-white px-6 py-2 rounded-md hover:bg-pink-600">
           Sign In
         </button>
@@ -253,23 +253,23 @@ export default function AdminDashboard() {
   }
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-      <h1 className="text-3xl font-bold text-gray-900 mb-8">Admin Dashboard</h1>
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 bg-white dark:bg-gray-900 min-h-screen">
+      <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-8">Admin Dashboard</h1>
 
       {/* Pending Requests Section */}
       <section className="mb-16">
-        <h2 className="text-2xl font-semibold text-gray-800 mb-6">Pending NGO Requests</h2>
+        <h2 className="text-2xl font-semibold text-gray-800 dark:text-white mb-6">Pending NGO Requests</h2>
         {pendingNGOs.length === 0 ? (
-          <p className="text-gray-500 bg-white p-6 rounded-lg shadow-md">No pending requests.</p>
+          <p className="text-gray-500 dark:text-gray-400 bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md">No pending requests.</p>
         ) : (
           <div className="space-y-6">
             {pendingNGOs.map(ngo => (
-              <div key={ngo.id} className="bg-white rounded-lg shadow-md p-6 border border-gray-100">
-                <h3 className="text-lg font-semibold text-gray-800 mb-2">{ngo.name}</h3>
-                <p className="text-gray-600 text-sm mb-3">{ngo.description}</p>
-                <p className="text-gray-700 text-sm"><strong>Contact:</strong> {ngo.contact}</p>
-                <p className="text-gray-700 text-sm"><strong>Email:</strong> {ngo.email}</p>
-                <p className="text-gray-700 text-sm"><strong>Registration #:</strong> {ngo.registration_number}</p>
+              <div key={ngo.id} className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6 border border-gray-100 dark:border-gray-700">
+                <h3 className="text-lg font-semibold text-gray-800 dark:text-white mb-2">{ngo.name}</h3>
+                <p className="text-gray-600 dark:text-gray-300 text-sm mb-3">{ngo.description}</p>
+                <p className="text-gray-700 dark:text-gray-300 text-sm"><strong>Contact:</strong> {ngo.contact}</p>
+                <p className="text-gray-700 dark:text-gray-300 text-sm"><strong>Email:</strong> {ngo.email}</p>
+                <p className="text-gray-700 dark:text-gray-300 text-sm"><strong>Registration #:</strong> {ngo.registration_number}</p>
                 <div className="mt-4 flex space-x-4">
                   <button onClick={() => handleApprove(ngo)} className="inline-flex items-center bg-green-500 text-white px-4 py-2 rounded-md hover:bg-green-600">
                     <CheckCircle className="h-5 w-5 mr-2" /> Approve
@@ -286,19 +286,19 @@ export default function AdminDashboard() {
 
 
       {/* Approved NGOs Section */}
-      <section>
-        <h2 className="text-2xl font-semibold text-gray-800 mb-6">Approved NGOs</h2>
+      <section className="mb-16">
+        <h2 className="text-2xl font-semibold text-gray-800 dark:text-white mb-6">Approved NGOs</h2>
         {approvedNGOs.length === 0 ? (
-          <p className="text-gray-500 bg-white p-6 rounded-lg shadow-md">No approved NGOs yet.</p>
+          <p className="text-gray-500 dark:text-gray-400 bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md">No approved NGOs yet.</p>
         ) : (
           <div className="space-y-6">
             {approvedNGOs.map(ngo => (
-              <div key={ngo.id} className="bg-white rounded-lg shadow-md p-6 border border-gray-100">
-                <h3 className="text-lg font-semibold text-gray-800 mb-2">{ngo.name}</h3>
-                <p className="text-gray-600 text-sm mb-3">{ngo.description}</p>
-                <p className="text-gray-700 text-sm"><strong>Contact:</strong> {ngo.contact}</p>
-                <p className="text-gray-700 text-sm"><strong>Email:</strong> {ngo.email}</p>
-                <p className="text-gray-500 text-xs mt-2">
+              <div key={ngo.id} className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6 border border-gray-100 dark:border-gray-700">
+                <h3 className="text-lg font-semibold text-gray-800 dark:text-white mb-2">{ngo.name}</h3>
+                <p className="text-gray-600 dark:text-gray-300 text-sm mb-3">{ngo.description}</p>
+                <p className="text-gray-700 dark:text-gray-300 text-sm"><strong>Contact:</strong> {ngo.contact}</p>
+                <p className="text-gray-700 dark:text-gray-300 text-sm"><strong>Email:</strong> {ngo.email}</p>
+                <p className="text-gray-500 dark:text-gray-400 text-xs mt-2">
                   Approved by {ngo.approved_by} on {ngo.approved_at ? new Date(ngo.approved_at.seconds * 1000).toLocaleDateString() : 'N/A'}
                 </p>
                 <div className="mt-4 flex space-x-4">
@@ -317,20 +317,20 @@ export default function AdminDashboard() {
 
       {/* Story Moderation Section */}
       <section>
-        <h2 className="text-2xl font-semibold text-gray-800 mb-6">Story Moderation</h2>
+        <h2 className="text-2xl font-semibold text-gray-800 dark:text-white mb-6">Story Moderation</h2>
         {stories.length === 0 ? (
-          <p className="text-gray-500 bg-white p-6 rounded-lg shadow-md">No stories to moderate.</p>
+          <p className="text-gray-500 dark:text-gray-400 bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md">No stories to moderate.</p>
         ) : (
           <div className="space-y-6">
             {stories.map(story => (
-              <div key={story.id} className="bg-white rounded-lg shadow-md p-6 border border-gray-100">
+              <div key={story.id} className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6 border border-gray-100 dark:border-gray-700">
                 <div className="flex justify-between items-start">
                   <div>
-                    <h3 className="text-lg font-semibold text-gray-800 mb-2">{story.title}</h3>
-                    <p className="text-gray-600 text-sm mb-3 max-h-24 overflow-y-auto">{story.content}</p>
+                    <h3 className="text-lg font-semibold text-gray-800 dark:text-white mb-2">{story.title}</h3>
+                    <p className="text-gray-600 dark:text-gray-300 text-sm mb-3 max-h-24 overflow-y-auto">{story.content}</p>
                   </div>
                   {story.reportCount && story.reportCount > 0 && (
-                    <div className="flex-shrink-0 ml-4 text-sm inline-flex items-center bg-yellow-100 text-yellow-800 px-2.5 py-1 rounded-full">
+                    <div className="flex-shrink-0 ml-4 text-sm inline-flex items-center bg-yellow-100 dark:bg-yellow-900 text-yellow-800 dark:text-yellow-200 px-2.5 py-1 rounded-full">
                       <Flag className="h-4 w-4 mr-1.5" />
                       {story.reportCount} {story.reportCount === 1 ? 'Report' : 'Reports'}
                     </div>

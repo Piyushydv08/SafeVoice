@@ -3,14 +3,14 @@ import { Shield, Eye, Lock, Users, AlertTriangle, FileText } from 'lucide-react'
 
 export default function PrivacyPolicy() {
   return (
-    <div className="max-w-7xl mx-auto mt-20 px-4 sm:px-6 lg:px-8 py-8">
+    <div className="max-w-7xl mx-auto mt-20 px-4 sm:px-6 lg:px-8 py-8 bg-white dark:bg-gray-900">
       <div className="text-center mb-12">
         <Shield className="h-16 w-16 text-pink-500 mx-auto mb-4" />
-        <h1 className="text-4xl font-bold text-gray-900 mb-4">Privacy Policy</h1>
-        <p className="text-xl text-gray-600">
+        <h1 className="text-4xl font-bold text-gray-900 dark:text-white mb-4">Privacy Policy</h1>
+        <p className="text-xl text-gray-600 dark:text-gray-300">
           Your privacy and safety are our highest priorities
         </p>
-        <p className="text-sm text-gray-500 mt-2">
+        <p className="text-sm text-gray-500 dark:text-gray-400 mt-2">
           Last updated: September 28, 2025
         </p>
       </div>
@@ -32,35 +32,35 @@ export default function PrivacyPolicy() {
 
       {/* Quick Overview */}
       <section className="mb-12">
-        <h2 className="text-2xl font-bold text-gray-900 mb-6">Privacy at a Glance</h2>
+        <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">Privacy at a Glance</h2>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          <div className="bg-white rounded-lg shadow-md p-6">
+          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6">
             <Eye className="h-8 w-8 text-blue-500 mb-3" />
-            <h3 className="font-semibold mb-2">What We Collect</h3>
-            <p className="text-gray-600 text-sm">Only essential information needed to provide our services and ensure safety</p>
+            <h3 className="font-semibold mb-2 dark:text-white">What We Collect</h3>
+            <p className="text-gray-600 dark:text-gray-300 text-sm">Only essential information needed to provide our services and ensure safety</p>
           </div>
-          <div className="bg-white rounded-lg shadow-md p-6">
+          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6">
             <Lock className="h-8 w-8 text-green-500 mb-3" />
-            <h3 className="font-semibold mb-2">How We Protect</h3>
-            <p className="text-gray-600 text-sm">Industry-standard encryption and security measures to safeguard your data</p>
+            <h3 className="font-semibold mb-2 dark:text-white">How We Protect</h3>
+            <p className="text-gray-600 dark:text-gray-300 text-sm">Industry-standard encryption and security measures to safeguard your data</p>
           </div>
-          <div className="bg-white rounded-lg shadow-md p-6">
+          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6">
             <Users className="h-8 w-8 text-purple-500 mb-3" />
-            <h3 className="font-semibold mb-2">Who Can Access</h3>
-            <p className="text-gray-600 text-sm">Strict access controls ensure only authorized personnel can view your information</p>
+            <h3 className="font-semibold mb-2 dark:text-white">Who Can Access</h3>
+            <p className="text-gray-600 dark:text-gray-300 text-sm">Strict access controls ensure only authorized personnel can view your information</p>
           </div>
         </div>
       </section>
 
       {/* Information We Collect */}
       <section className="mb-12">
-        <div className="bg-white rounded-lg shadow-md p-8">
-          <h2 className="text-2xl font-bold text-gray-900 mb-6">Information We Collect</h2>
+        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-8">
+          <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">Information We Collect</h2>
           
           <div className="space-y-6">
             <div>
-              <h3 className="text-lg font-semibold text-gray-800 mb-2">Account Information</h3>
-              <ul className="text-gray-600 space-y-1 ml-4">
+              <h3 className="text-lg font-semibold text-gray-800 dark:text-white mb-2">Account Information</h3>
+              <ul className="text-gray-600 dark:text-gray-300 space-y-1 ml-4">
                 <li>• Email address (for account creation and communication)</li>
                 <li>• Username or display name (can be anonymous/pseudonymous)</li>
                 <li>• Password (encrypted and never stored in plain text)</li>
@@ -69,8 +69,8 @@ export default function PrivacyPolicy() {
             </div>
 
             <div>
-              <h3 className="text-lg font-semibold text-gray-800 mb-2">Content You Share</h3>
-              <ul className="text-gray-600 space-y-1 ml-4">
+              <h3 className="text-lg font-semibold text-gray-800 dark:text-white mb-2">Content You Share</h3>
+              <ul className="text-gray-600 dark:text-gray-300 space-y-1 ml-4">
                 <li>• Stories and experiences you post</li>
                 <li>• Comments and support messages</li>
                 <li>• Any additional content you voluntarily share</li>
@@ -78,8 +78,8 @@ export default function PrivacyPolicy() {
             </div>
 
             <div>
-              <h3 className="text-lg font-semibold text-gray-800 mb-2">Technical Information</h3>
-              <ul className="text-gray-600 space-y-1 ml-4">
+              <h3 className="text-lg font-semibold text-gray-800 dark:text-white mb-2">Technical Information</h3>
+              <ul className="text-gray-600 dark:text-gray-300 space-y-1 ml-4">
                 <li>• IP address and location data (for security purposes)</li>
                 <li>• Browser type and device information</li>
                 <li>• Usage patterns and interaction data</li>
@@ -92,29 +92,29 @@ export default function PrivacyPolicy() {
 
       {/* How We Use Information */}
       <section className="mb-12">
-        <div className="bg-white rounded-lg shadow-md p-8">
-          <h2 className="text-2xl font-bold text-gray-900 mb-6">How We Use Your Information</h2>
+        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-8">
+          <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">How We Use Your Information</h2>
           
           <div className="space-y-4">
             <div className="flex items-start">
               <div className="flex-shrink-0 w-2 h-2 bg-pink-500 rounded-full mt-2 mr-3"></div>
-              <p className="text-gray-600"><strong>Platform Operations:</strong> To provide, maintain, and improve our services</p>
+              <p className="text-gray-600 dark:text-gray-300"><strong>Platform Operations:</strong> To provide, maintain, and improve our services</p>
             </div>
             <div className="flex items-start">
               <div className="flex-shrink-0 w-2 h-2 bg-pink-500 rounded-full mt-2 mr-3"></div>
-              <p className="text-gray-600"><strong>Safety & Security:</strong> To protect users from harassment, spam, and abuse</p>
+              <p className="text-gray-600 dark:text-gray-300"><strong>Safety & Security:</strong> To protect users from harassment, spam, and abuse</p>
             </div>
             <div className="flex items-start">
               <div className="flex-shrink-0 w-2 h-2 bg-pink-500 rounded-full mt-2 mr-3"></div>
-              <p className="text-gray-600"><strong>Communication:</strong> To send important updates, safety alerts, and support resources</p>
+              <p className="text-gray-600 dark:text-gray-300"><strong>Communication:</strong> To send important updates, safety alerts, and support resources</p>
             </div>
             <div className="flex items-start">
               <div className="flex-shrink-0 w-2 h-2 bg-pink-500 rounded-full mt-2 mr-3"></div>
-              <p className="text-gray-600"><strong>Legal Compliance:</strong> To comply with applicable laws and respond to legal requests</p>
+              <p className="text-gray-600 dark:text-gray-300"><strong>Legal Compliance:</strong> To comply with applicable laws and respond to legal requests</p>
             </div>
             <div className="flex items-start">
               <div className="flex-shrink-0 w-2 h-2 bg-pink-500 rounded-full mt-2 mr-3"></div>
-              <p className="text-gray-600"><strong>Community Building:</strong> To foster a supportive and safe environment</p>
+              <p className="text-gray-600 dark:text-gray-300"><strong>Community Building:</strong> To foster a supportive and safe environment</p>
             </div>
           </div>
         </div>
@@ -149,24 +149,24 @@ export default function PrivacyPolicy() {
 
       {/* Sharing and Disclosure */}
       <section className="mb-12">
-        <div className="bg-white rounded-lg shadow-md p-8">
-          <h2 className="text-2xl font-bold text-gray-900 mb-6">When We Share Information</h2>
+        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-8">
+          <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">When We Share Information</h2>
           
-          <div className="bg-red-50 border-l-4 border-red-500 p-4 mb-6">
+          <div className="bg-red-50 dark:bg-red-900/20 border-l-4 border-red-500 p-4 mb-6">
             <div className="flex">
               <AlertTriangle className="h-5 w-5 text-red-500 mr-2 flex-shrink-0 mt-0.5" />
               <div>
-                <h3 className="text-red-800 font-semibold">We Never Sell Your Data</h3>
-                <p className="text-red-700 text-sm">SafeVoice will never sell, rent, or trade your personal information to third parties for commercial purposes.</p>
+                <h3 className="text-red-800 dark:text-red-300 font-semibold">We Never Sell Your Data</h3>
+                <p className="text-red-700 dark:text-red-300 text-sm">SafeVoice will never sell, rent, or trade your personal information to third parties for commercial purposes.</p>
               </div>
             </div>
           </div>
 
           <div className="space-y-4">
             <div>
-              <h3 className="text-lg font-semibold text-gray-800 mb-2">Limited Sharing Scenarios</h3>
-              <p className="text-gray-600 mb-3">We may share information only in these specific circumstances:</p>
-              <ul className="text-gray-600 space-y-2 ml-4">
+              <h3 className="text-lg font-semibold text-gray-800 dark:text-white mb-2">Limited Sharing Scenarios</h3>
+              <p className="text-gray-600 dark:text-gray-300 mb-3">We may share information only in these specific circumstances:</p>
+              <ul className="text-gray-600 dark:text-gray-300 space-y-2 ml-4">
                 <li>• <strong>With Your Consent:</strong> When you explicitly agree to share information</li>
                 <li>• <strong>Legal Requirements:</strong> When required by law, court order, or legal process</li>
                 <li>• <strong>Safety Emergencies:</strong> To prevent immediate harm to you or others</li>
@@ -180,36 +180,36 @@ export default function PrivacyPolicy() {
 
       {/* Your Rights */}
       <section className="mb-12">
-        <div className="bg-white rounded-lg shadow-md p-8">
-          <h2 className="text-2xl font-bold text-gray-900 mb-6">Your Privacy Rights</h2>
+        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-8">
+          <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">Your Privacy Rights</h2>
           
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div className="space-y-4">
               <div>
-                <h3 className="font-semibold text-gray-800">Access & Control</h3>
-                <p className="text-gray-600 text-sm">View and update your personal information anytime</p>
+                <h3 className="font-semibold text-gray-800 dark:text-white">Access & Control</h3>
+                <p className="text-gray-600 dark:text-gray-300 text-sm">View and update your personal information anytime</p>
               </div>
               <div>
-                <h3 className="font-semibold text-gray-800">Data Portability</h3>
-                <p className="text-gray-600 text-sm">Request a copy of your data in a portable format</p>
+                <h3 className="font-semibold text-gray-800 dark:text-white">Data Portability</h3>
+                <p className="text-gray-600 dark:text-gray-300 text-sm">Request a copy of your data in a portable format</p>
               </div>
               <div>
-                <h3 className="font-semibold text-gray-800">Deletion Rights</h3>
-                <p className="text-gray-600 text-sm">Request deletion of your account and associated data</p>
+                <h3 className="font-semibold text-gray-800 dark:text-white">Deletion Rights</h3>
+                <p className="text-gray-600 dark:text-gray-300 text-sm">Request deletion of your account and associated data</p>
               </div>
             </div>
             <div className="space-y-4">
               <div>
-                <h3 className="font-semibold text-gray-800">Communication Preferences</h3>
-                <p className="text-gray-600 text-sm">Control what communications you receive from us</p>
+                <h3 className="font-semibold text-gray-800 dark:text-white">Communication Preferences</h3>
+                <p className="text-gray-600 dark:text-gray-300 text-sm">Control what communications you receive from us</p>
               </div>
               <div>
-                <h3 className="font-semibold text-gray-800">Anonymity Options</h3>
-                <p className="text-gray-600 text-sm">Use pseudonyms and control your visibility</p>
+                <h3 className="font-semibold text-gray-800 dark:text-white">Anonymity Options</h3>
+                <p className="text-gray-600 dark:text-gray-300 text-sm">Use pseudonyms and control your visibility</p>
               </div>
               <div>
-                <h3 className="font-semibold text-gray-800">Correction Rights</h3>
-                <p className="text-gray-600 text-sm">Request correction of inaccurate information</p>
+                <h3 className="font-semibold text-gray-800 dark:text-white">Correction Rights</h3>
+                <p className="text-gray-600 dark:text-gray-300 text-sm">Request correction of inaccurate information</p>
               </div>
             </div>
           </div>
@@ -218,15 +218,15 @@ export default function PrivacyPolicy() {
 
       {/* Data Retention */}
       <section className="mb-12">
-        <div className="bg-white rounded-lg shadow-md p-8">
-          <h2 className="text-2xl font-bold text-gray-900 mb-6">Data Retention</h2>
+        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-8">
+          <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">Data Retention</h2>
           <div className="space-y-4">
-            <p className="text-gray-600">
+            <p className="text-gray-600 dark:text-gray-300">
               We retain your personal information only for as long as necessary to provide our services and fulfill the purposes outlined in this policy.
             </p>
-            <div className="bg-gray-50 p-4 rounded-lg">
-              <h3 className="font-semibold text-gray-800 mb-2">Retention Periods</h3>
-              <ul className="text-gray-600 space-y-1">
+            <div className="bg-gray-50 dark:bg-gray-700 p-4 rounded-lg">
+              <h3 className="font-semibold text-gray-800 dark:text-white mb-2">Retention Periods</h3>
+              <ul className="text-gray-600 dark:text-gray-300 space-y-1">
                 <li>• <strong>Active accounts:</strong> Data retained while account is active</li>
                 <li>• <strong>Inactive accounts:</strong> Deleted after 2 years of inactivity</li>
                 <li>• <strong>Deleted accounts:</strong> Most data deleted within 30 days</li>
@@ -239,24 +239,24 @@ export default function PrivacyPolicy() {
 
       {/* Cookies and Tracking */}
       <section className="mb-12">
-        <div className="bg-white rounded-lg shadow-md p-8">
-          <h2 className="text-2xl font-bold text-gray-900 mb-6">Cookies and Tracking</h2>
+        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-8">
+          <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">Cookies and Tracking</h2>
           <div className="space-y-4">
-            <p className="text-gray-600">
+            <p className="text-gray-600 dark:text-gray-300">
               We use cookies and similar technologies to enhance your experience and ensure platform security.
             </p>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <div className="bg-gray-50 p-4 rounded-lg">
-                <h3 className="font-semibold text-gray-800 mb-2">Essential Cookies</h3>
-                <p className="text-gray-600 text-sm">Required for basic site functionality and security</p>
+              <div className="bg-gray-50 dark:bg-gray-700 p-4 rounded-lg">
+                <h3 className="font-semibold text-gray-800 dark:text-white mb-2">Essential Cookies</h3>
+                <p className="text-gray-600 dark:text-gray-300 text-sm">Required for basic site functionality and security</p>
               </div>
-              <div className="bg-gray-50 p-4 rounded-lg">
-                <h3 className="font-semibold text-gray-800 mb-2">Preference Cookies</h3>
-                <p className="text-gray-600 text-sm">Remember your settings and preferences</p>
+              <div className="bg-gray-50 dark:bg-gray-700 p-4 rounded-lg">
+                <h3 className="font-semibold text-gray-800 dark:text-white mb-2">Preference Cookies</h3>
+                <p className="text-gray-600 dark:text-gray-300 text-sm">Remember your settings and preferences</p>
               </div>
-              <div className="bg-gray-50 p-4 rounded-lg">
-                <h3 className="font-semibold text-gray-800 mb-2">Analytics Cookies</h3>
-                <p className="text-gray-600 text-sm">Help us improve our platform (optional)</p>
+              <div className="bg-gray-50 dark:bg-gray-700 p-4 rounded-lg">
+                <h3 className="font-semibold text-gray-800 dark:text-white mb-2">Analytics Cookies</h3>
+                <p className="text-gray-600 dark:text-gray-300 text-sm">Help us improve our platform (optional)</p>
               </div>
             </div>
           </div>
@@ -265,18 +265,18 @@ export default function PrivacyPolicy() {
 
       {/* Third Party Services */}
       <section className="mb-12">
-        <div className="bg-white rounded-lg shadow-md p-8">
-          <h2 className="text-2xl font-bold text-gray-900 mb-6">Third-Party Services</h2>
-          <p className="text-gray-600 mb-4">
+        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-8">
+          <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">Third-Party Services</h2>
+          <p className="text-gray-600 dark:text-gray-300 mb-4">
             We carefully select third-party services that meet our high privacy and security standards. These may include:
           </p>
-          <ul className="text-gray-600 space-y-2 ml-4">
+          <ul className="text-gray-600 dark:text-gray-300 space-y-2 ml-4">
             <li>• Cloud hosting providers (for secure data storage)</li>
             <li>• Email service providers (for account communications)</li>
             <li>• Security services (for fraud prevention and protection)</li>
             <li>• Analytics tools (for platform improvement)</li>
           </ul>
-          <p className="text-gray-600 mt-4">
+          <p className="text-gray-600 dark:text-gray-300 mt-4">
             All third-party partners are required to maintain strict confidentiality and use your information only for providing services to SafeVoice.
           </p>
         </div>
@@ -303,30 +303,30 @@ export default function PrivacyPolicy() {
 
       {/* Contact Information */}
       <section className="mb-12">
-        <div className="bg-white rounded-lg shadow-md p-8">
-          <h2 className="text-2xl font-bold text-gray-900 mb-6">Privacy Questions & Requests</h2>
+        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-8">
+          <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">Privacy Questions & Requests</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
             <div>
-              <h3 className="text-lg font-semibold mb-3">General Privacy Questions</h3>
-              <p className="text-gray-600 mb-2">
+              <h3 className="text-lg font-semibold mb-3 dark:text-white">General Privacy Questions</h3>
+              <p className="text-gray-600 dark:text-gray-300 mb-2">
                 For questions about this Privacy Policy or our privacy practices:
               </p>
-              <p className="text-gray-600">
-                Email: <a href="mailto:privacy@safevoiceforwomen.com" className="text-pink-500 hover:text-pink-600">privacy@safevoiceforwomen.com</a>
+              <p className="text-gray-600 dark:text-gray-300">
+                Email: <a href="mailto:privacy@safevoiceforwomen.com" className="text-pink-500 hover:text-pink-600 dark:text-pink-400 dark:hover:text-pink-300">privacy@safevoiceforwomen.com</a>
               </p>
             </div>
             <div>
-              <h3 className="text-lg font-semibold mb-3">Data Rights Requests</h3>
-              <p className="text-gray-600 mb-2">
+              <h3 className="text-lg font-semibold mb-3 dark:text-white">Data Rights Requests</h3>
+              <p className="text-gray-600 dark:text-gray-300 mb-2">
                 To exercise your privacy rights (access, delete, correct data):
               </p>
-              <p className="text-gray-600">
-                Email: <a href="mailto:datarights@safevoiceforwomen.com" className="text-pink-500 hover:text-pink-600">datarights@safevoiceforwomen.com</a>
+              <p className="text-gray-600 dark:text-gray-300">
+                Email: <a href="mailto:datarights@safevoiceforwomen.com" className="text-pink-500 hover:text-pink-600 dark:text-pink-400 dark:hover:text-pink-300">datarights@safevoiceforwomen.com</a>
               </p>
             </div>
           </div>
-          <div className="mt-6 bg-gray-50 rounded-lg p-4">
-            <p className="text-gray-600 text-sm">
+          <div className="mt-6 bg-gray-50 dark:bg-gray-700 rounded-lg p-4">
+            <p className="text-gray-600 dark:text-gray-300 text-sm">
               <strong>Response Time:</strong> We aim to respond to all privacy-related inquiries within 48 hours and complete data requests within 30 days.
             </p>
           </div>
@@ -335,12 +335,12 @@ export default function PrivacyPolicy() {
 
       {/* Footer */}
       <section>
-        <div className="bg-gray-50 rounded-lg p-6 text-center">
+        <div className="bg-gray-50 dark:bg-gray-800 rounded-lg p-6 text-center">
           <FileText className="h-8 w-8 text-gray-400 mx-auto mb-3" />
-          <p className="text-gray-600 text-sm">
+          <p className="text-gray-600 dark:text-gray-300 text-sm">
             This Privacy Policy is part of our Terms of Service. By using SafeVoice, you agree to both documents.
           </p>
-          <p className="text-gray-500 text-xs mt-2">
+          <p className="text-gray-500 dark:text-gray-400 text-xs mt-2">
             SafeVoice Privacy Policy - Version 2.0 - Effective September 28, 2025
           </p>
         </div>

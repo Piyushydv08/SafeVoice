@@ -1,9 +1,10 @@
 import { useEffect, useState } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
-import { Heart, Menu, X } from 'lucide-react';
+import { Heart, Menu, X, Moon, Sun } from 'lucide-react';
 import { auth } from '../lib/firebase';
 import { onAuthStateChanged } from 'firebase/auth';
 import { toast } from 'react-hot-toast';
+import { useTheme } from '../context/ThemeContext';
 
 const ADMIN_EMAILS = ['safevoiceforwomen@gmail.com', 'piyushydv011@gmail.com', 'aditiraj0205@gmail.com'];
 
@@ -12,6 +13,7 @@ export default function Navbar() {
   const [user, setUser] = useState<any>(null);
   const navigate = useNavigate();
   const location = useLocation();
+  const { theme, toggleTheme } = useTheme();
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (currentUser) => setUser(currentUser));
@@ -46,7 +48,7 @@ export default function Navbar() {
   ];
 
   return (
-    <nav className="fixed top-0 left-0 w-full z-50 bg-gradient-to-r from-pink-100 via-white to-pink-200 shadow-xl border-b border-pink-200 backdrop-blur-lg transition-all duration-300">
+    <nav className="fixed top-0 left-0 w-full z-50 bg-gradient-to-r from-pink-100 via-white to-pink-200 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 shadow-xl border-b border-pink-200 dark:border-gray-700 backdrop-blur-lg transition-all duration-300">
       <div className="max-w-7xl mx-auto px-3 sm:px-4 lg:px-6">
         <div className="flex justify-between items-center h-16 min-h-[4rem]">
           {/* Logo - Optimized for mobile */}
@@ -57,14 +59,14 @@ export default function Navbar() {
               onClick={handleLinkClick}
             >
               <span className="relative">
-                <Heart className="h-7 w-7 sm:h-8 sm:w-8 text-pink-500 drop-shadow-lg" />
-                <span className="absolute -top-1 -right-1 w-2 h-2 sm:w-3 sm:h-3 bg-pink-400 rounded-full opacity-70"></span>
+                <Heart className="h-7 w-7 sm:h-8 sm:w-8 text-pink-500 dark:text-pink-400 drop-shadow-lg" />
+                <span className="absolute -top-1 -right-1 w-2 h-2 sm:w-3 sm:h-3 bg-pink-400 dark:bg-pink-500 rounded-full opacity-70"></span>
               </span>
               <div className="ml-2">
-                <span className="text-xl sm:text-2xl font-extrabold text-pink-600 drop-shadow-sm tracking-wide font-serif">
+                <span className="text-xl sm:text-2xl font-extrabold text-pink-600 dark:text-pink-300 drop-shadow-sm tracking-wide font-serif">
                   SafeVoice
                 </span>
-                <p className="text-xs text-gray-600 sm:block animate-fade-in italic font-light">
+                <p className="text-xs text-gray-600 dark:text-gray-400 sm:block animate-fade-in italic font-light">
                   Your story. Your strength.
                 </p>
               </div>
@@ -78,11 +80,20 @@ export default function Navbar() {
                 key={to}
                 to={to}
                 onClick={handleLinkClick}
-                className={`nav-link px-2 py-2 xl:text-base ${location.pathname === to ? 'active' : ''}`}
+                className={`nav-link px-2 py-2 dark:text-pink-400 xl:text-base ${location.pathname === to ? 'active' : ''}`}
               >
                 {label}
               </Link>
             ))}
+
+            {/* Theme Toggle for Desktop */}
+            <button
+              onClick={toggleTheme}
+              className="p-2 rounded-lg bg-white dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-600 transition-all duration-200 border border-gray-200 dark:border-gray-600"
+              aria-label={`Switch to ${theme === 'light' ? 'dark' : 'light'} mode`}
+            >
+              {theme === 'light' ? <Moon size={18} /> : <Sun size={18} />}
+            </button>
 
             {user ? (
               <div className="flex items-center space-x-1 xl:space-x-2 ml-1">
@@ -95,12 +106,12 @@ export default function Navbar() {
                     Admin
                   </Link>
                 )}
-                <span className="text-gray-700 font-mono bg-pink-100 px-2 py-1 rounded text-xs xl:text-sm shadow-inner max-w-[100px] xl:max-w-[120px] truncate">
+                <span className="text-gray-700 dark:text-gray-300 font-mono bg-pink-100 dark:bg-gray-700 px-2 py-1 rounded text-xs xl:text-sm shadow-inner max-w-[100px] xl:max-w-[120px] truncate">
                   Anonymous_{user.uid.slice(0, 6)}
                 </span>
                 <button
                   onClick={handleSignOut}
-                  className="bg-gradient-to-r from-pink-500 to-pink-400 text-white px-2 py-2 rounded-md shadow-md hover:from-pink-600 hover:to-pink-500 transition-all duration-200 font-semibold text-sm whitespace-nowrap"
+                  className="bg-gradient-to-r from-pink-500 to-pink-400 dark:from-pink-600 dark:to-pink-500 text-white px-2 py-2 rounded-md shadow-md hover:from-pink-600 hover:to-pink-500 dark:hover:from-pink-700 dark:hover:to-pink-600 transition-all duration-200 font-semibold text-sm whitespace-nowrap"
                 >
                   Sign Out
                 </button>
@@ -109,18 +120,27 @@ export default function Navbar() {
               <Link
                 to="/auth"
                 onClick={handleLinkClick}
-                className={`bg-gradient-to-r from-pink-500 to-pink-400 text-white px-3 py-2 rounded-md shadow-md hover:from-pink-600 hover:to-pink-500 transition-all duration-200 font-semibold text-sm xl:text-base whitespace-nowrap ${location.pathname === '/auth' ? 'ring-2 ring-pink-400' : ''}`}
+                className={`bg-gradient-to-r from-pink-500 to-pink-400 dark:from-pink-600 dark:to-pink-500 text-white px-3 py-2 rounded-md shadow-md hover:from-pink-600 hover:to-pink-500 dark:hover:from-pink-700 dark:hover:to-pink-600 transition-all duration-200 font-semibold text-sm xl:text-base whitespace-nowrap ${location.pathname === '/auth' ? 'ring-2 ring-pink-400 dark:ring-pink-500' : ''}`}
               >
                 Sign In
               </Link>
             )}
           </div>
 
-          {/* Mobile menu button - Shows at 830px and below */}
-          <div className="custom-lg:hidden flex items-center">
+          {/* Mobile menu button with Theme Toggle - Shows at 830px and below */}
+          <div className="custom-lg:hidden flex items-center space-x-1">
+            {/* Theme Toggle for Mobile */}
+            <button
+              onClick={toggleTheme}
+              className="p-2 rounded-lg bg-white dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-600 transition-all duration-200 border border-gray-200 dark:border-gray-600"
+              aria-label={`Switch to ${theme === 'light' ? 'dark' : 'light'} mode`}
+            >
+              {theme === 'light' ? <Moon size={18} /> : <Sun size={18} />}
+            </button>
+
             <button
               onClick={() => setIsMenuOpen(!isMenuOpen)}
-              className="text-pink-500 hover:text-pink-700 transition-colors duration-200 p-2 rounded-lg hover:bg-pink-50"
+              className="text-pink-500 dark:text-pink-400 hover:text-pink-700 dark:hover:text-pink-300 transition-colors duration-200 p-2 rounded-lg hover:bg-pink-50 dark:hover:bg-gray-700"
               aria-label="Toggle menu"
             >
               {isMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
@@ -130,10 +150,10 @@ export default function Navbar() {
 
         {/* Simplified Mobile Menu */}
         {isMenuOpen && (
-          <div className="custom-lg:hidden fixed inset-0 top-16 z-40 animate-fade-in bg-white">
-            <div className="flex flex-col h-full w-full bg-white">
+          <div className="custom-lg:hidden fixed inset-0 top-16 z-40 animate-fade-in bg-white dark:bg-gray-900">
+            <div className="flex flex-col h-full w-full bg-white dark:bg-gray-900">
               {/* Navigation Links - Simplified */}
-              <div className="flex-1 px-4 pt-4 space-y-1 bg-white">
+              <div className="flex-1 px-4 pt-4 space-y-1 bg-white dark:bg-gray-900">
                 {navLinks.map(({ to, label }) => (
                   <Link
                     key={to}
@@ -141,8 +161,8 @@ export default function Navbar() {
                     onClick={handleLinkClick}
                     className={`block w-full text-left px-4 py-3 rounded-lg text-base font-medium transition-all duration-200 ${
                       location.pathname === to 
-                        ? 'bg-pink-500 text-white shadow-sm' 
-                        : 'text-gray-700 hover:bg-pink-50'
+                        ? 'bg-pink-500 dark:bg-pink-600 text-white shadow-sm' 
+                        : 'text-gray-700 dark:text-gray-300 hover:bg-pink-50 dark:hover:bg-gray-800'
                     }`}
                   >
                     {label}
@@ -151,7 +171,7 @@ export default function Navbar() {
               </div>
 
               {/* User Section */}
-              <div className="px-4 space-y-3 border-t border-gray-200 pt-4 pb-6 bg-white">
+              <div className="px-4 space-y-3 border-t border-gray-200 dark:border-gray-700 pt-4 pb-6 bg-white dark:bg-gray-900">
                 {user ? (
                   <>
                     {isAdmin && (
@@ -160,23 +180,23 @@ export default function Navbar() {
                         onClick={handleLinkClick}
                         className={`block w-full text-left px-4 py-3 rounded-lg text-base font-medium transition-all duration-200 ${
                           location.pathname === '/admin'
-                            ? 'bg-amber-500 text-white shadow-sm'
-                            : 'text-gray-700 hover:bg-amber-50'
+                            ? 'bg-amber-500 dark:bg-amber-600 text-white shadow-sm'
+                            : 'text-gray-700 dark:text-gray-300 hover:bg-amber-50 dark:hover:bg-amber-900'
                         }`}
                       >
                         Admin
                       </Link>
                     )}
                     
-                    <div className="px-4 py-2 bg-gray-100 rounded-lg">
-                      <p className="text-gray-600 font-mono text-sm break-all">
+                    <div className="px-4 py-2 bg-gray-100 dark:bg-gray-800 rounded-lg">
+                      <p className="text-gray-600 dark:text-gray-400 font-mono text-sm break-all">
                         Anonymous_{user.uid.slice(0, 8)}
                       </p>
                     </div>
                     
                     <button
                       onClick={handleSignOut}
-                      className="w-full bg-pink-500 text-white px-4 py-3 rounded-lg font-medium text-base hover:bg-pink-600 transition-all duration-200"
+                      className="w-full bg-pink-500 dark:bg-pink-600 text-white px-4 py-3 rounded-lg font-medium text-base hover:bg-pink-600 dark:hover:bg-pink-700 transition-all duration-200"
                     >
                       Sign Out
                     </button>
@@ -185,8 +205,8 @@ export default function Navbar() {
                   <Link
                     to="/auth"
                     onClick={handleLinkClick}
-                    className={`block w-full text-center bg-pink-500 text-white px-4 py-3 rounded-lg font-medium text-base hover:bg-pink-600 transition-all duration-200 ${
-                      location.pathname === '/auth' ? 'ring-2 ring-pink-300' : ''
+                    className={`block w-full text-center bg-pink-500 dark:bg-pink-600 text-white px-4 py-3 rounded-lg font-medium text-base hover:bg-pink-600 dark:hover:bg-pink-700 transition-all duration-200 ${
+                      location.pathname === '/auth' ? 'ring-2 ring-pink-300 dark:ring-pink-500' : ''
                     }`}
                   >
                     Sign In
