@@ -12,6 +12,7 @@ import Footer from './components/Footer';
 import EditStory from './pages/EditStory';
 import AdminDashboard from './pages/AdminDashboard';
 import FAQs from './pages/FAQs';
+import ScrollToTop from './components/ScrollToTop';
 import PrivacyPolicy from './pages/Privacypolicy';
 import Termsandconditions from './pages/termsandconditions';
 
@@ -21,6 +22,7 @@ import Termsandconditions from './pages/termsandconditions';
 function App() {
   return (
     <Router>
+      <ScrollToTop />
       <div className="min-h-screen bg-gray-50">
         <Navbar />
         <main>
