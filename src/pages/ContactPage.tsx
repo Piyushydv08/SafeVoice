@@ -9,7 +9,7 @@ export default function ContactPage() {
     body: ''
   });
 
-  const your_formspree_id = "paste-your-formspree-id-here";
+  const your_formspree_id = "https://formspree.io/f/xwpraewp";
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     setFormData({
@@ -163,12 +163,12 @@ export default function ContactPage() {
                   <div className="flex items-center space-x-3">
                     <Linkedin className="h-5 w-5 text-yellow-300" />
                     <a 
-                      href="https://linkedin.com/in/piyushydv08"
+                      href="https://www.linkedin.com/in/piyush-yadav-b513a0288/"
                       target="_blank"
                       rel="noopener noreferrer"
                       className="text-yellow-300 hover:text-yellow-200 hover:underline transition-colors"
                     >
-                      linkedin.com/in/piyushydv08
+                      linkedin.com/in/piyush-yadav-b513a0288
                     </a>
                   </div>
                 </div>
@@ -190,12 +190,12 @@ export default function ContactPage() {
                   <div className="flex items-center space-x-3">
                     <Linkedin className="h-5 w-5 text-yellow-300" />
                     <a 
-                      href="https://linkedin.com/in/aditiraj2006"
+                      href="https://www.linkedin.com/in/aditi-raj-890358329/"
                       target="_blank"
                       rel="noopener noreferrer"
                       className="text-yellow-300 hover:text-yellow-200 hover:underline transition-colors"
                     >
-                      linkedin.com/in/aditiraj2006
+                      linkedin.com/in/aditi-raj-890358329/
                     </a>
                   </div>
                 </div>
