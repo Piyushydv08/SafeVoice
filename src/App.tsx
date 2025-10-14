@@ -12,8 +12,10 @@ import Footer from './components/Footer';
 import EditStory from './pages/EditStory';
 import AdminDashboard from './pages/AdminDashboard';
 import FAQs from './pages/FAQs';
+import ScrollToTop from './components/ScrollToTop';
 import PrivacyPolicy from './pages/Privacypolicy';
 import Termsandconditions from './pages/termsandconditions';
+import ContactPage from './pages/ContactPage';
 
 
 
@@ -21,6 +23,7 @@ import Termsandconditions from './pages/termsandconditions';
 function App() {
   return (
     <Router>
+      <ScrollToTop />
       <div className="min-h-screen bg-gray-50">
         <Navbar />
         <main>
@@ -36,6 +39,7 @@ function App() {
             <Route path="/admin" element={<AdminDashboard />} />
             <Route path="/PrivacyPolicy" element={<PrivacyPolicy />} />
             <Route path="/termsandconditions" element={<Termsandconditions />} />
+            <Route path="/contact" element={<ContactPage />} />
 
           </Routes>
         </main>

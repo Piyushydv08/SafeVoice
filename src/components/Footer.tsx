@@ -1,7 +1,7 @@
 import { FaXTwitter, FaLinkedin, FaDiscord, FaGithub } from "react-icons/fa6";
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Heart } from 'lucide-react';
+import { Heart, Link2 } from 'lucide-react';
 
 export default function Footer() {
   const [email, setEmail] = useState('');
@@ -106,12 +106,10 @@ export default function Footer() {
                 Emergency: 1800-SAFE-NOW
               </li>
               <li>
-                <a
-                  href="mailto:safevoiceforwomen@gmail.com"
-                  className="hover:text-pink-400 transition-colors text-gray-400 hover:text-pink-500"
-                >
+                <Link 
+                to='/contact'>
                   Contact Us
-                </a>
+                </Link>
               </li>
             </ul>
           </div>

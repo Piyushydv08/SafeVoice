@@ -10,6 +10,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@formspree/react": "^3.0.0",
     "@google/generative-ai": "^0.24.1",
     "@supabase/auth-ui-react": "^0.4.7",
     "@supabase/auth-ui-shared": "^0.1.8",
@@ -20,7 +21,7 @@
     "express": "^5.1.0",
     "firebase": "^11.9.1",
     "lucide-react": "^0.344.0",
-    "nodemailer": "^6.10.1",
+    "nodemailer": "^7.0.9",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
     "react-hot-toast": "^2.4.1",
