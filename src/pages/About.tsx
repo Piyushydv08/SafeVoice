@@ -1,4 +1,5 @@
 import { Users, Heart, Shield, MessageSquare } from "lucide-react";
+import { Link } from "react-router-dom";
 
 export default function About() {
   return (
@@ -73,7 +74,6 @@ export default function About() {
         </div>
       </section>
 
-      {/* Contact Section */}
       <section className="mb-20">
         <div className="bg-white rounded-2xl shadow-lg p-10 hover:shadow-2xl hover:scale-[1.01] transition duration-500">
           <h2 className="text-3xl font-bold text-gray-900 mb-6">Contact Us</h2>
@@ -93,6 +93,16 @@ export default function About() {
             <p className="text-gray-600">
               For immediate support, please visit our Resources page for emergency contact numbers and support services.
             </p>
+            {/* Add Contact Page Link */}
+            <div className="pt-4">
+              <Link
+                to="/contact"
+                className="inline-flex items-center space-x-2 bg-gradient-to-r from-pink-500 to-purple-600 text-white px-6 py-3 rounded-lg font-semibold shadow-lg hover:from-pink-600 hover:to-purple-700 transform hover:scale-105 transition-all duration-200"
+              >
+                <MessageSquare className="h-5 w-5" />
+                <span>Send us a Message</span>
+              </Link>
+            </div>
           </div>
         </div>
       </section>
