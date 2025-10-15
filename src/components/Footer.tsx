@@ -105,9 +105,11 @@ export default function Footer() {
               <li className="text-gray-800 dark:text-gray-300">
                 Emergency: 1800-SAFE-NOW
               </li>
-              <li>
+              <li className="break-words overflow-hidden">
                 <Link 
-                to='/contact'>
+                  to='/contact'
+                  className="text-pink-500 hover:text-pink-600 dark:text-pink-400 dark:hover:text-pink-300 font-semibold transition-colors"
+                >
                   Contact Us
                 </Link>
               </li>
