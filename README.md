@@ -26,50 +26,82 @@ Safevoice is a secure, AI-enhanced platform that lets individuals anonymously sh
 
 ---
 
-## 📂 Project Structure
-```bash
-netlify/functions
-├── correct-grammar.cjs
-├── translate.cjs
-public
-├── _redirects
-src
-├── components/
-  └──  Navbar.tsx
-  └──  Footer.tsx
-├── lib/
-  └──  firebase.ts
-  └──  supabase.ts
-├── pages/
-  └──  About.tsx
-  └── AdminDashboard.tsx
-  └──  Auth.tsx
-  └──  EditStory.tsx
-  └──  Home.tsx
-  └── Resources.tsx
-  └──  ShareStory.tsx
-  └──  Stories.tsx
-├── App.tsx
-├── index.css
-├── main.tsx
-├── vite-env.d.ts
-.gitignore
-CODE_OF_CONDUCT.md
-README.md
-eslint.config.js
-index.html
-netlify.toml
-package-lock.json
-package.json
-postcss.config.js
-server.js
-tailwind.config.js
-tsconfig.app.json
-tsconfig.json
-tsconfig.node.json
-vite.config.js
-```
 
+## 📁 Project Structure
+
+Below is the folder and file structure of the SafeVoice project 👇  
+
+```bash
+SafeVoice/
+│
+├── .github/
+│   └── ISSUE_TEMPLATE/                # GitHub issue templates for contributors
+│
+├── netlify/
+│   └── functions/                     # Netlify serverless functions
+│       ├── correct-grammar.cjs        # Function to correct grammar in stories
+│       ├── subscribe.cjs              # Function to handle email subscriptions
+│       └── translate.cjs              # Function to translate stories or text
+│
+├── public/
+│   └── _redirects                     # Netlify redirects configuration
+│
+├── src/
+│   ├── components/                    # Reusable UI components
+│   │   ├── Footer.tsx
+│   │   ├── Navbar.tsx
+│   │   ├── ScrollToTop.tsx
+│   │   └── ThemeToggle.tsx
+│   │
+│   ├── context/                       # React context for global state management
+│   │   └── ThemeContext.tsx
+│   │
+│   ├── lib/                           # External service configurations
+│   │   ├── firebase.ts
+│   │   └── supabase.ts
+│   │
+│   ├── pages/                         # Main app pages
+│   │   ├── About.tsx
+│   │   ├── AdminDashboard.tsx
+│   │   ├── Auth.tsx
+│   │   ├── ContactPage.tsx
+│   │   ├── EditStory.tsx
+│   │   ├── FAQs.tsx
+│   │   ├── Home.tsx
+│   │   ├── Privacypolicy.tsx
+│   │   ├── Resources.tsx
+│   │   ├── ShareStory.tsx
+│   │   ├── Stories.tsx
+│   │   └── termsandconditions.tsx
+│   │
+│   ├── App.tsx                        # Root app component
+│   ├── index.css                      # Global styles
+│   ├── main.tsx                       # App entry point
+│   └── vite-env.d.ts                  # Type definitions for Vite
+│
+├── .env.example                       # Example environment variables
+├── .gitignore                         # Git ignore configuration
+├── CODE_OF_CONDUCT.md                 # Community behavior guidelines
+├── CONTRIBUTING.md                    # Contribution guide
+├── GirlScript-Summer-of-Code.png      # Project/organization image
+├── LICENSE.md                         # License information
+├── PULL_REQUEST_TEMPLATE.md           # Pull request format
+├── README.md                          # This file 😄
+│
+├── eslint.config.js                   # ESLint configuration
+├── index.html                         # Main HTML entry file
+├── netlify.toml                       # Netlify configuration
+├── package-lock.json                  # NPM lock file
+├── package.json                       # Dependencies and scripts
+├── postcss.config.js                  # PostCSS setup for Tailwind
+├── server.js                          # Local server setup (optional)
+├── tailwind.config.js                 # TailwindCSS configuration
+├── tsconfig.app.json                  # TypeScript config for app
+├── tsconfig.json                      # Main TypeScript configuration
+├── tsconfig.node.json                 # Node TypeScript config
+└── vite.config.js                     # Vite configuration
+```
+---
 
 ## ⚙️ Installation & Setup
 
