@@ -24,6 +24,8 @@ export default function Auth() {
   const [loading, setLoading] = useState(false);
   const [isSignUp, setIsSignUp] = useState(true);
   const [authMethod, setAuthMethod] = useState<'email' | 'google'>('email');
+  const [isAwaitingCode, setIsAwaitingCode] = useState(false);
+  const [verificationCode, setVerificationCode] = useState('');
   const navigate = useNavigate();
 
     // ADDED: toggle for show/hide password
@@ -64,6 +66,42 @@ export default function Auth() {
     }
   };
 
+  const handleVerifyCodeAndCreate = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!verificationCode) {
+      toast.error('Please enter verification code sent to your email.');
+      return;
+    }
+
+    setLoading(true);
+    try {
+      const backendUrl = import.meta.env.VITE_API_BASE_URL;
+      const res = await fetch(`${backendUrl}/verify-code`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, code: verificationCode }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data?.message || 'Verification failed');
+
+      const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+      const user = userCredential.user;
+      try { await sendEmailVerification(user); } catch {}
+      const profileCreated = await createUserProfile(user, { provider: 'email' });
+      if (!profileCreated) throw new Error('Failed to create user profile');
+
+      toast.success('Signup successful!');
+      setIsAwaitingCode(false);
+      setVerificationCode('');
+      navigate('/');
+    } catch (err: any) {
+      console.error('Error verifying code or creating user:', err);
+      toast.error(err?.message || 'Verification or sign-up failed.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const handleSignUp = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!isValidEmail(email)) {
@@ -71,31 +109,31 @@ export default function Auth() {
       return;
     }
 
-     // CHANGED: use strong password validation
     if (!isPasswordValid) {
       toast.error('Password must be at least 8 chars, with uppercase, lowercase, number & special character.');
       return;
     }
-    
+
     setLoading(true);
     try {
-      const userCredential = await createUserWithEmailAndPassword(auth, email, password);
-      const user = userCredential.user;
-      await sendEmailVerification(user);
-      const profileCreated = await createUserProfile(user, { provider: 'email' });
-      if (!profileCreated) {
-        throw new Error('Failed to create user profile');
+      const backendUrl = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3000';
+      const res = await fetch(`${backendUrl}/send-verification`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email }),
+      });
+
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) {
+        throw new Error(data?.message || 'Failed to send verification code');
       }
-      toast.success('Signup successful! Please check your email to verify your account.');
-      setLoading(false);
-      navigate('/');
-    } catch (error: any) {
-      console.error('Error signing up:', error);
-      if (error.code === 'auth/email-already-in-use') {
-        toast.error('This email is already registered. Please sign in instead.');
-      } else {
-        toast.error('Failed to sign up. Please try again.');
-      }
+
+      toast.success('Verification code sent. Check your email.');
+      setIsAwaitingCode(true);
+    } catch (err: any) {
+      console.error('Error sending verification code:', err);
+      toast.error(err?.message || 'Failed to send verification code');
+    } finally {
       setLoading(false);
     }
   };
@@ -253,7 +291,10 @@ export default function Auth() {
           <div className="mt-6">
             {/* Email/Password Form */}
             {authMethod === 'email' && (
-              <form onSubmit={isSignUp ? handleSignUp : handleSignIn} className="space-y-4">
+              <form
+                onSubmit={isSignUp ? (isAwaitingCode ? handleVerifyCodeAndCreate : handleSignUp) : handleSignIn}
+                className="space-y-4"
+              >
                 <div>
                   <label htmlFor="email" className="block text-sm font-medium text-gray-700">
                     Email
@@ -301,13 +342,33 @@ export default function Auth() {
                     </ul>
                   )}
                 </div>
-
+                {isSignUp && isAwaitingCode && (
+                  <div>
+                    <label htmlFor="verificationCode" className="block text-sm font-medium text-gray-700">
+                      Verification Code
+                    </label>
+                    <input
+                      id="verificationCode"
+                      type="text"
+                      value={verificationCode}
+                      onChange={(e) => setVerificationCode(e.target.value)}
+                      className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-pink-500 focus:ring-pink-500"
+                      placeholder="Enter code from email"
+                      required
+                    />
+                    <p className="text-xs text-gray-500 mt-1">Enter the 6-character code we sent to your email.</p>
+                  </div>
+                )}
                 <button
                   type="submit"
                   className="w-full bg-pink-500 text-white px-4 py-2 rounded-md hover:bg-pink-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-pink-500"
                   disabled={loading}
                 >
-                  {loading ? (isSignUp ? 'Signing up...' : 'Signing in...') : isSignUp ? 'Sign Up' : 'Sign In'}
+                  {loading
+                  ? (isSignUp ? 'Working...' : 'Signing in...')
+                  : isSignUp
+                    ? (isAwaitingCode ? 'Verify & Create Account' : 'Send verification code')
+                    : 'Sign In'}
                 </button>
                 
                 {!isSignUp && (
