@@ -58,7 +58,7 @@ const PrevArrow = (props: any) => {
   return (
     <button
       onClick={onClick}
-      className="absolute left-0 top-1/2 -translate-y-1/2 z-10 text-pink-500 hover:text-pink-700 bg-white rounded-full p-2 shadow-md -ml-4"
+      className="absolute left-0 top-1/2 -translate-y-1/2 z-10 text-pink-500 hover:text-pink-700 bg-white dark:bg-gray-800 rounded-full p-2 shadow-md -ml-4"
     >
       <FaChevronLeft />
     </button>
@@ -70,7 +70,7 @@ const NextArrow = (props: any) => {
   return (
     <button
       onClick={onClick}
-      className="absolute right-0 top-1/2 -translate-y-1/2 z-10 text-pink-500 hover:text-pink-700 bg-white rounded-full p-2 shadow-md -mr-4"
+      className="absolute right-0 top-1/2 -translate-y-1/2 z-10 text-pink-500 hover:text-pink-700 bg-white dark:bg-gray-800 rounded-full p-2 shadow-md -mr-4"
     >
       <FaChevronRight />
     </button>
@@ -252,7 +252,7 @@ export default function Home() {
   }
 
   return (
-    <div className="min-h-screen pt-16" style={{ fontFamily: "'Montserrat', 'Nunito', sans-serif" }}>
+    <div className="min-h-screen pt-16 bg-white dark:bg-gray-900" style={{ fontFamily: "'Montserrat', 'Nunito', sans-serif" }}>
       {/* Hero Section */}
       <div className="relative bg-gradient-to-r from-pink-500 via-fuchsia-600 to-purple-700 text-white py-24 overflow-hidden shadow-xl">
       <div className="absolute inset-0 opacity-30 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-white/30 via-pink-400/10 to-transparent pointer-events-none"></div>
@@ -310,7 +310,7 @@ export default function Home() {
 
       {/* Top Stories Section */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
-      <h2 className="text-3xl font-bold text-gray-900 mb-12 text-center">Top Stories</h2>
+      <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-12 text-center">Top Stories</h2>
       {topStories.length > 0 ? (
         <Slider
         prevArrow={<PrevArrow />}
@@ -354,17 +354,17 @@ export default function Home() {
           const shouldTruncate = story.content.length > 600 && !isExpanded;
           return (
             <div key={story.id} className="px-4">
-            <div className="bg-white rounded-lg shadow-lg overflow-hidden flex flex-col w-[420px] max-w-full mx-auto transform hover:scale-105 transition-transform duration-300" style={{ fontFamily: "'Montserrat', 'Nunito', sans-serif" }}>
+            <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg overflow-hidden flex flex-col w-[420px] max-w-full mx-auto transform hover:scale-105 transition-transform duration-300" style={{ fontFamily: "'Montserrat', 'Nunito', sans-serif" }}>
               <div className="p-8 flex-grow">
-              <h3 className="text-2xl font-semibold text-gray-800 mb-3">{story.title}</h3>
-              <p className="text-gray-600 text-base mb-4">
+              <h3 className="text-2xl font-semibold text-gray-800 dark:text-white mb-3">{story.title}</h3>
+              <p className="text-gray-600 dark:text-gray-300 text-base mb-4">
                 {shouldTruncate
                 ? `${story.content.substring(0, 600)}...`
                 : story.content}
                 {shouldTruncate && (
                 <button
                   onClick={() => setExpandedStoryId(story.id)}
-                  className="ml-2 text-pink-600 hover:text-pink-700 font-semibold transition-colors duration-200"
+                  className="ml-2 text-pink-600 hover:text-pink-700 dark:text-pink-400 dark:hover:text-pink-300 font-semibold transition-colors duration-200"
                 >
                   Read More
                 </button>
@@ -372,15 +372,15 @@ export default function Home() {
                 {isExpanded && story.content.length > 600 && (
                 <button
                   onClick={() => setExpandedStoryId(null)}
-                  className="ml-2 text-purple-600 hover:text-purple-700 font-semibold transition-colors duration-200"
+                  className="ml-2 text-purple-600 hover:text-purple-700 dark:text-purple-400 dark:hover:text-purple-300 font-semibold transition-colors duration-200"
                 >
                   Show Less
                 </button>
                 )}
               </p>
               </div>
-              <div className="p-6 border-t border-gray-100">
-              <div className="flex justify-between items-center text-xs text-gray-500">
+              <div className="p-6 border-t border-gray-100 dark:border-gray-700">
+              <div className="flex justify-between items-center text-xs text-gray-500 dark:text-gray-400">
                 <span>By Anonymous_{story.author_id?.slice(0, 6) || 'User'}</span>
                 <span>{story.reactionsCount ?? 0} reactions</span>
               </div>
@@ -391,14 +391,14 @@ export default function Home() {
           })}
         </Slider>
       ) : (
-        <p className="col-span-full text-center text-gray-500">No top stories available at the moment.</p>
+        <p className="col-span-full text-center text-gray-500 dark:text-gray-400">No top stories available at the moment.</p>
       )}
       </div>
       
       {/* Testimonials Section */}
-      <div className="bg-gray-100 py-16">
+      <div className="bg-gray-100 dark:bg-gray-800 py-16">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <h2 className="text-3xl font-bold text-gray-900 mb-12 text-center">
+        <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-12 text-center">
         Voices of Strength
         </h2>
 
@@ -409,7 +409,7 @@ export default function Home() {
           value={testimonialContent}
           onChange={(e) => setTestimonialContent(e.target.value)}
           placeholder="Share your experience with SafeVoice..."
-          className="w-full p-4 rounded-md border-gray-300 shadow-sm focus:border-pink-500 focus:ring-pink-500"
+          className="w-full p-4 rounded-md border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white shadow-sm focus:border-pink-500 focus:ring-pink-500"
           rows={4}
           required
           style={{ fontFamily: "'Montserrat', 'Nunito', sans-serif" }}
@@ -425,7 +425,7 @@ export default function Home() {
         </form>
         ) : (
         <div className="mb-12 max-w-xl mx-auto text-center">
-          <p className="text-gray-600 mb-2">Please sign in to share your experience</p>
+          <p className="text-gray-600 dark:text-gray-300 mb-2">Please sign in to share your experience</p>
           <button
           onClick={() => navigate('/auth')}
           className="bg-pink-500 text-white px-6 py-2 rounded-md hover:bg-pink-600"
@@ -442,13 +442,13 @@ export default function Home() {
           {testimonials.map((testimonial) => (
             <div key={testimonial.id} className="px-2 sm:px-3">
             <div
-              className="bg-white rounded-lg shadow-md p-6 h-full flex flex-col justify-between transform transition-transform duration-300 hover:scale-105"
+              className="bg-white dark:bg-gray-700 rounded-lg shadow-md p-6 h-full flex flex-col justify-between transform transition-transform duration-300 hover:scale-105"
               style={{ fontFamily: "'Montserrat', 'Nunito', sans-serif" }}
             >
-              <p className="text-gray-600 mb-4 font-normal text-sm italic">
+              <p className="text-gray-600 dark:text-gray-300 mb-4 font-normal text-sm italic">
               "{testimonial.content}"
               </p>
-              <p className="text-gray-800 font-semibold text-xs text-right">
+              <p className="text-gray-800 dark:text-gray-200 font-semibold text-xs text-right">
               By Anonymous_{testimonial.author_id?.slice(0, 8) || 'User'}
               </p>
             </div>
@@ -461,13 +461,13 @@ export default function Home() {
           {testimonials.map((testimonial) => (
             <div key={testimonial.id} className="px-2 sm:px-3">
             <div
-              className="bg-white rounded-lg shadow-md p-6 h-full flex flex-col justify-between transform transition-transform duration-300 hover:scale-105"
+              className="bg-white dark:bg-gray-700 rounded-lg shadow-md p-6 h-full flex flex-col justify-between transform transition-transform duration-300 hover:scale-105"
               style={{ fontFamily: "'Montserrat', 'Nunito', sans-serif" }}
             >
-              <p className="text-gray-600 mb-4 font-normal text-sm italic">
+              <p className="text-gray-600 dark:text-gray-300 mb-4 font-normal text-sm italic">
               "{testimonial.content}"
               </p>
-              <p className="text-gray-800 font-semibold text-xs text-right">
+              <p className="text-gray-800 dark:text-gray-200 font-semibold text-xs text-right">
               By Anonymous_{testimonial.author_id?.slice(0, 8) || 'User'}
               </p>
             </div>
@@ -476,7 +476,7 @@ export default function Home() {
           </div>
         )
         ) : (
-        <p className="text-center text-gray-500">No testimonials yet. Be the first to share your experience!</p>
+        <p className="text-center text-gray-500 dark:text-gray-400">No testimonials yet. Be the first to share your experience!</p>
         )}
       </div>
       </div>
@@ -484,10 +484,10 @@ export default function Home() {
       {/* About Section */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
       <div className="text-center">
-        <h2 className="text-3xl font-bold text-gray-900 mb-4">
+        <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-4">
         About SafeVoice
         </h2>
-        <p className="text-lg text-gray-600 mb-8">
+        <p className="text-lg text-gray-600 dark:text-gray-300 mb-8">
         We provide a safe, anonymous platform for women to share their stories,
         find support, and access resources. Together, we're building a
         community of strength and healing.

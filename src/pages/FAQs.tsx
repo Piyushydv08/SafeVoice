@@ -1,4 +1,3 @@
-
 import  { useState, useMemo } from 'react';
 import { Search, ChevronDown, ChevronUp, HelpCircle, Shield, Users, Phone, Mail, ThumbsUp, ThumbsDown } from 'lucide-react';
 import { Link } from 'react-router-dom';
@@ -148,22 +147,22 @@ export default function FAQs() {
   };
 
   return (
-    <div className="min-h-screen pt-16 bg-gray-50">
+    <div className="min-h-screen pt-16 bg-gray-50 dark:bg-gray-900">
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         {/* Header Section */}
         <div className="text-center mb-12">
           <div className="flex justify-center items-center mb-4">
             <HelpCircle className="h-12 w-12 text-pink-500 mr-3" />
-            <h1 className="text-4xl font-bold text-gray-900">Frequently Asked Questions</h1>
+            <h1 className="text-4xl font-bold text-gray-900 dark:text-white">Frequently Asked Questions</h1>
           </div>
-          <p className="text-xl text-gray-600 max-w-3xl mx-auto">
+          <p className="text-xl text-gray-600 dark:text-gray-300 max-w-3xl mx-auto">
             Find answers to common questions about SafeVoice. Can't find what you're looking for? 
-            <Link to="/resources" className="text-pink-500 hover:text-pink-600 ml-1">Contact our support team</Link>.
+            <Link to="/resources" className="text-pink-500 hover:text-pink-600 dark:text-pink-400 dark:hover:text-pink-300 ml-1">Contact our support team</Link>.
           </p>
         </div>
 
         {/* Search and Filter Section */}
-        <div className="bg-white rounded-lg shadow-md p-6 mb-8">
+        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6 mb-8">
           <div className="flex flex-col lg:flex-row gap-4">
             {/* Search Bar */}
             <div className="flex-1 relative">
@@ -173,7 +172,7 @@ export default function FAQs() {
                 placeholder="Search FAQs..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-pink-500 focus:border-transparent"
+                className="w-full pl-10 pr-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-pink-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
               />
             </div>
 
@@ -182,7 +181,7 @@ export default function FAQs() {
               <select
                 value={selectedCategory}
                 onChange={(e) => setSelectedCategory(e.target.value)}
-                className="w-full py-3 px-4 border border-gray-300 rounded-lg focus:ring-2 focus:ring-pink-500 focus:border-transparent"
+                className="w-full py-3 px-4 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-pink-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
               >
                 {categories.map(category => (
                   <option key={category} value={category}>{category}</option>
@@ -192,7 +191,7 @@ export default function FAQs() {
           </div>
 
           {/* Results Count */}
-          <div className="mt-4 text-sm text-gray-600">
+          <div className="mt-4 text-sm text-gray-600 dark:text-gray-400">
             Showing {filteredFAQs.length} of {faqData.length} questions
             {searchTerm && ` for "${searchTerm}"`}
             {selectedCategory !== 'All' && ` in ${selectedCategory}`}
@@ -215,13 +214,17 @@ export default function FAQs() {
               <div
                 key={category}
                 onClick={() => setSelectedCategory(category)}
-                className={`bg-white rounded-lg shadow-md p-6 cursor-pointer transition-all duration-300 hover:shadow-lg transform hover:-translate-y-1 ${
-                  selectedCategory === category ? 'ring-2 ring-pink-500 bg-pink-50' : ''
+                className={`bg-white dark:bg-gray-800 rounded-lg shadow-md p-6 cursor-pointer transition-all duration-300 hover:shadow-lg transform hover:-translate-y-1 ${
+                  selectedCategory === category ? 'ring-2 ring-pink-500 bg-pink-50 dark:bg-pink-900/20' : ''
                 }`}
               >
-                <Icon className={`h-8 w-8 mb-3 ${selectedCategory === category ? 'text-pink-600' : 'text-gray-600'}`} />
-                <h3 className="font-semibold text-gray-900 mb-2">{category}</h3>
-                <p className="text-sm text-gray-600">{count} questions</p>
+                <Icon className={`h-8 w-8 mb-3 ${
+                  selectedCategory === category 
+                    ? 'text-pink-600 dark:text-pink-400' 
+                    : 'text-gray-600 dark:text-gray-400'
+                }`} />
+                <h3 className="font-semibold text-gray-900 dark:text-white mb-2">{category}</h3>
+                <p className="text-sm text-gray-600 dark:text-gray-400">{count} questions</p>
               </div>
             );
           })}
@@ -230,49 +233,49 @@ export default function FAQs() {
         {/* FAQ List */}
         <div className="space-y-4">
           {filteredFAQs.length === 0 ? (
-            <div className="text-center py-12 bg-white rounded-lg shadow-md">
-              <HelpCircle className="h-16 w-16 text-gray-300 mx-auto mb-4" />
-              <h3 className="text-xl font-semibold text-gray-600 mb-2">No FAQs found</h3>
-              <p className="text-gray-500">Try adjusting your search terms or category filter.</p>
+            <div className="text-center py-12 bg-white dark:bg-gray-800 rounded-lg shadow-md">
+              <HelpCircle className="h-16 w-16 text-gray-300 dark:text-gray-600 mx-auto mb-4" />
+              <h3 className="text-xl font-semibold text-gray-600 dark:text-gray-300 mb-2">No FAQs found</h3>
+              <p className="text-gray-500 dark:text-gray-400">Try adjusting your search terms or category filter.</p>
             </div>
           ) : (
             filteredFAQs.map((faq, index) => (
               <div
                 key={faq.id}
-                className="bg-white rounded-lg shadow-md overflow-hidden transition-all duration-300 hover:shadow-lg"
+                className="bg-white dark:bg-gray-800 rounded-lg shadow-md overflow-hidden transition-all duration-300 hover:shadow-lg"
                 style={{ animationDelay: `${index * 100}ms` }}
               >
                 <button
                   onClick={() => toggleFAQ(faq.id)}
-                  className="w-full px-6 py-4 text-left flex justify-between items-center hover:bg-gray-50 focus:outline-none focus:bg-gray-50 transition-colors duration-200"
+                  className="w-full px-6 py-4 text-left flex justify-between items-center hover:bg-gray-50 dark:hover:bg-gray-700 focus:outline-none focus:bg-gray-50 dark:focus:bg-gray-700 transition-colors duration-200"
                 >
                   <div className="flex-1">
-                    <h3 className="text-lg font-semibold text-gray-900 mb-1">{faq.question}</h3>
-                    <span className="text-sm text-pink-500 font-medium">{faq.category}</span>
+                    <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-1">{faq.question}</h3>
+                    <span className="text-sm text-pink-500 dark:text-pink-400 font-medium">{faq.category}</span>
                   </div>
                   {expandedFAQ === faq.id ? (
-                    <ChevronUp className="h-5 w-5 text-gray-500 flex-shrink-0" />
+                    <ChevronUp className="h-5 w-5 text-gray-500 dark:text-gray-400 flex-shrink-0" />
                   ) : (
-                    <ChevronDown className="h-5 w-5 text-gray-500 flex-shrink-0" />
+                    <ChevronDown className="h-5 w-5 text-gray-500 dark:text-gray-400 flex-shrink-0" />
                   )}
                 </button>
 
                 {expandedFAQ === faq.id && (
                   <div className="px-6 pb-6 animate-fade-in">
-                    <div className="border-t border-gray-200 pt-4">
-                      <p className="text-gray-700 leading-relaxed mb-4">{faq.answer}</p>
+                    <div className="border-t border-gray-200 dark:border-gray-700 pt-4">
+                      <p className="text-gray-700 dark:text-gray-300 leading-relaxed mb-4">{faq.answer}</p>
                       
                       {/* Feedback Section */}
-                      <div className="flex items-center justify-between pt-4 border-t border-gray-100">
-                        <span className="text-sm text-gray-600">Was this answer helpful?</span>
+                      <div className="flex items-center justify-between pt-4 border-t border-gray-100 dark:border-gray-700">
+                        <span className="text-sm text-gray-600 dark:text-gray-400">Was this answer helpful?</span>
                         <div className="flex items-center space-x-4">
                           <button
                             onClick={() => handleFeedback(faq.id, true)}
                             disabled={feedbackGiven.has(faq.id)}
                             className={`flex items-center space-x-1 px-3 py-1 rounded-full text-sm transition-colors duration-200 ${
                               feedbackGiven.has(faq.id)
-                                ? 'bg-gray-100 text-gray-500 cursor-not-allowed'
-                                : 'hover:bg-green-100 text-green-600'
+                                ? 'bg-gray-100 dark:bg-gray-700 text-gray-500 dark:text-gray-400 cursor-not-allowed'
+                                : 'hover:bg-green-100 dark:hover:bg-green-900 text-green-600 dark:text-green-400'
                             }`}
                           >
                             <ThumbsUp className="h-4 w-4" />
@@ -283,8 +286,8 @@ export default function FAQs() {
                             disabled={feedbackGiven.has(faq.id)}
                             className={`flex items-center space-x-1 px-3 py-1 rounded-full text-sm transition-colors duration-200 ${
                               feedbackGiven.has(faq.id)
-                                ? 'bg-gray-100 text-gray-500 cursor-not-allowed'
-                                : 'hover:bg-red-100 text-red-600'
+                                ? 'bg-gray-100 dark:bg-gray-700 text-gray-500 dark:text-gray-400 cursor-not-allowed'
+                                : 'hover:bg-red-100 dark:hover:bg-red-900 text-red-600 dark:text-red-400'
                             }`}
                           >
                             <ThumbsDown className="h-4 w-4" />

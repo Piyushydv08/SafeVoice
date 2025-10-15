@@ -178,11 +178,11 @@ export default function EditStory() {
   };
 
   return (
-    <div className="max-w-4xl mx-auto px-4 py-8 pt-16">
-      <h1 className="text-3xl font-bold text-gray-900 mb-8">Edit Your Story</h1>
+    <div className="max-w-4xl mx-auto px-4 py-8 pt-16 bg-white dark:bg-gray-900 min-h-screen">
+      <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-8">Edit Your Story</h1>
       <form onSubmit={handleUpdate} className="space-y-6">
         <div>
-          <label htmlFor="title" className="block text-sm font-medium text-gray-700">
+          <label htmlFor="title" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
             Title
           </label>
           <input
@@ -190,13 +190,13 @@ export default function EditStory() {
             id="title"
             value={title}
             onChange={(e) => setTitle(e.target.value)}
-            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-pink-500 focus:ring-pink-500"
+            className="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 shadow-sm focus:border-pink-500 focus:ring-pink-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
             required
           />
         </div>
 
         <div>
-          <label htmlFor="content" className="block text-sm font-medium text-gray-700">
+          <label htmlFor="content" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
             Your Story
           </label>
           <textarea
@@ -204,13 +204,13 @@ export default function EditStory() {
             rows={10}
             value={content}
             onChange={(e) => setContent(e.target.value)}
-            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-pink-500 focus:ring-pink-500"
+            className="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 shadow-sm focus:border-pink-500 focus:ring-pink-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
             required
           />
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
+          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
             Tags
           </label>
           <div className="flex flex-wrap gap-2">
@@ -219,10 +219,10 @@ export default function EditStory() {
                 key={tag}
                 type="button"
                 onClick={() => toggleTag(tag)}
-                className={`px-3 py-1 rounded-full text-sm font-medium ${
+                className={`px-3 py-1 rounded-full text-sm font-medium transition-colors ${
                   tags.includes(tag)
-                    ? 'bg-pink-500 text-white'
-                    : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+                    ? 'bg-pink-500 text-white hover:bg-pink-600'
+                    : 'bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-600'
                 }`}
               >
                 {tag}
@@ -232,7 +232,7 @@ export default function EditStory() {
         </div>
 
         <div>
-          <label htmlFor="media" className="block text-sm font-medium text-gray-700">
+          <label htmlFor="media" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
             Upload New Media (Optional)
           </label>
           <input
@@ -241,29 +241,29 @@ export default function EditStory() {
             multiple
             accept="image/*,video/*,audio/*"
             onChange={(e) => setMediaFiles(e.target.files)}
-            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-pink-500 focus:ring-pink-500"
+            className="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 shadow-sm focus:border-pink-500 focus:ring-pink-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-pink-50 file:text-pink-700 hover:file:bg-pink-100 dark:file:bg-pink-900/20 dark:file:text-pink-300 dark:hover:file:bg-pink-900/30"
           />
         </div>
 
         {existingMediaUrls.length > 0 && (
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
               Existing Media
             </label>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
               {existingMediaUrls.map((url, index) => (
                 <div key={index} className="relative">
                   {url.match(/\.(jpeg|jpg|gif|png)$/i) && (
-                    <img src={url} alt={`Media ${index + 1}`} className="w-full rounded-md" />
+                    <img src={url} alt={`Media ${index + 1}`} className="w-full rounded-md bg-gray-50 dark:bg-gray-700" />
                   )}
                   {url.match(/\.(mp4|webm|ogg)$/i) && (
-                    <video controls className="w-full rounded-md">
+                    <video controls className="w-full rounded-md bg-black">
                       <source src={url} type="video/mp4" />
                       Your browser does not support the video tag.
                     </video>
                   )}
                   {url.match(/\.(mp3|wav|ogg)$/i) && (
-                    <audio controls className="w-full">
+                    <audio controls className="w-full bg-gray-50 dark:bg-gray-700 rounded-md">
                       <source src={url} type="audio/mpeg" />
                       Your browser does not support the audio element.
                     </audio>
@@ -271,7 +271,7 @@ export default function EditStory() {
                   <button
                     type="button"
                     onClick={() => handleRemoveMedia(url)}
-                    className="absolute top-2 right-2 bg-red-500 text-white rounded-full p-1 hover:bg-red-600"
+                    className="absolute top-2 right-2 bg-red-500 text-white rounded-full p-1 hover:bg-red-600 transition-colors"
                   >
                     ✕
                   </button>
@@ -284,7 +284,7 @@ export default function EditStory() {
         <div className="flex items-center space-x-4">
           <button
             type="submit"
-            className="bg-pink-500 text-white px-6 py-2 rounded-md hover:bg-pink-600 focus:outline-none focus:ring-2 focus:ring-pink-500 focus:ring-offset-2"
+            className="bg-pink-500 text-white px-6 py-2 rounded-md hover:bg-pink-600 focus:outline-none focus:ring-2 focus:ring-pink-500 focus:ring-offset-2 disabled:opacity-50 transition-colors"
             disabled={loading}
           >
             {loading ? 'Updating...' : 'Update Story'}
@@ -292,7 +292,7 @@ export default function EditStory() {
           <button
             type="button"
             onClick={() => navigate('/share-story')}
-            className="text-gray-500 hover:underline"
+            className="text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 hover:underline transition-colors"
           >
             Cancel
           </button>
