@@ -73,7 +73,7 @@ app.post("/send-verification", async (req, res) => {
       
         <p style="font-size: 0.9rem; color: #555;">
           SafeVoice Team<br />
-          <a href="https://your-website.com" style="color: #3498db; text-decoration: none;">https://your-website.com</a>
+          <a href="https://safevoiceforwomen.netlify.app/" style="color: #3498db; text-decoration: none;">safevoiceforwomen</a>
         </p>
       </div>
     `
