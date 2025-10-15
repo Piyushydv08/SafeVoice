@@ -58,15 +58,15 @@ export default function Navbar() {
               className="flex items-center group transform transition-transform duration-300 hover:scale-105"
               onClick={handleLinkClick}
             >
-              <span className="relative">
-                <Heart className="h-7 w-7 sm:h-8 sm:w-8 text-pink-500 dark:text-pink-400 drop-shadow-lg" />
-                <span className="absolute -top-1 -right-1 w-2 h-2 sm:w-3 sm:h-3 bg-pink-400 dark:bg-pink-500 rounded-full opacity-70"></span>
+              <span className="relative flex items-center">
+                <Heart className="h-8 w-8 text-pink-500 animate-bounce drop-shadow-lg" />
+                <span className="absolute -top-2 -right-2 w-3 h-3 bg-pink-400 rounded-full animate-ping opacity-70"></span>
               </span>
               <div className="ml-2">
-                <span className="text-xl sm:text-2xl font-extrabold text-pink-600 dark:text-pink-300 drop-shadow-sm tracking-wide font-serif">
+                <span className="text-2xl font-extrabold text-pink-600 drop-shadow-sm tracking-wide font-serif">
                   SafeVoice
                 </span>
-                <p className="text-xs text-gray-600 dark:text-gray-400 sm:block animate-fade-in italic font-light">
+                <p className="text-xs text-gray-600 hidden md:block animate-fade-in italic font-light">
                   Your story. Your strength.
                 </p>
               </div>

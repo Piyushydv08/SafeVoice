@@ -9,7 +9,7 @@ export default function ContactPage() {
     body: ''
   });
 
-  const your_formspree_id = "paste-your-formspree-id-here";
+  const your_formspree_id = "https://formspree.io/f/xwpraewp";
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     setFormData({
