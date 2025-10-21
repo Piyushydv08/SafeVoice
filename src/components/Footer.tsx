@@ -13,60 +13,99 @@ export default function Footer() {
   };
   return (
     <footer className="bg-gray-100 dark:bg-gray-950 text-white">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-          {/* Brand & Social */}
-          <div className="col-span-1 lg:col-span-2">
-            <div className="flex items-center mb-4">
-              <Heart className="h-8 w-8 text-pink-500 dark:text-pink-400" />
-              <span className="ml-2 text-xl font-bold text-black dark:text-white">SafeVoice</span>
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+        <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-8">
+          {/* Brand, Social & Newsletter */}
+          <div className="col-span-1 md:col-span-1 lg:col-span-2 space-y-8">
+            {/* Brand & Social */}
+            <div>
+              <div className="flex items-center mb-4">
+                <Heart className="h-8 w-8 text-pink-500 dark:text-pink-400" />
+                <span className="ml-2 text-xl font-bold text-black dark:text-white">SafeVoice</span>
+              </div>
+              <p className="text-gray-800 dark:text-gray-300 mb-4 text-sm">
+                Your story. Your strength. Your Safe Voice.
+              </p>
+              <p className="text-gray-800 dark:text-gray-300 mb-4 text-sm">
+                A safe space for women to share their stories and find support.
+              </p>
+              <div className="flex space-x-6 text-xl">
+                <a
+                  href="https://x.com/piyushydv011?t=8VKvJiRHuwFIWstbcXji3Q&s=09"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-gray-800 hover:text-white dark:text-gray-300 dark:hover:text-white transition-colors"
+                >
+                  <FaXTwitter />
+                </a>
+                <a
+                  href="https://www.linkedin.com/in/piyush-yadav-b513a0288"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-gray-800 hover:text-white dark:text-gray-300 dark:hover:text-white transition-colors"
+                >
+                  <FaLinkedin />
+                </a>
+                <a
+                  href="https://discord.gg/bdRJz6q2"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-gray-800 hover:text-white dark:text-gray-300 dark:hover:text-white transition-colors"
+                >
+                  <FaDiscord />
+                </a>
+                <a
+                  href="https://github.com/Piyushydv08"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-gray-800 hover:text-white dark:text-gray-300 dark:hover:text-white transition-colors"
+                >
+                  <FaGithub />
+                </a>
+              </div>
             </div>
-            <p className="text-gray-800 dark:text-gray-300 mb-4">
-              Your story. Your strength. Your Safe Voice.
-            </p>
-            <p className="text-gray-800 dark:text-gray-300 mb-4">
-              A safe space for women to share their stories and find support.
-            </p>
-            <div className="flex space-x-6 text-xl mt-2">
-              <a
-                href="https://x.com/piyushydv011?t=8VKvJiRHuwFIWstbcXji3Q&s=09"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-gray-800 hover:text-white dark:text-gray-300 dark:hover:text-white transition-colors"
-              >
-                <FaXTwitter />
-              </a>
-              <a
-                href="https://www.linkedin.com/in/piyush-yadav-b513a0288"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-gray-800 hover:text-white dark:text-gray-300 dark:hover:text-white transition-colors"
-              >
-                <FaLinkedin />
-              </a>
-              <a
-                href="https://discord.gg/bdRJz6q2"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-gray-800 hover:text-white dark:text-gray-300 dark:hover:text-white transition-colors"
-              >
-                <FaDiscord />
-              </a>
-              <a
-                href="https://github.com/Piyushydv08"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-gray-800 hover:text-white dark:text-gray-300 dark:hover:text-white transition-colors"
-              >
-                <FaGithub />
-              </a>
+
+            {/* Newsletter Subscription Section */}
+            <div>
+              <h3 className="text-lg font-semibold mb-4 text-black dark:text-white">Subscribe to Our Newsletter</h3>
+              {/* MODIFIED: Added max-w-sm to the form wrapper */}
+              <div className="max-w-sm">
+                <form onSubmit={handleSubscribe} className="flex flex-col space-y-2">
+                  <input
+                    type="email"
+                    placeholder="Enter your email"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    required
+                    className="p-2 rounded bg-gray-800 dark:bg-gray-700 text-white placeholder-gray-400 dark:placeholder-gray-300 focus:outline-none focus:ring-2 focus:ring-pink-500 dark:focus:ring-pink-400 w-full transition-colors"
+                  />
+                  <div className="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-2">
+                    <button
+                      type="submit"
+                      className="flex-1 bg-pink-500 hover:bg-pink-600 dark:bg-pink-600 dark:hover:bg-pink-700 text-white font-semibold py-2 px-4 rounded transition-colors"
+                    >
+                      Subscribe
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setEmail('')}
+                      className="flex-1 bg-gray-700 hover:bg-gray-600 dark:bg-gray-600 dark:hover:bg-gray-500 text-white font-semibold py-2 px-4 rounded transition-colors"
+                    >
+                      No Thanks
+                    </button>
+                  </div>
+                </form>
+                <p className="text-gray-700 dark:text-gray-300 text-xs mt-2">
+                  By subscribing, you agree to our <Link to="/termsandconditions" className="underline hover:text-pink-500 dark:hover:text-pink-400 transition-colors">Terms of Service</Link> and <Link to="/PrivacyPolicy" className="underline hover:text-pink-500 dark:hover:text-pink-400 transition-colors">Privacy Policy</Link>.
+                </p>
+              </div>
             </div>
           </div>
 
           {/* Quick Links */}
-          <div>
+          <div className="col-span-1 md:col-span-1 lg:col-span-1">
             <h3 className="text-lg font-semibold mb-4 text-black dark:text-white">Quick Links</h3>
-            <ul className="space-y-2">
+            <ul className="space-y-2 text-sm">
               <li>
                 <Link to="/" className="text-gray-800 hover:text-pink-500 dark:text-gray-300 dark:hover:text-pink-400 transition-colors">Home</Link>
               </li>
@@ -95,18 +134,18 @@ export default function Footer() {
           </div>
 
           {/* Contact */}
-          <div>
+          <div className="col-span-1 md:col-span-1 lg:col-span-1">
             <h3 className="text-lg font-semibold mb-4 text-black dark:text-white">Contact</h3>
-            <ul className="space-y-2">
+            <ul className="space-y-2 text-sm">
               <li className="text-gray-800 dark:text-gray-300 break-words overflow-hidden">
                 <span className="block sm:inline">Email: </span>
-                <span className="block sm:inline text-sm sm:text-base">safevoiceforwomen@gmail.com</span>
+                <span className="block sm:inline">safevoiceforwomen@gmail.com</span>
               </li>
               <li className="text-gray-800 dark:text-gray-300">
                 Emergency: 1800-SAFE-NOW
               </li>
               <li className="break-words overflow-hidden">
-                <Link 
+                <Link
                   to='/contact'
                   className="text-pink-500 hover:text-pink-600 dark:text-pink-400 dark:hover:text-pink-300 font-semibold transition-colors"
                 >
@@ -115,43 +154,10 @@ export default function Footer() {
               </li>
             </ul>
           </div>
-
-          {/* Newsletter Subscription Section */}
-          <div className="col-span-1 lg:col-span-4 xl:col-span-1">
-            <h3 className="text-lg font-semibold mb-4 text-black dark:text-white">Subscribe to Our Newsletter</h3>
-            <form onSubmit={handleSubscribe} className="flex flex-col space-y-2">
-              <input
-                type="email"
-                placeholder="Enter your email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                required
-                className="p-2 rounded bg-gray-800 dark:bg-gray-700 text-white placeholder-gray-400 dark:placeholder-gray-300 focus:outline-none focus:ring-2 focus:ring-pink-500 dark:focus:ring-pink-400 w-full transition-colors"
-              />
-              <div className="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-2">
-                <button
-                  type="submit"
-                  className="flex-1 bg-pink-500 hover:bg-pink-600 dark:bg-pink-600 dark:hover:bg-pink-700 text-white font-semibold py-2 px-4 rounded transition-colors"
-                >
-                  Subscribe
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setEmail('')}
-                  className="flex-1 bg-gray-700 hover:bg-gray-600 dark:bg-gray-600 dark:hover:bg-gray-500 text-white font-semibold py-2 px-4 rounded transition-colors"
-                >
-                  No Thanks
-                </button>
-              </div>
-            </form>
-            <p className="text-gray-700 dark:text-gray-300 text-xs mt-2">
-              By subscribing, you agree to our <Link to="/termsandconditions" className="underline hover:text-pink-500 dark:hover:text-pink-400 transition-colors">Terms of Service</Link> and <Link to="/PrivacyPolicy" className="underline hover:text-pink-500 dark:hover:text-pink-400 transition-colors">Privacy Policy</Link>.
-            </p>
-          </div>
         </div>
 
-        <div className="mt-8 pt-8 border-t border-gray-800 dark:border-gray-700">
-          <p className="text-center text-gray-800 dark:text-gray-300">
+        <div className="mt-6 pt-6 border-t border-gray-700 dark:border-gray-700">
+          <p className="text-center text-sm text-gray-800 dark:text-gray-400">
             © {new Date().getFullYear()} SafeVoice. All rights reserved.
           </p>
         </div>

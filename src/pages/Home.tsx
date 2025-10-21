@@ -6,12 +6,12 @@ import { useNavigate } from 'react-router-dom';
 
 // Firebase imports
 import { auth } from '../lib/firebase';
-import { 
-  getFirestore, 
-  collection, 
-  query, 
-  orderBy, 
-  limit, 
+import {
+  getFirestore,
+  collection,
+  query,
+  orderBy,
+  limit,
   getDocs,
   addDoc,
   serverTimestamp,
@@ -119,7 +119,7 @@ export default function Home() {
   const [testimonialContent, setTestimonialContent] = useState('');
   const [loading, setLoading] = useState(false);
   const [expandedStoryId, setExpandedStoryId] = useState<string | null>(null);
-  const [showButton, setShowButton] = useState(false); 
+  const [showButton, setShowButton] = useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -131,9 +131,11 @@ export default function Home() {
   }, []);
 
   useEffect(() => {
+    // Re-enabled fetching real stories
     fetchTopStories();
     fetchTestimonials();
   }, []);
+
   useEffect(() => {
     const handleScroll = () => {
       if (window.scrollY > 300) {
@@ -161,10 +163,10 @@ export default function Home() {
         orderBy('created_at', 'desc'),
         limit(9)
       );
-      
+
       const querySnapshot = await getDocs(q);
       const storiesData: Story[] = [];
-      
+
       // Process each document
       for (const doc of querySnapshot.docs) {
         const storyData = {
@@ -172,29 +174,30 @@ export default function Home() {
           ...doc.data(),
           reactionsCount: 0
         } as Story;
-        
+
         // Get reaction count for this story
         const reactionsRef = collection(db, 'reactions');
         const reactionsQuery = query(
           reactionsRef,
           where('story_id', '==', doc.id)
         );
-        
+
         const reactionsSnapshot = await getDocs(reactionsQuery);
         // Count reactions for this story
         const storyReactions = reactionsSnapshot.docs.filter(
           reactionDoc => reactionDoc.data().story_id === doc.id
         );
-        
+
         storyData.reactionsCount = storyReactions.length;
         storiesData.push(storyData);
       }
-      
+
       // Sort by reaction count (highest first)
       storiesData.sort((a, b) => (b.reactionsCount ?? 0) - (a.reactionsCount ?? 0));
       setTopStories(storiesData);
     } catch (error) {
       console.error('Error fetching stories:', error);
+      toast.error('Failed to fetch stories.');
       setTopStories([]); // Set empty array on error
     }
   }
@@ -207,13 +210,13 @@ export default function Home() {
         orderBy('created_at', 'desc'),
         limit(9)
       );
-      
+
       const querySnapshot = await getDocs(q);
       const testimonialsData = querySnapshot.docs.map(doc => ({
         id: doc.id,
         ...doc.data()
       })) as Testimonial[];
-      
+
       setTestimonials(testimonialsData);
     } catch (error) {
       console.error('Error fetching testimonials:', error);
@@ -224,14 +227,14 @@ export default function Home() {
   async function handleAddTestimonial(e: React.FormEvent) {
     e.preventDefault();
     setLoading(true);
-  
+
     const user = auth.currentUser;
     if (!user) {
       toast.error('Please sign in to add a testimonial.');
       setLoading(false);
       return;
     }
-  
+
     try {
       const testimonialsRef = collection(db, 'testimonials');
       await addDoc(testimonialsRef, {
@@ -239,7 +242,7 @@ export default function Home() {
         author_id: user.uid,
         created_at: serverTimestamp()
       });
-      
+
       toast.success('Testimonial added successfully!');
       setTestimonialContent('');
       fetchTestimonials(); // Refresh the testimonials list
@@ -347,43 +350,39 @@ export default function Home() {
         ]}
         >
         {topStories
-          .sort((a, b) => (b.reactionsCount ?? 0) - (a.reactionsCount ?? 0))
           .slice(0, 9)
           .map((story) => {
           const isExpanded = expandedStoryId === story.id;
-          const shouldTruncate = story.content.length > 600 && !isExpanded;
+          const showReadMoreButton = story.content.length > 200; // Check original length
           return (
-            <div key={story.id} className="px-4">
-            <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg overflow-hidden flex flex-col w-[420px] max-w-full mx-auto transform hover:scale-105 transition-transform duration-300" style={{ fontFamily: "'Montserrat', 'Nunito', sans-serif" }}>
-              <div className="p-8 flex-grow">
-              <h3 className="text-2xl font-semibold text-gray-800 dark:text-white mb-3">{story.title}</h3>
-              <p className="text-gray-600 dark:text-gray-300 text-base mb-4">
-                {shouldTruncate
-                ? `${story.content.substring(0, 600)}...`
-                : story.content}
-                {shouldTruncate && (
-                <button
-                  onClick={() => setExpandedStoryId(story.id)}
-                  className="ml-2 text-pink-600 hover:text-pink-700 dark:text-pink-400 dark:hover:text-pink-300 font-semibold transition-colors duration-200"
-                >
-                  Read More
-                </button>
-                )}
-                {isExpanded && story.content.length > 600 && (
-                <button
-                  onClick={() => setExpandedStoryId(null)}
-                  className="ml-2 text-purple-600 hover:text-purple-700 dark:text-purple-400 dark:hover:text-purple-300 font-semibold transition-colors duration-200"
-                >
-                  Show Less
-                </button>
-                )}
-              </p>
+            <div key={story.id} className="px-4 h-full"> {/* Slider item height */}
+            {/* Card with fixed height */}
+            <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg overflow-hidden flex flex-col h-[450px] w-full max-w-[420px] mx-auto transform hover:scale-105 transition-transform duration-300" style={{ fontFamily: "'Montserrat', 'Nunito', sans-serif" }}>
+              {/* Card Body */}
+              <div className="p-6 flex-grow flex flex-col min-h-0"> {/* Use flex-col and min-h-0 */}
+                <h3 className="text-xl font-semibold text-gray-800 dark:text-white mb-3 flex-shrink-0">{story.title}</h3>
+                {/* Content Area: Scrolls if needed, scrollbar hidden, uses max-height for truncation */}
+                <div className={`flex-grow relative overflow-hidden ${!isExpanded ? 'max-h-56' : 'overflow-y-auto scrollbar-hide'}`}>
+                    <p className={`text-gray-600 dark:text-gray-300 text-sm leading-relaxed`}>
+                        {story.content}
+                    </p>
+                </div>
+                {/* Read More Button Area */}
+                {showReadMoreButton && (
+                    <button
+                      onClick={() => setExpandedStoryId(isExpanded ? null : story.id)}
+                      className="mt-2 text-pink-600 hover:text-pink-700 dark:text-pink-400 dark:hover:text-pink-300 font-semibold transition-colors duration-200 self-start flex-shrink-0"
+                    >
+                      {isExpanded ? 'Show Less' : 'Read More'}
+                    </button>
+                  )}
               </div>
-              <div className="p-6 border-t border-gray-100 dark:border-gray-700">
-              <div className="flex justify-between items-center text-xs text-gray-500 dark:text-gray-400">
-                <span>By Anonymous_{story.author_id?.slice(0, 6) || 'User'}</span>
-                <span>{story.reactionsCount ?? 0} reactions</span>
-              </div>
+              {/* Card Footer */}
+              <div className="p-4 border-t border-gray-100 dark:border-gray-700 flex-shrink-0">
+                <div className="flex justify-between items-center text-xs text-gray-500 dark:text-gray-400">
+                  <span>By Anonymous_{story.author_id?.slice(0, 6) || 'User'}</span> {/* Fallback if author_id is missing */}
+                  <span>{story.reactionsCount ?? 0} reactions</span>
+                </div>
               </div>
             </div>
             </div>
@@ -391,10 +390,10 @@ export default function Home() {
           })}
         </Slider>
       ) : (
-        <p className="col-span-full text-center text-gray-500 dark:text-gray-400">No top stories available at the moment.</p>
+        <p className="col-span-full text-center text-gray-500 dark:text-gray-400">Loading stories or no stories available...</p>
       )}
       </div>
-      
+
       {/* Testimonials Section */}
       <div className="bg-gray-100 dark:bg-gray-800 py-16">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -503,6 +502,18 @@ export default function Home() {
         <FaArrowUp />
       </button>
       )}
+      {/* ADDED: CSS for scrollbar hiding */}
+      <style>{`
+        /* For Webkit browsers (Chrome, Safari) */
+        .scrollbar-hide::-webkit-scrollbar {
+          display: none;
+        }
+        /* For IE, Edge and Firefox */
+        .scrollbar-hide {
+          -ms-overflow-style: none;  /* IE and Edge */
+          scrollbar-width: none;  /* Firefox */
+        }
+      `}</style>
     </div>
   );
 }
