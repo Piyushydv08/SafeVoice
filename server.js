@@ -4,6 +4,10 @@ import nodemailer from 'nodemailer';
 import bodyParser from 'body-parser';
 import cors from 'cors';
 import { createClient } from '@supabase/supabase-js';
+import { v4 as uuidv4 } from "uuid";
+import dotenv from 'dotenv';
+
+dotenv.config();
 
 const app = express();
 
@@ -23,15 +27,82 @@ app.use(bodyParser.json());
 const supabaseUrl = process.env.VITE_SUPABASE_URL; // Supabase URL from .env
 const supabaseKey = process.env.VITE_SUPABASE_ANON_KEY; // Supabase Key from .env
 const supabase = createClient(supabaseUrl, supabaseKey);
+const verificationCodes = [];
 
 // Configure nodemailer
 const transporter = nodemailer.createTransport({
   service: 'gmail',
   auth: {
-    user: 'safevoiceforwomen@gmail.com', // Replace with your email
-    pass: 'safevoiceforwomen@2025', // Replace with your email password or app password
+    user: 'saishmungase@gmail.com', // Replace with your email
+    pass: 'kszo mktf hhwt ypvs', // Replace with your email password or app password
   },
 });
+
+// Auth Stuff
+app.post("/send-verification", async (req, res) => {
+  const { email } = req.body;
+  if (!email) return res.status(400).json({ message: "Email required" });
+
+  const code = uuidv4().slice(0, 6).toUpperCase();
+  const expiresAt = Date.now() + 2 * 60 * 1000; 
+
+  verificationCodes.push({ email, code, expiresAt });
+
+  try {
+    await transporter.sendMail({
+    from: `"SafeVoice" <${process.env.EMAIL}>`,
+    to: email,
+    subject: "Verify your SafeVoice email",
+    html: `
+      <div style="font-family: Arial, sans-serif; color: #333; line-height: 1.5;">
+        <h2 style="color: #2c3e50;">SafeVoice Email Verification</h2>
+        <p>Hello,</p>
+        <p>Thank you for signing up. To complete your registration, please use the verification code below:</p>
+        
+        <div style="margin: 20px 0; padding: 15px; background-color: #f7f7f7; border: 1px solid #ddd; display: inline-block; font-size: 1.2rem; font-weight: bold; letter-spacing: 2px;">
+          ${code}
+        </div>
+      
+        <p style="color: #e74c3c; font-weight: bold;">
+          ⚠️ This code will expire in <strong>2 minutes</strong>.
+        </p>
+      
+        <p>If you did not request this, please ignore this email.</p>
+      
+        <hr style="border: none; border-top: 1px solid #ddd; margin: 20px 0;" />
+      
+        <p style="font-size: 0.9rem; color: #555;">
+          SafeVoice Team<br />
+          <a href="https://safevoiceforwomen.netlify.app/" style="color: #3498db; text-decoration: none;">safevoiceforwomen</a>
+        </p>
+      </div>
+    `
+  });
+
+    res.json({ message: "Verification code sent to your email." });
+  } catch (err) {
+    console.error("Error sending email:", err);
+    res.status(500).json({ message: "Failed to send verification code" });
+  }
+});
+
+app.post("/verify-code", (req, res) => {
+  const { email, code } = req.body;
+  if (!email || !code) return res.status(400).json({ message: "Email and code required" });
+
+  const record = verificationCodes.find(
+    (item) => item.email === email && item.code === code
+  );
+
+  if (!record) return res.status(400).json({ message: "Invalid code" });
+  if (record.expiresAt < Date.now()) return res.status(400).json({ message: "Code expired" });
+
+  const index = verificationCodes.indexOf(record);
+  verificationCodes.splice(index, 1);
+
+  res.json({ verified: true, message: "Email verified successfully" });
+});
+
 
 // Endpoint to handle NGO requests
 app.post('/api/send-ngo-request', async (req, res) => {
