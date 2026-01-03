@@ -70,7 +70,7 @@ exports.handler = async function(event, context) {
     }
 
     const genAI = new GoogleGenerativeAI(GEMINI_API_KEY);
-    const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash-latest' });
+    const model = genAI.getGenerativeModel({ model: 'gemini-2.5-flash-lite' });
     const prompt = `Correct the grammar and spelling mistakes in the following text. Preserve the original meaning and tone. Only output the corrected text, without any introductory phrases like "Here is the corrected text:":\n\n"${content}"`;
 
     const result = await model.generateContent(prompt);

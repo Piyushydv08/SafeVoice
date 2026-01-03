@@ -69,7 +69,7 @@ exports.handler = async function(event, context) {
     }
     const effectiveTitle = title && typeof title === 'string' ? title : '';
     const genAI = new GoogleGenerativeAI(GEMINI_API_KEY);
-    const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash-latest' });
+    const model = genAI.getGenerativeModel({ model: 'gemini-2.5-flash-lite' });
     const targetLangName = SUPPORTED_LANGUAGES.find(l => l.code === targetLang)?.name || targetLang;
     const contentPrompt = `Translate the following story content accurately to ${targetLangName}. Output only the translated content:\n"${content}"`;
     const titlePrompt = effectiveTitle ? `Translate the following story title accurately to ${targetLangName}. Output only the translated title:\n"${effectiveTitle}"` : null;
