@@ -30,7 +30,7 @@ Make sure you have the following installed:
 - Git
 - Node.js v18+ and npm
 - Firebase CLI: npm install -g firebase-tools
-- Netlify CLI: npm install -g netlify-cli (optional, for local serverless functions)
+- Netlify CLI: npm install -g netlify-cli
 - A code editor (VS Code recommended)
 
 ### Tech Stack
@@ -40,43 +40,30 @@ Make sure you have the following installed:
 - *AI Integration*: Google Gemini AI
 - *Deployment*: Netlify
 
-### Development Setup
+## ⚙️ Installation & Setup
 
-1.  *Fork the Repository*
-    Click the Fork button on the SafeVoice repository page.
+1. **Clone the Repository**
+   ```bash
+   git clone https://github.com/Piyushydv08/SafeVoice.git
+   cd SafeVoice
+   ```
+2. **Install Dependencies and CLI**
 
-2.  *Clone Your Fork*
-    ```bash
-    git clone https://github.com/Piyushydv08/SafeVoice.git
-    cd SafeVoice
-    ```
-    
+```bash
+npm install
+npm install -g firebase-tools
+npm install -g netlify-cli
+```
+3. **Configure Environment Variables**
 
-3.  *Install Dependencies*
-    ```bash
-    npm install
-    ```
+- Create a .env file in the root directory.
+- Place all keys according to .env.example
+- Add Firebase & API keys.
 
-4.  *Set Up Environment Variables*
-    Create a .env file in the root directory with the following variables:
-    ```
-    
-    VITE_FIREBASE_API_KEY=your_api_key
-    VITE_FIREBASE_PROJECT_ID=your_project_id
-    VITE_GEMINI_API_KEY=your_gemini_key
-    ```
-    > ⚠ Never commit your API keys or secrets to the repository.
-
-5.  *Run Locally*
-    ```bash
-    npm run dev
-    ```
-    The app will be available at: http://localhost:5173
-
-6.  *Run with Netlify Functions (Optional)*
-    ```bash
-    netlify dev
-    ```
+4. **Start Development Server**
+```bash
+netlify dev
+```
 
 ---
 

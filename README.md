@@ -1,6 +1,6 @@
 # 🌐 SafeVoice – AI-Powered Anonymous Support Platform
 
-**Live Demo:** [SafeVoice on Netlify](https://safevoice.netlify.app)  
+**Live Demo:** [SafeVoice on Netlify](https://safevoiceforwomen.netlify.app/)  
 
 ## 📌 About
 
@@ -110,25 +110,29 @@ SafeVoice/
    git clone https://github.com/Piyushydv08/SafeVoice.git
    cd SafeVoice
    ```
-2. **Install Dependencies**
+
+2. **Install Dependencies and CLI**
 
 ```bash
 npm install
+npm install -g firebase-tools
+npm install -g netlify-cli
 ```
 3. **Configure Environment Variables**
 
 - Create a .env file in the root directory.
+- Place all keys according to .env.example
 - Add Firebase & API keys.
 
-Start Development Server
+4. **Start Development Server**
 ```bash
-npm run dev
+netlify dev
 ```
 
 ### ▶️ Usage
 --- 
 
-- Visit http://localhost:5000 in your browser.
+- Visit http://localhost:8888 in your browser.
 - Sign up / Log in securely using Firebase Auth.
 - Share an anonymous story with or without media.
 - Translate and correct grammar instantly.
@@ -198,9 +202,10 @@ Please read [CONTRIBUTING.md](CONTRIBUTING.md) and follow our [Code of Conduct](
 ---
 ## 📧 Contact  
 
-For queries, feedback, or guidance regarding this project, you can contact the **mentor** assigned to the issue:  
+For queries, feedback, or guidance regarding this project, you can contact the **mentor** assigned to the issue or admins:  
 
-- 📩 **GitHub**: [Piyushydv08](https://github.com/Piyushydv08)
+- 📩 **LinkedIn**: [Aditi-raj](https://www.linkedin.com/in/aditi-raj-890358329/)
+- 📩 **LinkedIn**: [Piyushydv08](https://www.linkedin.com/in/piyushydv08/)
 - 💬 **By commit/PR comments**: Please tag the mentor in your commit or pull request discussion for direct feedback.  
  
 Original Repository: [SafeVoice](https://github.com/Piyushydv08/SafeVoice.git)  
@@ -215,4 +220,3 @@ This project is licensed under the **MIT License** - see the [LICENSE](LICENSE) 
 If you like this project, please give it a ⭐ star. Your support means a lot to us!
 
 Feel free to contribute or suggest new features!🙏
-
