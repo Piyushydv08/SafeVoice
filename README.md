@@ -6,7 +6,7 @@
 
 # 🚀 Live Demo
 
-🔗 [Live Demo](https://safevoiceforwomen.netlify.app/)
+🔗 [SafeVoice on Netlify](https://safevoiceforwomen.netlify.app/)
 
 ---
 
