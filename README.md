@@ -427,9 +427,9 @@ F --> G[Create Pull Request]
 
 ---
 
-# 🌟 GSSoC'25 Participation
+# 🌟 GSSoC'26 Participation
 
-SafeVoice is officially part of GirlScript Summer of Code 2025.
+SafeVoice is officially part of GirlScript Summer of Code 2026.
 
 Contributors can:
 
