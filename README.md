@@ -6,7 +6,7 @@
 
 # 🚀 Live Demo
 
-🔗 SafeVoice on Netlify
+🔗 [Live Demo](https://safevoiceforwomen.netlify.app/)
 
 ---
 
@@ -446,14 +446,19 @@ Contributors can:
 
 ## Maintainers
 
-- Aditi Raj
-- Piyush Yadav
+- Piyush Yadav  
+  - GitHub: https://github.com/Piyushydv08
+  - LinkedIn: https://www.linkedin.com/in/piyushydv08/
+    
+- Aditi Raj  
+  - GitHub: https://github.com/aditiraj2006
+  - LinkedIn: https://www.linkedin.com/in/aditi-raj-890358329/
+
 
 ### Support Channels
 
 - GitHub Issues
 - Pull Request Discussions
-- LinkedIn Profiles
 
 ---
 
