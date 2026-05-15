@@ -77,7 +77,7 @@ export default function Footer() {
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     required
-                    className="p-2 rounded bg-gray-800 dark:bg-gray-700 text-white placeholder-gray-400 dark:placeholder-gray-300 focus:outline-none focus:ring-2 focus:ring-pink-500 dark:focus:ring-pink-400 w-full transition-colors"
+                    className="p-2 rounded bg-white dark:bg-gray-700 text-black dark:text-white placeholder-gray-500 dark:placeholder-gray-300 border border-gray-300 dark:border-gray-600 focus:outline-none focus:ring-2 focus:ring-pink-500 dark:focus:ring-pink-400 w-full transition-colors"
                   />
                   <div className="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-2">
                     <button
@@ -89,8 +89,7 @@ export default function Footer() {
                     <button
                       type="button"
                       onClick={() => setEmail('')}
-                      className="flex-1 bg-gray-700 hover:bg-gray-600 dark:bg-gray-600 dark:hover:bg-gray-500 text-white font-semibold py-2 px-4 rounded transition-colors"
-                    >
+                      className="flex-1 bg-gray-200 hover:bg-gray-300 dark:bg-gray-600 dark:hover:bg-gray-500 text-black dark:text-white font-semibold py-2 px-4 rounded transition-colors" >
                       No Thanks
                     </button>
                   </div>
