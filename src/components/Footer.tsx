@@ -9,7 +9,7 @@ export default function Footer() {
   const handleSubscribe = (e: React.FormEvent) => {
     e.preventDefault();
     // TODO: Add backend logic (Netlify function or Firebase) to save email
-    alert(`Subscribed with: ${email}`);
+    toast.success(`Subscribed with: ${email}`);
     setEmail('');
   };
 

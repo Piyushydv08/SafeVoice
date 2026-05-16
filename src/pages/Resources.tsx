@@ -353,13 +353,20 @@ export default function Resources() {
                       Contact Number <span className="text-red-500">*</span>
                     </label>
                     <input
-                      type="tel"
-                      id="contact"
-                      value={contact}
-                      onChange={(e) => setContact(e.target.value)}
-                      className="w-full px-3 py-2 rounded-lg border border-gray-300 dark:border-gray-600 shadow-sm focus:border-pink-500 focus:ring-1 focus:ring-pink-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
-                      required
-                    />
+  type="tel"
+  id="contact"
+  value={contact}
+  onChange={(e) => {
+    const val = e.target.value.replace(/\D/g, "").slice(0, 10);
+    setContact(val);
+  }}
+  pattern="[0-9]{10}"
+  maxLength={10}
+  placeholder="10-digit phone number"
+  title="Please enter a valid 10-digit phone number"
+  className="w-full px-3 py-2 rounded-lg border border-gray-300 dark:border-gray-600 shadow-sm focus:border-pink-500 focus:ring-1 focus:ring-pink-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+  required
+/>
                   </div>
                   <div>
                     <label htmlFor="email" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
