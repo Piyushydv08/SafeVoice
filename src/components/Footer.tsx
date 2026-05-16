@@ -8,12 +8,8 @@ export default function Footer() {
   const [email, setEmail] = useState('');
   const handleSubscribe = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!email.trim()) {
-      toast.error('Please enter a valid email address.');
-      return;
-    }
     // TODO: Add backend logic (Netlify function or Firebase) to save email
-    toast.success(`🎉 You're subscribed! Welcome to SafeVoice.`);
+    toast.success(`Subscribed with: ${email}`);
     setEmail('');
   };
   return (
