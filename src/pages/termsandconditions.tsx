@@ -3,7 +3,7 @@ import { FileText, Shield, Users, AlertCircle, Scale, Heart, MessageSquare, Lock
 
 export default function TermsAndConditions() {
   return (
-    <div className="max-w-7xl mx-auto mt-20 px-4 sm:px-6 lg:px-8 py-8 bg-white dark:bg-gray-900">
+    <div className="max-w-7xl mx-auto pt-24 pb-16 px-4 sm:px-6 lg:px-8">
       <div className="text-center mb-12">
         <Scale className="h-16 w-16 text-pink-500 mx-auto mb-4" />
         <h1 className="text-4xl font-bold text-gray-900 dark:text-white mb-4">Terms and Conditions</h1>
