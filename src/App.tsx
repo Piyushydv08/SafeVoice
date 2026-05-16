@@ -26,7 +26,7 @@ function App() {
         <ScrollToTop />
         {/* // Global back-to-top button available across all pages */}
         <BackToTop />
-        <div className="min-h-screen bg-gray-50">
+        <div className="min-h-screen bg-gray-50 dark:bg-gray-900 transition-colors duration-200">
           <Navbar />
           <main>
             <Routes>
