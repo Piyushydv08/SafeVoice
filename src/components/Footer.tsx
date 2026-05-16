@@ -154,39 +154,6 @@ export default function Footer() {
                   </li>
                 ))}
               </ul>
-            {/* Newsletter Subscription Section */}
-            <div>
-              <h3 className="text-lg font-semibold mb-4 text-black dark:text-white">Subscribe to Our Newsletter</h3>
-              {/* MODIFIED: Added max-w-sm to the form wrapper */}
-              <div className="max-w-sm">
-                <form onSubmit={handleSubscribe} className="flex flex-col space-y-2">
-                  <input
-                    type="email"
-                    placeholder="Enter your email"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    required
-                    className="p-2 rounded bg-white dark:bg-gray-700 text-black dark:text-white placeholder-gray-500 dark:placeholder-gray-300 border border-gray-300 dark:border-gray-600 focus:outline-none focus:ring-2 focus:ring-pink-500 dark:focus:ring-pink-400 w-full transition-colors"
-                  />
-                  <div className="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-2">
-                    <button
-                      type="submit"
-                      className="flex-1 bg-pink-500 hover:bg-pink-600 dark:bg-pink-600 dark:hover:bg-pink-700 text-white font-semibold py-2 px-4 rounded transition-colors"
-                    >
-                      Subscribe
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => setEmail('')}
-                      className="flex-1 bg-gray-200 hover:bg-gray-300 dark:bg-gray-600 dark:hover:bg-gray-500 text-black dark:text-white font-semibold py-2 px-4 rounded transition-colors" >
-                      No Thanks
-                    </button>
-                  </div>
-                </form>
-                <p className="text-gray-700 dark:text-gray-300 text-xs mt-2">
-                  By subscribing, you agree to our <Link to="/termsandconditions" className="underline hover:text-pink-500 dark:hover:text-pink-400 transition-colors">Terms of Service</Link> and <Link to="/PrivacyPolicy" className="underline hover:text-pink-500 dark:hover:text-pink-400 transition-colors">Privacy Policy</Link>.
-                </p>
-              </div>
             </div>
 
             {/* ── Contact ── */}
