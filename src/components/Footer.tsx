@@ -2,13 +2,18 @@ import { FaXTwitter, FaLinkedin, FaDiscord, FaGithub } from "react-icons/fa6";
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Heart, Link2 } from 'lucide-react';
+import { toast } from 'react-hot-toast';
 
 export default function Footer() {
   const [email, setEmail] = useState('');
   const handleSubscribe = (e: React.FormEvent) => {
     e.preventDefault();
+    if (!email.trim()) {
+      toast.error('Please enter a valid email address.');
+      return;
+    }
     // TODO: Add backend logic (Netlify function or Firebase) to save email
-    alert(`Subscribed with: ${email}`);
+    toast.success(`🎉 You're subscribed! Welcome to SafeVoice.`);
     setEmail('');
   };
   return (
