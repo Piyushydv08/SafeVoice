@@ -11,6 +11,7 @@ const ADMIN_EMAILS = ['safevoiceforwomen@gmail.com', 'piyushydv011@gmail.com', '
 export default function Navbar() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [user, setUser] = useState<any>(null);
+  const [scrolled, setScrolled] = useState(false);
   const navigate = useNavigate();
   const location = useLocation();
   const { theme, toggleTheme } = useTheme();
@@ -19,6 +20,20 @@ export default function Navbar() {
     const unsubscribe = onAuthStateChanged(auth, (currentUser) => setUser(currentUser));
     return () => unsubscribe();
   }, []);
+
+  // Track scroll position for enhanced glass effect
+  useEffect(() => {
+    const handleScroll = () => {
+      setScrolled(window.scrollY > 20);
+    };
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
+  // Close mobile menu on route change
+  useEffect(() => {
+    setIsMenuOpen(false);
+  }, [location.pathname]);
 
   const isAdmin = user && ADMIN_EMAILS.includes(user.email || '');
 
@@ -48,217 +63,441 @@ export default function Navbar() {
   ];
 
   return (
-    <nav className="fixed top-0 left-0 w-full z-50 bg-gradient-to-r from-pink-100 via-white to-pink-200 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 shadow-xl border-b border-pink-200 dark:border-gray-700 backdrop-blur-lg transition-all duration-300">
-      <div className="max-w-7xl mx-auto px-3 sm:px-4 lg:px-6">
-        <div className="flex justify-between items-center h-16 min-h-[4rem]">
-          {/* Logo - Optimized for mobile */}
-          <div className="flex items-center flex-shrink-0">
-            <Link
-              to="/"
-              className="flex items-center group transform transition-transform duration-300 hover:scale-105"
-              onClick={handleLinkClick}
-            >
-              <span className="relative flex items-center">
-                <Heart className="h-8 w-8 text-pink-500 animate-bounce drop-shadow-lg" />
-                <span className="absolute -top-2 -right-2 w-3 h-3 bg-pink-400 rounded-full animate-ping opacity-70"></span>
-              </span>
-              <div className="ml-2">
-                <span className="text-2xl font-extrabold text-pink-600 drop-shadow-sm tracking-wide font-serif">
-                  SafeVoice
-                </span>
-                <p className="text-xs text-gray-600 hidden md:block animate-fade-in italic font-light">
-                  Your story. Your strength.
-                </p>
-              </div>
-            </Link>
-          </div>
+    <>
+      <nav
+        className={`navbar-glass fixed top-0 left-0 w-full z-50 transition-all duration-500 ${
+          scrolled ? 'navbar-scrolled' : 'navbar-top'
+        }`}
+      >
+        <div className="max-w-7xl mx-auto px-3 sm:px-4 lg:px-6">
+          <div className="flex justify-between items-center h-16 min-h-[4rem]">
 
-          {/* Desktop menu - Updated breakpoint to 830px */}
-          <div className="hidden custom-lg:flex items-center space-x-1 xl:space-x-2">
+            {/* Logo */}
+            <div className="flex items-center flex-shrink-0">
+              <Link
+                to="/"
+                className="flex items-center group transform transition-transform duration-300 hover:scale-105"
+                onClick={handleLinkClick}
+              >
+                <span className="relative flex items-center">
+                  <Heart className="h-8 w-8 text-pink-500 dark:text-pink-400 animate-bounce drop-shadow-lg" />
+                  <span className="absolute -top-2 -right-2 w-3 h-3 bg-pink-400 rounded-full animate-ping opacity-70"></span>
+                </span>
+                <div className="ml-2">
+                  <span className="text-2xl font-extrabold bg-gradient-to-r from-pink-600 to-rose-500 dark:from-pink-400 dark:to-rose-400 bg-clip-text text-transparent drop-shadow-sm tracking-wide font-serif">
+                    SafeVoice
+                  </span>
+                  <p className="text-xs text-gray-500 dark:text-gray-400 hidden md:block italic font-light leading-none mt-0.5">
+                    Your story. Your strength.
+                  </p>
+                </div>
+              </Link>
+            </div>
+
+            {/* Desktop menu - custom-lg breakpoint (830px) */}
+            <div className="hidden custom-lg:flex items-center space-x-1 xl:space-x-2">
+              {navLinks.map(({ to, label }) => (
+                <Link
+                  key={to}
+                  to={to}
+                  onClick={handleLinkClick}
+                  className={`nav-link px-3 py-2 text-sm xl:text-base ${location.pathname === to ? 'active' : ''}`}
+                >
+                  {label}
+                </Link>
+              ))}
+
+              {/* Theme Toggle for Desktop */}
+              <button
+                onClick={toggleTheme}
+                className="theme-toggle-btn p-2 rounded-xl transition-all duration-300"
+                aria-label={`Switch to ${theme === 'light' ? 'dark' : 'light'} mode`}
+              >
+                {theme === 'light' ? <Moon size={18} /> : <Sun size={18} />}
+              </button>
+
+              {user ? (
+                <div className="flex items-center space-x-1 xl:space-x-2 ml-1">
+                  {isAdmin && (
+                    <Link
+                      to="/admin"
+                      onClick={handleLinkClick}
+                      className={`admin-link px-3 py-2 text-sm ${location.pathname === '/admin' ? 'active-admin' : ''}`}
+                    >
+                      Admin
+                    </Link>
+                  )}
+                  <span className="user-badge text-xs xl:text-sm max-w-[100px] xl:max-w-[120px] truncate">
+                    Anonymous_{user.uid.slice(0, 6)}
+                  </span>
+                  <button
+                    onClick={handleSignOut}
+                    className="sign-btn text-sm whitespace-nowrap"
+                  >
+                    Sign Out
+                  </button>
+                </div>
+              ) : (
+                <Link
+                  to="/auth"
+                  onClick={handleLinkClick}
+                  className={`sign-btn text-sm xl:text-base whitespace-nowrap ${location.pathname === '/auth' ? 'ring-2 ring-pink-400 dark:ring-pink-500' : ''}`}
+                >
+                  Sign In
+                </Link>
+              )}
+            </div>
+
+            {/* Mobile: Theme Toggle + Hamburger */}
+            <div className="custom-lg:hidden flex items-center space-x-1">
+              <button
+                onClick={toggleTheme}
+                className="theme-toggle-btn p-2 rounded-xl transition-all duration-300"
+                aria-label={`Switch to ${theme === 'light' ? 'dark' : 'light'} mode`}
+              >
+                {theme === 'light' ? <Moon size={18} /> : <Sun size={18} />}
+              </button>
+
+              <button
+                onClick={() => setIsMenuOpen(!isMenuOpen)}
+                className="hamburger-btn p-2 rounded-xl transition-all duration-300"
+                aria-label="Toggle menu"
+              >
+                {isMenuOpen
+                  ? <X className="h-6 w-6" />
+                  : <Menu className="h-6 w-6" />
+                }
+              </button>
+            </div>
+          </div>
+        </div>
+
+        {/* Mobile Dropdown Menu — Glassmorphic */}
+        <div className={`custom-lg:hidden mobile-menu-glass overflow-hidden transition-all duration-400 ease-in-out ${isMenuOpen ? 'mobile-menu-open' : 'mobile-menu-closed'}`}>
+          <div className="px-4 pt-3 pb-2 space-y-1">
             {navLinks.map(({ to, label }) => (
               <Link
                 key={to}
                 to={to}
                 onClick={handleLinkClick}
-                className={`nav-link px-2 py-2 dark:text-pink-400 xl:text-base ${location.pathname === to ? 'active' : ''}`}
+                className={`mobile-nav-link block w-full text-left px-4 py-3 rounded-xl text-base font-medium transition-all duration-200 ${
+                  location.pathname === to
+                    ? 'mobile-nav-active'
+                    : 'mobile-nav-inactive'
+                }`}
               >
                 {label}
               </Link>
             ))}
+          </div>
 
-            {/* Theme Toggle for Desktop */}
-            <button
-              onClick={toggleTheme}
-              className="p-2 rounded-lg bg-white dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-600 transition-all duration-200 border border-gray-200 dark:border-gray-600"
-              aria-label={`Switch to ${theme === 'light' ? 'dark' : 'light'} mode`}
-            >
-              {theme === 'light' ? <Moon size={18} /> : <Sun size={18} />}
-            </button>
-
+          {/* User Section */}
+          <div className="px-4 pt-2 pb-5 space-y-3 border-t border-pink-200/40 dark:border-white/10">
             {user ? (
-              <div className="flex items-center space-x-1 xl:space-x-2 ml-1">
+              <>
                 {isAdmin && (
                   <Link
                     to="/admin"
                     onClick={handleLinkClick}
-                    className={`admin-link px-2 py-2 text-sm ${location.pathname === '/admin' ? 'active-admin' : ''}`}
+                    className={`block w-full text-left px-4 py-3 rounded-xl text-base font-medium transition-all duration-200 ${
+                      location.pathname === '/admin'
+                        ? 'bg-amber-500 text-white shadow-md'
+                        : 'text-amber-600 dark:text-amber-400 hover:bg-amber-50/60 dark:hover:bg-amber-900/30'
+                    }`}
                   >
                     Admin
                   </Link>
                 )}
-                <span className="text-gray-700 dark:text-gray-300 font-mono bg-pink-100 dark:bg-gray-700 px-2 py-1 rounded text-xs xl:text-sm shadow-inner max-w-[100px] xl:max-w-[120px] truncate">
-                  Anonymous_{user.uid.slice(0, 6)}
-                </span>
+
+                <div className="px-4 py-2 rounded-xl bg-white/30 dark:bg-white/5 border border-pink-200/40 dark:border-white/10 backdrop-blur-sm">
+                  <p className="text-gray-600 dark:text-gray-300 font-mono text-sm break-all">
+                    Anonymous_{user.uid.slice(0, 8)}
+                  </p>
+                </div>
+
                 <button
                   onClick={handleSignOut}
-                  className="bg-gradient-to-r from-pink-500 to-pink-400 dark:from-pink-600 dark:to-pink-500 text-white px-2 py-2 rounded-md shadow-md hover:from-pink-600 hover:to-pink-500 dark:hover:from-pink-700 dark:hover:to-pink-600 transition-all duration-200 font-semibold text-sm whitespace-nowrap"
+                  className="sign-btn w-full text-base py-3"
                 >
                   Sign Out
                 </button>
-              </div>
+              </>
             ) : (
               <Link
                 to="/auth"
                 onClick={handleLinkClick}
-                className={`bg-gradient-to-r from-pink-500 to-pink-400 dark:from-pink-600 dark:to-pink-500 text-white px-3 py-2 rounded-md shadow-md hover:from-pink-600 hover:to-pink-500 dark:hover:from-pink-700 dark:hover:to-pink-600 transition-all duration-200 font-semibold text-sm xl:text-base whitespace-nowrap ${location.pathname === '/auth' ? 'ring-2 ring-pink-400 dark:ring-pink-500' : ''}`}
+                className={`sign-btn block w-full text-center text-base py-3 ${
+                  location.pathname === '/auth' ? 'ring-2 ring-pink-300 dark:ring-pink-500' : ''
+                }`}
               >
                 Sign In
               </Link>
             )}
           </div>
-
-          {/* Mobile menu button with Theme Toggle - Shows at 830px and below */}
-          <div className="custom-lg:hidden flex items-center space-x-1">
-            {/* Theme Toggle for Mobile */}
-            <button
-              onClick={toggleTheme}
-              className="p-2 rounded-lg bg-white dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-600 transition-all duration-200 border border-gray-200 dark:border-gray-600"
-              aria-label={`Switch to ${theme === 'light' ? 'dark' : 'light'} mode`}
-            >
-              {theme === 'light' ? <Moon size={18} /> : <Sun size={18} />}
-            </button>
-
-            <button
-              onClick={() => setIsMenuOpen(!isMenuOpen)}
-              className="text-pink-500 dark:text-pink-400 hover:text-pink-700 dark:hover:text-pink-300 transition-colors duration-200 p-2 rounded-lg hover:bg-pink-50 dark:hover:bg-gray-700"
-              aria-label="Toggle menu"
-            >
-              {isMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
-            </button>
-          </div>
         </div>
+      </nav>
 
-        {/* Simplified Mobile Menu */}
-        {isMenuOpen && (
-          <div className="custom-lg:hidden fixed inset-0 top-16 z-40 animate-fade-in bg-white dark:bg-gray-900">
-            <div className="flex flex-col h-full w-full bg-white dark:bg-gray-900">
-              {/* Navigation Links - Simplified */}
-              <div className="flex-1 px-4 pt-4 space-y-1 bg-white dark:bg-gray-900">
-                {navLinks.map(({ to, label }) => (
-                  <Link
-                    key={to}
-                    to={to}
-                    onClick={handleLinkClick}
-                    className={`block w-full text-left px-4 py-3 rounded-lg text-base font-medium transition-all duration-200 ${
-                      location.pathname === to 
-                        ? 'bg-pink-500 dark:bg-pink-600 text-white shadow-sm' 
-                        : 'text-gray-700 dark:text-gray-300 hover:bg-pink-50 dark:hover:bg-gray-800'
-                    }`}
-                  >
-                    {label}
-                  </Link>
-                ))}
-              </div>
-
-              {/* User Section */}
-              <div className="px-4 space-y-3 border-t border-gray-200 dark:border-gray-700 pt-4 pb-6 bg-white dark:bg-gray-900">
-                {user ? (
-                  <>
-                    {isAdmin && (
-                      <Link 
-                        to="/admin" 
-                        onClick={handleLinkClick}
-                        className={`block w-full text-left px-4 py-3 rounded-lg text-base font-medium transition-all duration-200 ${
-                          location.pathname === '/admin'
-                            ? 'bg-amber-500 dark:bg-amber-600 text-white shadow-sm'
-                            : 'text-gray-700 dark:text-gray-300 hover:bg-amber-50 dark:hover:bg-amber-900'
-                        }`}
-                      >
-                        Admin
-                      </Link>
-                    )}
-                    
-                    <div className="px-4 py-2 bg-gray-100 dark:bg-gray-800 rounded-lg">
-                      <p className="text-gray-600 dark:text-gray-400 font-mono text-sm break-all">
-                        Anonymous_{user.uid.slice(0, 8)}
-                      </p>
-                    </div>
-                    
-                    <button
-                      onClick={handleSignOut}
-                      className="w-full bg-pink-500 dark:bg-pink-600 text-white px-4 py-3 rounded-lg font-medium text-base hover:bg-pink-600 dark:hover:bg-pink-700 transition-all duration-200"
-                    >
-                      Sign Out
-                    </button>
-                  </>
-                ) : (
-                  <Link
-                    to="/auth"
-                    onClick={handleLinkClick}
-                    className={`block w-full text-center bg-pink-500 dark:bg-pink-600 text-white px-4 py-3 rounded-lg font-medium text-base hover:bg-pink-600 dark:hover:bg-pink-700 transition-all duration-200 ${
-                      location.pathname === '/auth' ? 'ring-2 ring-pink-300 dark:ring-pink-500' : ''
-                    }`}
-                  >
-                    Sign In
-                  </Link>
-                )}
-              </div>
-            </div>
-          </div>
-        )}
-      </div>
-
-      {/* Custom styles */}
+      {/* Glassmorphic styles */}
       <style>{`
+        /* ─── Glassmorphic Navbar Base ─────────────────────────── */
+        .navbar-glass {
+          background: rgba(255, 240, 245, 0.65);
+          backdrop-filter: blur(18px) saturate(180%);
+          -webkit-backdrop-filter: blur(18px) saturate(180%);
+          border-bottom: 1px solid rgba(236, 72, 153, 0.18);
+          box-shadow: 0 4px 24px -2px rgba(236, 72, 153, 0.10),
+                      0 1px 0 0 rgba(255,255,255,0.5) inset;
+        }
+
+        /* Dark mode glass */
+        .dark .navbar-glass {
+          background: rgba(17, 10, 25, 0.60);
+          backdrop-filter: blur(18px) saturate(160%);
+          -webkit-backdrop-filter: blur(18px) saturate(160%);
+          border-bottom: 1px solid rgba(244, 114, 182, 0.15);
+          box-shadow: 0 4px 30px -2px rgba(0, 0, 0, 0.40),
+                      0 1px 0 0 rgba(255,255,255,0.04) inset;
+        }
+
+        /* Enhanced glass on scroll */
+        .navbar-scrolled {
+          background: rgba(255, 235, 245, 0.78);
+          box-shadow: 0 8px 32px -4px rgba(236, 72, 153, 0.16),
+                      0 1px 0 0 rgba(255,255,255,0.6) inset;
+        }
+        .dark .navbar-scrolled {
+          background: rgba(15, 8, 22, 0.80);
+          box-shadow: 0 8px 32px -4px rgba(0,0,0,0.55),
+                      0 1px 0 0 rgba(255,255,255,0.05) inset;
+        }
+
+        /* ─── Nav Links ─────────────────────────────────────────── */
         .nav-link {
           position: relative;
           color: #be185d;
           font-weight: 500;
           border-radius: 0.75rem;
-          transition: all 0.3s ease;
+          transition: all 0.25s ease;
           white-space: nowrap;
+          letter-spacing: 0.01em;
+        }
+        .dark .nav-link {
+          color: #f9a8d4;
+        }
+        .nav-link::after {
+          content: '';
+          position: absolute;
+          bottom: 4px;
+          left: 50%;
+          transform: translateX(-50%);
+          width: 0;
+          height: 2px;
+          border-radius: 2px;
+          background: linear-gradient(90deg, #ec4899, #db2777);
+          transition: width 0.25s ease;
         }
         .nav-link:hover {
-          background: linear-gradient(90deg, #f9a8d4 0%, #f472b6 100%);
-          color: #fff;
+          background: rgba(236, 72, 153, 0.10);
+          color: #db2777;
           transform: translateY(-1px);
         }
+        .nav-link:hover::after {
+          width: 60%;
+        }
+        .dark .nav-link:hover {
+          background: rgba(244, 114, 182, 0.12);
+          color: #f472b6;
+        }
         .nav-link.active {
-          background: linear-gradient(90deg, #ec4899 0%, #db2777 100%);
-          color: white;
-          box-shadow: 0 4px 15px #ec489966;
+          background: linear-gradient(135deg, #ec4899 0%, #db2777 100%);
+          color: white !important;
+          box-shadow: 0 4px 15px rgba(236, 72, 153, 0.40),
+                      0 0 0 1px rgba(255,255,255,0.15) inset;
+        }
+        .nav-link.active::after {
+          display: none;
+        }
+        .dark .nav-link.active {
+          background: linear-gradient(135deg, #db2777 0%, #be185d 100%);
+          box-shadow: 0 4px 18px rgba(236, 72, 153, 0.50);
         }
 
+        /* ─── Admin Link ─────────────────────────────────────────── */
         .admin-link {
           position: relative;
           color: #d97706;
           font-weight: 500;
           border-radius: 0.75rem;
-          transition: all 0.3s ease;
+          transition: all 0.25s ease;
           white-space: nowrap;
         }
+        .dark .admin-link {
+          color: #fbbf24;
+        }
         .admin-link:hover {
-          background: linear-gradient(90deg, #fbbf24 0%, #f59e0b 100%);
-          color: #fff;
+          background: rgba(251, 191, 36, 0.12);
+          color: #b45309;
           transform: translateY(-1px);
         }
         .admin-link.active-admin {
-          background: linear-gradient(90deg, #f59e0b 0%, #d97706 100%);
+          background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
           color: white;
-          box-shadow: 0 4px 15px #fbbf2433;
+          box-shadow: 0 4px 15px rgba(245, 158, 11, 0.35);
         }
 
-        /* Custom breakpoint for 830px */
+        /* ─── Theme Toggle Button ───────────────────────────────── */
+        .theme-toggle-btn {
+          background: rgba(255, 255, 255, 0.45);
+          border: 1px solid rgba(236, 72, 153, 0.20);
+          color: #9d174d;
+          backdrop-filter: blur(8px);
+        }
+        .theme-toggle-btn:hover {
+          background: rgba(255, 255, 255, 0.70);
+          border-color: rgba(236, 72, 153, 0.40);
+          transform: rotate(12deg) scale(1.05);
+          box-shadow: 0 4px 12px rgba(236, 72, 153, 0.18);
+        }
+        .dark .theme-toggle-btn {
+          background: rgba(255, 255, 255, 0.07);
+          border: 1px solid rgba(244, 114, 182, 0.18);
+          color: #f9a8d4;
+        }
+        .dark .theme-toggle-btn:hover {
+          background: rgba(255, 255, 255, 0.12);
+          border-color: rgba(244, 114, 182, 0.35);
+          box-shadow: 0 4px 14px rgba(244, 114, 182, 0.20);
+        }
+
+        /* ─── Hamburger Button ──────────────────────────────────── */
+        .hamburger-btn {
+          background: rgba(255, 255, 255, 0.45);
+          border: 1px solid rgba(236, 72, 153, 0.20);
+          color: #be185d;
+          backdrop-filter: blur(8px);
+        }
+        .hamburger-btn:hover {
+          background: rgba(255, 255, 255, 0.70);
+          border-color: rgba(236, 72, 153, 0.40);
+          color: #9d174d;
+          box-shadow: 0 4px 12px rgba(236, 72, 153, 0.18);
+        }
+        .dark .hamburger-btn {
+          background: rgba(255, 255, 255, 0.07);
+          border: 1px solid rgba(244, 114, 182, 0.18);
+          color: #f9a8d4;
+        }
+        .dark .hamburger-btn:hover {
+          background: rgba(255, 255, 255, 0.12);
+          border-color: rgba(244, 114, 182, 0.35);
+          color: #f472b6;
+        }
+
+        /* ─── Sign In / Sign Out Button ─────────────────────────── */
+        .sign-btn {
+          display: inline-flex;
+          align-items: center;
+          justify-content: center;
+          padding: 0.45rem 0.9rem;
+          border-radius: 0.75rem;
+          font-weight: 600;
+          background: linear-gradient(135deg, #ec4899 0%, #db2777 100%);
+          color: white;
+          border: 1px solid rgba(255,255,255,0.20);
+          box-shadow: 0 4px 16px rgba(236, 72, 153, 0.35),
+                      0 1px 0 0 rgba(255,255,255,0.25) inset;
+          transition: all 0.25s ease;
+          text-decoration: none;
+        }
+        .sign-btn:hover {
+          background: linear-gradient(135deg, #db2777 0%, #be185d 100%);
+          transform: translateY(-2px);
+          box-shadow: 0 8px 24px rgba(236, 72, 153, 0.50),
+                      0 1px 0 0 rgba(255,255,255,0.25) inset;
+        }
+        .sign-btn:active {
+          transform: translateY(0);
+        }
+        .dark .sign-btn {
+          background: linear-gradient(135deg, #db2777 0%, #9d174d 100%);
+          box-shadow: 0 4px 18px rgba(219, 39, 119, 0.45);
+        }
+        .dark .sign-btn:hover {
+          background: linear-gradient(135deg, #ec4899 0%, #db2777 100%);
+          box-shadow: 0 8px 28px rgba(236, 72, 153, 0.55);
+        }
+
+        /* ─── User Badge ────────────────────────────────────────── */
+        .user-badge {
+          display: inline-block;
+          padding: 0.3rem 0.65rem;
+          border-radius: 0.6rem;
+          font-family: 'Courier New', monospace;
+          background: rgba(236, 72, 153, 0.10);
+          border: 1px solid rgba(236, 72, 153, 0.20);
+          color: #9d174d;
+          backdrop-filter: blur(8px);
+        }
+        .dark .user-badge {
+          background: rgba(244, 114, 182, 0.10);
+          border: 1px solid rgba(244, 114, 182, 0.20);
+          color: #f9a8d4;
+        }
+
+        /* ─── Mobile Menu Glass ─────────────────────────────────── */
+        .mobile-menu-glass {
+          background: rgba(255, 240, 248, 0.88);
+          backdrop-filter: blur(20px) saturate(180%);
+          -webkit-backdrop-filter: blur(20px) saturate(180%);
+          border-top: 1px solid rgba(236, 72, 153, 0.15);
+          box-shadow: 0 12px 40px -4px rgba(236, 72, 153, 0.15);
+        }
+        .dark .mobile-menu-glass {
+          background: rgba(12, 6, 20, 0.92);
+          backdrop-filter: blur(20px) saturate(160%);
+          -webkit-backdrop-filter: blur(20px) saturate(160%);
+          border-top: 1px solid rgba(244, 114, 182, 0.12);
+          box-shadow: 0 12px 40px -4px rgba(0, 0, 0, 0.50);
+        }
+
+        .mobile-menu-open {
+          max-height: 600px;
+          opacity: 1;
+        }
+        .mobile-menu-closed {
+          max-height: 0;
+          opacity: 0;
+          pointer-events: none;
+        }
+
+        .mobile-nav-link {
+          backdrop-filter: blur(4px);
+        }
+        .mobile-nav-active {
+          background: linear-gradient(135deg, #ec4899 0%, #db2777 100%);
+          color: white;
+          box-shadow: 0 4px 14px rgba(236, 72, 153, 0.35);
+        }
+        .mobile-nav-inactive {
+          color: #9d174d;
+          background: transparent;
+        }
+        .mobile-nav-inactive:hover {
+          background: rgba(236, 72, 153, 0.10);
+          color: #be185d;
+        }
+        .dark .mobile-nav-inactive {
+          color: #f9a8d4;
+        }
+        .dark .mobile-nav-inactive:hover {
+          background: rgba(244, 114, 182, 0.12);
+          color: #f472b6;
+        }
+        .dark .mobile-nav-active {
+          background: linear-gradient(135deg, #db2777 0%, #9d174d 100%);
+        }
+
+        /* ─── Custom Breakpoint (830px) ─────────────────────────── */
         @media (min-width: 830px) {
           .custom-lg\\:flex {
             display: flex !important;
@@ -268,22 +507,15 @@ export default function Navbar() {
           }
         }
 
-        /* Mobile animations */
+        /* ─── Animations ────────────────────────────────────────── */
         @keyframes fade-in {
-          from { opacity: 0; transform: translateY(-10px); }
-          to { opacity: 1; transform: translateY(0); }
+          from { opacity: 0; transform: translateY(-8px); }
+          to   { opacity: 1; transform: translateY(0); }
         }
-        
         .animate-fade-in {
           animation: fade-in 0.3s ease-out;
         }
-
-        /* Backdrop for mobile menu */
-        .backdrop-blur-lg {
-          backdrop-filter: blur(16px);
-        }
-      `}
-      </style>
-    </nav>
+      `}</style>
+    </>
   );
 }
