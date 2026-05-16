@@ -14,6 +14,7 @@ import EditStory from './pages/EditStory';
 import AdminDashboard from './pages/AdminDashboard';
 import FAQs from './pages/FAQs';
 import ScrollToTop from './components/ScrollToTop';
+import BackToTop from './components/BackToTop';
 import PrivacyPolicy from './pages/Privacypolicy';
 import Termsandconditions from './pages/termsandconditions';
 import ContactPage from './pages/ContactPage';
@@ -23,6 +24,8 @@ function App() {
     <ThemeProvider>
       <Router>
         <ScrollToTop />
+        {/* // Global back-to-top button available across all pages */}
+        <BackToTop />
         <div className="min-h-screen bg-gray-50">
           <Navbar />
           <main>

@@ -1,222 +1,484 @@
 # 🌐 SafeVoice – AI-Powered Anonymous Support Platform
 
-**Live Demo:** [SafeVoice on Netlify](https://safevoiceforwomen.netlify.app/)  
-
-## 📌 About
-
-Safevoice is a secure, AI-enhanced platform that lets individuals anonymously share harassment experiences, attach media (photos/audio), and access verified NGO resources. It integrates language tools to improve clarity and reach, and is designed to be beginner-friendly for open-source contributors.
-
-## ✨ Features
-- 📝 **Anonymous Story Management** — Add, edit, and delete stories while preserving contributor anonymity.  
-- 🖼 **Media Attachments** — Upload photos and audio recordings with stories.  
-- 🌍 **Real-Time Translation** — Translate stories into 8+ Indian languages using Google Gemini AI.  
-- ✏️ **AI Grammar Correction** — Real-time grammar fixes for submitted text.  
-- 📚 **NGO Resource Hub** — Searchable database of support organizations and contact info.  
-- 🔐 **Secure Auth & DB** — Firebase Authentication + Firestore for secure, privacy-focused storage.  
-- ⚡ **Serverless API** — Netlify Functions for backend endpoints with CORS handling.  
-- 🛡️ **Access Controls & Rate-Limiting** — Basic protections to prevent abuse and preserve anonymity.
+> A secure, AI-assisted platform where users can anonymously express experiences, access NGO support resources, translate content into regional languages, and safely communicate without exposing identity.
 
 ---
 
-## 🛠 Tech Stack
-**Frontend:** React, TypeScript, Tailwind CSS  
-**Backend:** Firebase (Auth, Firestore, Cloud Functions), Netlify Functions  
-**AI Integration:** Google Gemini AI  
-**Deployment:** Netlify
+# 🚀 Live Demo
+
+🔗 [SafeVoice on Netlify](https://safevoiceforwomen.netlify.app/)
 
 ---
 
+# 📌 About The Platform
 
-## 📁 Project Structure
+SafeVoice is a privacy-focused web platform designed to provide a safe digital environment for individuals to anonymously express experiences related to harassment, abuse, discrimination, emotional distress, or social issues.
 
-Below is the folder and file structure of the SafeVoice project 👇  
+The platform integrates:
+
+- 🔐 Secure Authentication
+- 🧠 AI-powered Text Enhancement
+- 🌍 Multilingual Translation
+- 🖼️ Media Upload Support
+- 📚 NGO Resource Discovery
+- ⚡ Serverless Backend Infrastructure
+
+The architecture prioritizes:
+
+- Privacy-first design
+- Scalability
+- Performance optimization
+- Modular backend services
+- Beginner-friendly open-source contribution
+
+---
+
+# ✨ Features
+
+| Feature | Description |
+|---|---|
+| 📝 Anonymous Publishing | Create, edit, and manage content without exposing identity |
+| 🌍 AI Translation | Translate content into multiple Indian languages |
+| ✏️ AI Grammar Enhancement | Improve text quality before publishing |
+| 🖼️ Media Uploads | Upload audio recordings and images |
+| 🔐 Secure Authentication | Firebase-based login & signup |
+| 📚 NGO Resource Hub | Browse verified support organizations |
+| ⚡ Serverless APIs | Lightweight backend using Netlify Functions |
+| 🛡️ Abuse Protection | Rate limiting and secured API access |
+
+---
+
+# 🏗️ High-Level Architecture
+
+```mermaid
+flowchart LR
+
+A[👤 User] --> B[⚛ React Frontend]
+
+B --> C[🔥 Firebase Authentication]
+B --> D[📦 Firestore Database]
+B --> E[⚡ Netlify Serverless Functions]
+
+E --> F[🧠 Google Gemini AI]
+
+B --> G[🖼 Media Storage]
+
+D --> H[📚 Content Collection]
+D --> I[👥 Users Collection]
+D --> J[🏢 NGO Resources]
+
+F --> K[🌍 Translation Output]
+F --> L[✏️ Grammar Corrected Output]
+```
+
+---
+
+# 🔄 Complete Platform Workflow
+
+## 1️⃣ Authentication Lifecycle
+
+```mermaid
+sequenceDiagram
+    participant User
+    participant Frontend
+    participant FirebaseAuth
+    participant Firestore
+
+    User->>Frontend: Open Login / Signup Page
+    Frontend->>FirebaseAuth: Send Credentials
+    FirebaseAuth-->>Frontend: Authentication Token
+    Frontend->>Firestore: Store User Metadata
+    Firestore-->>Frontend: User Profile Created
+    Frontend-->>User: Redirect to Dashboard
+```
+
+### Internal Flow
+
+- Firebase Authentication validates credentials
+- Session tokens are generated securely
+- User metadata is stored in Firestore
+- Public content remains detached from identity
+
+---
+
+## 2️⃣ Content Creation Lifecycle
+
+```mermaid
+flowchart TD
+
+A[👤 User Creates Content] --> B[📝 ShareStory.tsx]
+
+B --> C{Use AI Grammar Enhancement?}
+
+C -->|Yes| D[⚡ correct-grammar.cjs]
+D --> E[🧠 Gemini AI]
+E --> F[✏️ Enhanced Text]
+
+C -->|No| G[Continue Original Text]
+
+F --> H[📦 Submit Content]
+G --> H
+
+H --> I{Attach Media?}
+
+I -->|Yes| J[🖼 Upload Audio/Image]
+I -->|No| K[📄 Store Text Only]
+
+J --> L[☁ Media Storage]
+L --> M[🔗 Media URL Generated]
+
+M --> N[🔥 Firestore Database]
+K --> N
+
+N --> O[📚 Content Published]
+```
+
+---
+
+## 3️⃣ AI Translation Lifecycle
+
+```mermaid
+flowchart LR
+
+A[📚 Existing Content] --> B[⚡ translate.cjs]
+
+B --> C[🧠 Google Gemini AI]
+
+C --> D[🌍 Selected Language Translation]
+
+D --> E[⚛ Frontend Display]
+```
+
+### Translation Benefits
+
+- Regional accessibility
+- Cross-language communication
+- Better outreach for support systems
+
+---
+
+## 4️⃣ Content Retrieval Workflow
+
+```mermaid
+sequenceDiagram
+    participant User
+    participant Frontend
+    participant Firestore
+
+    User->>Frontend: Open Feed Page
+    Frontend->>Firestore: Fetch Content
+    Firestore-->>Frontend: Return Content Data
+    Frontend-->>User: Render Content Cards
+```
+
+### Retrieved Data
+
+- Anonymous content
+- Media URLs
+- Timestamp metadata
+- Translation versions
+
+---
+
+## 5️⃣ NGO Resource Hub Workflow
+
+```mermaid
+flowchart LR
+
+A[👤 User Searches NGO] --> B[⚛ Resources.tsx]
+
+B --> C[🔥 Firestore NGO Collection]
+
+C --> D[📚 NGO Resource Cards]
+
+D --> E[📞 Contact Information]
+```
+
+---
+
+# 🧠 Backend-to-Frontend Detailed Architecture
+
+```mermaid
+flowchart TB
+
+subgraph Frontend
+A[Home.tsx]
+B[Auth.tsx]
+C[ShareStory.tsx]
+D[Stories.tsx]
+E[Resources.tsx]
+F[AdminDashboard.tsx]
+end
+
+subgraph Backend
+G[Firebase Authentication]
+H[Firestore Database]
+I[Netlify Functions]
+J[Google Gemini AI]
+K[Media Storage]
+end
+
+A --> B
+B --> G
+
+C --> I
+I --> J
+
+C --> H
+D --> H
+E --> H
+F --> H
+
+C --> K
+K --> H
+
+J --> I
+I --> C
+```
+
+---
+
+# 🔐 Security & Privacy Architecture
+
+## Privacy Principles
+
+- Anonymous publishing
+- Minimal personally identifiable information
+- Secure authentication flow
+- Protected backend APIs
+- Firestore security rules
+- Abuse prevention mechanisms
+
+---
+
+## Security Workflow
+
+```mermaid
+flowchart LR
+
+A[👤 User Request] --> B[🔐 Firebase Authentication]
+B --> C[🛡 Auth Validation]
+C --> D[⚡ Serverless Function]
+D --> E[🔥 Firestore Rules]
+E --> F[📦 Database Access]
+```
+
+---
+
+# ⚡ API Architecture
+
+| Endpoint | Purpose |
+|---|---|
+| correct-grammar.cjs | AI grammar enhancement |
+| translate.cjs | Multi-language translation |
+| subscribe.cjs | Newsletter/email subscriptions |
+
+---
+
+# 📂 Project Structure
 
 ```bash
 SafeVoice/
 │
 ├── .github/
-│   └── ISSUE_TEMPLATE/                # GitHub issue templates for contributors
+│   └── ISSUE_TEMPLATE/
 │
 ├── netlify/
-│   └── functions/                     # Netlify serverless functions
-│       ├── correct-grammar.cjs        # Function to correct grammar in stories
-│       ├── subscribe.cjs              # Function to handle email subscriptions
-│       └── translate.cjs              # Function to translate stories or text
+│   └── functions/
+│       ├── correct-grammar.cjs
+│       ├── subscribe.cjs
+│       └── translate.cjs
 │
 ├── public/
-│   └── _redirects                     # Netlify redirects configuration
+│   └── _redirects
 │
 ├── src/
-│   ├── components/                    # Reusable UI components
-│   │   ├── Footer.tsx
-│   │   ├── Navbar.tsx
-│   │   ├── ScrollToTop.tsx
-│   │   └── ThemeToggle.tsx
-│   │
-│   ├── context/                       # React context for global state management
-│   │   └── ThemeContext.tsx
-│   │
-│   ├── lib/                           # External service configurations
-│   │   ├── firebase.ts
-│   │   └── supabase.ts
-│   │
-│   ├── pages/                         # Main app pages
-│   │   ├── About.tsx
-│   │   ├── AdminDashboard.tsx
-│   │   ├── Auth.tsx
-│   │   ├── ContactPage.tsx
-│   │   ├── EditStory.tsx
-│   │   ├── FAQs.tsx
-│   │   ├── Home.tsx
-│   │   ├── Privacypolicy.tsx
-│   │   ├── Resources.tsx
-│   │   ├── ShareStory.tsx
-│   │   ├── Stories.tsx
-│   │   └── termsandconditions.tsx
-│   │
-│   ├── App.tsx                        # Root app component
-│   ├── index.css                      # Global styles
-│   ├── main.tsx                       # App entry point
-│   └── vite-env.d.ts                  # Type definitions for Vite
+│   ├── components/
+│   ├── context/
+│   ├── lib/
+│   ├── pages/
+│   ├── App.tsx
+│   ├── main.tsx
+│   └── index.css
 │
-├── .env.example                       # Example environment variables
-├── .gitignore                         # Git ignore configuration
-├── CODE_OF_CONDUCT.md                 # Community behavior guidelines
-├── CONTRIBUTING.md                    # Contribution guide
-├── GirlScript-Summer-of-Code.png      # Project/organization image
-├── LICENSE.md                         # License information
-├── PULL_REQUEST_TEMPLATE.md           # Pull request format
-├── README.md                          # This file 😄
-│
-├── eslint.config.js                   # ESLint configuration
-├── index.html                         # Main HTML entry file
-├── netlify.toml                       # Netlify configuration
-├── package-lock.json                  # NPM lock file
-├── package.json                       # Dependencies and scripts
-├── postcss.config.js                  # PostCSS setup for Tailwind
-├── server.js                          # Local server setup (optional)
-├── tailwind.config.js                 # TailwindCSS configuration
-├── tsconfig.app.json                  # TypeScript config for app
-├── tsconfig.json                      # Main TypeScript configuration
-├── tsconfig.node.json                 # Node TypeScript config
-└── vite.config.js                     # Vite configuration
+├── README.md
+├── package.json
+├── netlify.toml
+└── vite.config.js
 ```
+
 ---
 
-## ⚙️ Installation & Setup
+# ⚙️ Tech Stack
 
-1. **Clone the Repository**
-   ```bash
-   git clone https://github.com/Piyushydv08/SafeVoice.git
-   cd SafeVoice
-   ```
+| Layer | Technology |
+|---|---|
+| Frontend | React + TypeScript + Tailwind CSS |
+| Backend | Firebase + Netlify Functions |
+| Database | Firestore |
+| Authentication | Firebase Auth |
+| AI Integration | Google Gemini AI |
+| Deployment | Netlify |
+| Storage | Cloud Storage / External Storage |
 
-2. **Install Dependencies and CLI**
+---
+
+# 📈 Scalability Design
+
+SafeVoice uses a modular serverless architecture.
+
+### Benefits
+
+- ⚡ Faster deployments
+- 📈 Easy horizontal scaling
+- 💸 Lower infrastructure costs
+- 🔧 Independent backend functions
+- 🌍 CDN delivery via Netlify
+
+---
+
+# 🧩 Frontend Routing Structure
+
+```mermaid
+flowchart TD
+
+A[🏠 Home] --> B[🔐 Authentication]
+A --> C[📝 Create Content]
+A --> D[📚 Explore Content]
+A --> E[🏢 NGO Resources]
+A --> F[❓ FAQs]
+A --> G[📞 Contact]
+A --> H[⚙️ Admin Dashboard]
+```
+
+---
+
+# 🛠️ Installation & Setup
+
+## 1️⃣ Clone Repository
+
+```bash
+git clone https://github.com/Piyushydv08/SafeVoice.git
+cd SafeVoice
+```
+
+---
+
+## 2️⃣ Install Dependencies
 
 ```bash
 npm install
 npm install -g firebase-tools
 npm install -g netlify-cli
 ```
-3. **Configure Environment Variables**
 
-- Create a .env file in the root directory.
-- Place all keys according to .env.example
-- Add Firebase & API keys.
+---
 
-4. **Start Development Server**
+## 3️⃣ Configure Environment Variables
+
+Create a `.env` file in the root directory.
+
+Add:
+
+- Firebase configuration keys
+- Gemini AI API keys
+- Storage configuration values
+
+---
+
+## 4️⃣ Start Development Server
+
 ```bash
 netlify dev
 ```
 
-### ▶️ Usage
---- 
-
-- Visit http://localhost:8888 in your browser.
-- Sign up / Log in securely using Firebase Auth.
-- Share an anonymous story with or without media.
-- Translate and correct grammar instantly.
-- Browse NGO resources for support.
-
-## 🤝 Contributing
-
-Contributions are welcome! Follow these steps:
-
-1. Fork the repository
-2. Create a new branch (`git checkout -b feature-name`)
-3. Make your changes
-4. Commit your changes (`git commit -m 'Add feature'`)
-5. Push to the branch  (`git push origin feature-name`)
-6. Create a Pull Request
-
-Please read [CONTRIBUTING.md](CONTRIBUTING.md) and follow our [Code of Conduct](CODE_OF_CONDUCT.md).
-
----
-## 🌟GSSoC'25
-![GSSoC Logo](https://github.com/dimpal-yadav/SafeVoice/blob/main/GirlScript-Summer-of-Code.png)
-🌟 **Exciting News...**
-
-🚀 This project is now an official part of GirlScript Summer of Code – GSSoC'25! 💃🎉💻 We're thrilled to welcome contributors from all over India and beyond to collaborate, build, and grow *Medicine-Reminder-App!* Let’s make learning and career development smarter – together! 🌟👨‍💻👩‍💻
-
-👩‍💻 GSSoC is one of India’s **largest 3-month-long open-source programs** that encourages developers of all levels to contribute to real-world projects 🌍 while learning, collaborating, and growing together. 🌱
-
-🌈 With **mentorship, community support**, and **collaborative coding**, it's the perfect platform for developers to:
-
-- ✨ Improve their skills
-- 🤝 Contribute to impactful projects
-- 🏆 Get recognized for their work
-- 📜 Receive certificates and swag!
-
-🎉 **I can’t wait to welcome new contributors** from GSSoC 2025 to this Medicine-Reminder-App project family! Let's build, learn, and grow together — one commit at a time. 🔥👨‍💻👩‍💻
-
-## 🏆 **GSSoC 2025 Guidelines**
-
-### 📋 **For Participants**
-#### ✅ **Do's**
-- ✅ **Read documentation** thoroughly before contributing
-- ✅ **Follow code style** and project structure
-- ✅ **Write descriptive** commit messages
-- ✅ **Test your changes** before submitting PR
-- ✅ **Be respectful** and collaborative
-- ✅ **Ask questions** if you're unsure about anything
-#### ❌ **Don'ts**
-- ❌ **Don't spam** with multiple PRs for same issue
-- ❌ **Don't copy code** without understanding
-- ❌ **Don't make unnecessary** changes
-- ❌ **Don't ignore** code review feedback
-- ❌ **Don't forget** to update documentation when needed
-### 🎯 **Contribution Levels**
-| Level | Description | Points | Badge |
-|-------|-------------|--------|-------|
-| 🥉 **Beginner** | Fix typos, update docs, minor bug fixes | 5-10 | ![Beginner](https://img.shields.io/badge/Level-Beginner-green) |
-| 🥈 **Intermediate** | Add features, improve UI/UX, performance | 15-25 | ![Intermediate](https://img.shields.io/badge/Level-Intermediate-blue) |
-| 🥇 **Advanced** | Major features, architecture improvements | 30-50 | ![Advanced](https://img.shields.io/badge/Level-Advanced-red) |
 ---
 
-## ✨ Contributors
+# ▶️ Usage Guide
 
-#### Thanks to all the wonderful contributors 💖
-
-[![Contributors](https://contrib.rocks/image?repo=Piyushydv08/SafeVoice)](https://github.com/Piyushydv08/SafeVoice/graphs/contributors)
+1. Open the platform in browser
+2. Sign up securely using Firebase Auth
+3. Create anonymous content
+4. Attach optional media
+5. Improve text using AI grammar enhancement
+6. Translate content into regional languages
+7. Browse NGO support resources
 
 ---
-## 📧 Contact  
 
-For queries, feedback, or guidance regarding this project, you can contact the **mentor** assigned to the issue or admins:  
+# 🤝 Contributing
 
-- 📩 **LinkedIn**: [Aditi-raj](https://www.linkedin.com/in/aditi-raj-890358329/)
-- 📩 **LinkedIn**: [Piyushydv08](https://www.linkedin.com/in/piyushydv08/)
-- 💬 **By commit/PR comments**: Please tag the mentor in your commit or pull request discussion for direct feedback.  
- 
-Original Repository: [SafeVoice](https://github.com/Piyushydv08/SafeVoice.git)  
+Contributions are welcome from developers of all experience levels.
+
+---
+
+## Contribution Workflow
+
+```mermaid
+flowchart LR
+
+A[Fork Repository] --> B[Create Branch]
+B --> C[Make Changes]
+C --> D[Test Changes]
+D --> E[Commit Code]
+E --> F[Push Branch]
+F --> G[Create Pull Request]
+```
+
+---
+
+# 🌟 GSSoC'26 Participation
+
+SafeVoice is officially part of GirlScript Summer of Code 2026.
+
+Contributors can:
+
+- Improve frontend UI/UX
+- Build backend APIs
+- Add AI integrations
+- Improve accessibility
+- Enhance documentation
+- Optimize performance
+
+---
+
+# 📧 Contact
+
+## Maintainers
+
+- Piyush Yadav  
+  - GitHub: https://github.com/Piyushydv08
+  - LinkedIn: https://www.linkedin.com/in/piyushydv08/
+    
+- Aditi Raj  
+  - GitHub: https://github.com/aditiraj2006
+  - LinkedIn: https://www.linkedin.com/in/aditi-raj-890358329/
 
 
+### Support Channels
 
-## 📄 **License**
-This project is licensed under the **MIT License** - see the [LICENSE](LICENSE) file for details.
+- GitHub Issues
+- Pull Request Discussions
 
---- 
+---
 
-If you like this project, please give it a ⭐ star. Your support means a lot to us!
+# 📄 License
 
-Feel free to contribute or suggest new features!🙏
+Licensed under the MIT License.
+
+---
+
+# ⭐ Support The Project
+
+If you found this project useful:
+
+- ⭐ Star the repository
+- 🍴 Fork the project
+- 🧑‍💻 Contribute improvements
+- 📢 Share with others
+
+---
+
+# 💙 SafeVoice Mission
+
+> “Creating a secure space where voices can be heard safely, anonymously, and without fear.”

@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { toast } from 'react-hot-toast';
 import Slider from 'react-slick';
-import { FaChevronLeft, FaChevronRight, FaArrowUp } from "react-icons/fa";
+// import { FaChevronLeft, FaChevronRight, FaArrowUp } from "react-icons/fa";
+import { FaChevronLeft, FaChevronRight } from "react-icons/fa";
 import { useNavigate } from 'react-router-dom';
+import TopStoriesCarousel from '../components/TopStoriesCarousel';
 
 // Firebase imports
 import { auth } from '../lib/firebase';
@@ -118,7 +120,6 @@ export default function Home() {
   const [testimonials, setTestimonials] = useState<Testimonial[]>([]);
   const [testimonialContent, setTestimonialContent] = useState('');
   const [loading, setLoading] = useState(false);
-  const [expandedStoryId, setExpandedStoryId] = useState<string | null>(null);
   const [showButton, setShowButton] = useState(false);
   const navigate = useNavigate();
 
@@ -136,22 +137,22 @@ export default function Home() {
     fetchTestimonials();
   }, []);
 
-  useEffect(() => {
-    const handleScroll = () => {
-      if (window.scrollY > 300) {
-        setShowButton(true);
-      } else {
-        setShowButton(false);
-      }
-    };
-    window.addEventListener("scroll", handleScroll);
-    return () => window.removeEventListener("scroll", handleScroll);
-  }, []);
+  // useEffect(() => {
+  //   const handleScroll = () => {
+  //     if (window.scrollY > 300) {
+  //       setShowButton(true);
+  //     } else {
+  //       setShowButton(false);
+  //     }
+  //   };
+  //   window.addEventListener("scroll", handleScroll);
+  //   return () => window.removeEventListener("scroll", handleScroll);
+  // }, []);
 
   // ✅ Scroll to top function
-  const scrollToTop = () => {
-    window.scrollTo({ top: 0, behavior: "smooth" });
-  };
+  // const scrollToTop = () => {
+  //   window.scrollTo({ top: 0, behavior: "smooth" });
+  // };
 
 
   async function fetchTopStories() {
@@ -312,86 +313,8 @@ export default function Home() {
       </div>
 
       {/* Top Stories Section */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
-      <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-12 text-center">Top Stories</h2>
-      {topStories.length > 0 ? (
-        <Slider
-        prevArrow={<PrevArrow />}
-        nextArrow={<NextArrow />}
-        dots={false}
-        arrows={true}
-        infinite={topStories.length > 3}
-        speed={500}
-        slidesToShow={3}
-        slidesToScroll={1}
-        autoplay={true}
-        autoplaySpeed={5000}
-        responsive={[
-          {
-          breakpoint: 1024,
-          settings: {
-            slidesToShow: 2,
-            slidesToScroll: 1,
-            infinite: topStories.length > 2,
-            arrows: true,
-            dots: false,
-          }
-          },
-          {
-          breakpoint: 640,
-          settings: {
-            slidesToShow: 1,
-            slidesToScroll: 1,
-            infinite: topStories.length > 1,
-            arrows: true,
-            dots: false,
-          }
-          }
-        ]}
-        >
-        {topStories
-          .slice(0, 9)
-          .map((story) => {
-          const isExpanded = expandedStoryId === story.id;
-          const showReadMoreButton = story.content.length > 200; // Check original length
-          return (
-            <div key={story.id} className="px-4 h-full"> {/* Slider item height */}
-            {/* Card with fixed height */}
-            <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg overflow-hidden flex flex-col h-[450px] w-full max-w-[420px] mx-auto transform hover:scale-105 transition-transform duration-300" style={{ fontFamily: "'Montserrat', 'Nunito', sans-serif" }}>
-              {/* Card Body */}
-              <div className="p-6 flex-grow flex flex-col min-h-0"> {/* Use flex-col and min-h-0 */}
-                <h3 className="text-xl font-semibold text-gray-800 dark:text-white mb-3 flex-shrink-0">{story.title}</h3>
-                {/* Content Area: Scrolls if needed, scrollbar hidden, uses max-height for truncation */}
-                <div className={`flex-grow relative overflow-hidden ${!isExpanded ? 'max-h-56' : 'overflow-y-auto scrollbar-hide'}`}>
-                    <p className={`text-gray-600 dark:text-gray-300 text-sm leading-relaxed`}>
-                        {story.content}
-                    </p>
-                </div>
-                {/* Read More Button Area */}
-                {showReadMoreButton && (
-                    <button
-                      onClick={() => setExpandedStoryId(isExpanded ? null : story.id)}
-                      className="mt-2 text-pink-600 hover:text-pink-700 dark:text-pink-400 dark:hover:text-pink-300 font-semibold transition-colors duration-200 self-start flex-shrink-0"
-                    >
-                      {isExpanded ? 'Show Less' : 'Read More'}
-                    </button>
-                  )}
-              </div>
-              {/* Card Footer */}
-              <div className="p-4 border-t border-gray-100 dark:border-gray-700 flex-shrink-0">
-                <div className="flex justify-between items-center text-xs text-gray-500 dark:text-gray-400">
-                  <span>By Anonymous_{story.author_id?.slice(0, 6) || 'User'}</span> {/* Fallback if author_id is missing */}
-                  <span>{story.reactionsCount ?? 0} reactions</span>
-                </div>
-              </div>
-            </div>
-            </div>
-          );
-          })}
-        </Slider>
-      ) : (
-        <p className="col-span-full text-center text-gray-500 dark:text-gray-400">Loading stories or no stories available...</p>
-      )}
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+        <TopStoriesCarousel stories={topStories} />
       </div>
 
       {/* Testimonials Section */}
@@ -493,7 +416,7 @@ export default function Home() {
         </p>
       </div>
       </div>
-      {showButton && (
+      {/* {showButton && (
       <button
         onClick={scrollToTop}
         className="fixed bottom-6 right-6 bg-pink-500 text-white p-3 rounded-full shadow-lg hover:bg-pink-600 transition duration-300 z-50"
@@ -501,7 +424,7 @@ export default function Home() {
       >
         <FaArrowUp />
       </button>
-      )}
+      )} */}
       {/* ADDED: CSS for scrollbar hiding */}
       <style>{`
         /* For Webkit browsers (Chrome, Safari) */
