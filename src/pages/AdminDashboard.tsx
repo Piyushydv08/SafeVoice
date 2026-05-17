@@ -130,7 +130,7 @@ export default function AdminDashboard() {
 
       const riskOrder: Record<string, number> = { HIGH: 0, MEDIUM: 1, LOW: 2 };
 
-      storiesWithReportCounts.sort((a, b) => {
+      storiesList.sort((a, b) => {
         const riskA = riskOrder[a.risk_level || 'LOW'] ?? 2;
         const riskB = riskOrder[b.risk_level || 'LOW'] ?? 2;
         if (riskA !== riskB) return riskA - riskB;
@@ -138,12 +138,7 @@ export default function AdminDashboard() {
         return b.created_at.seconds - a.created_at.seconds;
       });
 
-      // Sort stories by report count descending, then by creation date
-      storiesWithReportCounts.sort((a, b) => {
-        if (b.reportCount !== a.reportCount) return b.reportCount - a.reportCount;
-        return b.created_at.seconds - b.created_at.seconds;
-      });
-      setStories(storiesWithReportCounts);
+      setStories(storiesList);
     } catch (error) {
       console.error('Error fetching admin data: ', error);
       toast.error('Could not load admin data.');
