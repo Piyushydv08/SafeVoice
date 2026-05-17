@@ -1,4 +1,3 @@
-import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { ThemeProvider } from './context/ThemeContext';
 import { Toaster } from 'react-hot-toast';
@@ -18,6 +17,8 @@ import BackToTop from './components/BackToTop';
 import PrivacyPolicy from './pages/Privacypolicy';
 import Termsandconditions from './pages/termsandconditions';
 import ContactPage from './pages/ContactPage';
+
+
 
 function App() {
   return (
