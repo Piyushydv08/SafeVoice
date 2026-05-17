@@ -4,6 +4,97 @@ import Slider from 'react-slick';
 import { FaChevronLeft, FaChevronRight, FaArrowUp } from "react-icons/fa";
 import { useNavigate } from 'react-router-dom';
 
+
+interface Testimonial {
+  id: string;
+  content: string;
+  author_id?: string;
+}
+
+function TestimonialsBanner({ testimonials }: { testimonials: Testimonial[] }) {
+  const [currentIndex, setCurrentIndex] = useState(0);
+  const [isTransitioning, setIsTransitioning] = useState(false);
+
+  const visibleCount = Math.min(3, testimonials.length);
+
+  useEffect(() => {
+    if (testimonials.length <= 3) return;
+
+    const interval = setInterval(() => {
+      setIsTransitioning(true);
+      setTimeout(() => {
+        setCurrentIndex((prev) => (prev + visibleCount) % testimonials.length);
+        setIsTransitioning(false);
+      }, 500);
+    }, 7000);
+
+    return () => clearInterval(interval);
+  }, [testimonials.length, visibleCount]);
+
+  const getVisible = () => {
+    if (testimonials.length <= 3) return testimonials;
+    return Array.from({ length: visibleCount }, (_, i) =>
+      testimonials[(currentIndex + i) % testimonials.length]
+    );
+  };
+
+  const totalGroups = Math.ceil(testimonials.length / visibleCount);
+  const currentGroup = Math.floor(currentIndex / visibleCount);
+
+  return (
+    <div>
+      {/* Animated cards */}
+      <div
+        className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 transition-all duration-500"
+        style={{
+          opacity: isTransitioning ? 0 : 1,
+          transform: isTransitioning ? 'translateY(8px)' : 'translateY(0)',
+        }}
+      >
+        {getVisible().map((testimonial) => (
+          <div key={`${testimonial.id}-${currentIndex}`} className="px-2 sm:px-3">
+            <div
+              className="bg-white dark:bg-gray-700 rounded-lg shadow-md p-6 h-full flex flex-col justify-between transform transition-transform duration-300 hover:scale-105"
+              style={{ fontFamily: "'Montserrat', 'Nunito', sans-serif" }}
+            >
+              <p className="text-gray-600 dark:text-gray-300 mb-4 font-normal text-sm italic">
+                "{testimonial.content}"
+              </p>
+              <p className="text-gray-800 dark:text-gray-200 font-semibold text-xs text-right">
+                By Anonymous_{testimonial.author_id?.slice(0, 8) || 'User'}
+              </p>
+            </div>
+          </div>
+        ))}
+      </div>
+
+      {/* Dot indicators — only show if more than 3 testimonials */}
+      {testimonials.length > 3 && (
+        <div className="flex justify-center gap-2 mt-8">
+          {Array.from({ length: totalGroups }).map((_, i) => (
+            <button
+              key={i}
+              onClick={() => {
+                setIsTransitioning(true);
+                setTimeout(() => {
+                  setCurrentIndex(i * visibleCount);
+                  setIsTransitioning(false);
+                }, 300);
+              }}
+              className={`w-2 h-2 rounded-full transition-all duration-300 ${
+                i === currentGroup
+                  ? 'bg-pink-500 w-4'
+                  : 'bg-gray-300 dark:bg-gray-600 hover:bg-pink-300'
+              }`}
+              aria-label={`Go to group ${i + 1}`}
+            />
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
 // Firebase imports
 import { auth } from '../lib/firebase';
 import {
@@ -395,16 +486,16 @@ export default function Home() {
       </div>
 
       {/* Testimonials Section */}
-      <div className="bg-gray-100 dark:bg-gray-800 py-16">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-12 text-center">
-        Voices of Strength
-        </h2>
+<div className="bg-gray-100 dark:bg-gray-800 py-16 overflow-hidden">
+  <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-12 text-center">
+      Voices of Strength
+    </h2>
 
-        {/* Testimonial Submission Form */}
-        {auth.currentUser ? (
-        <form onSubmit={handleAddTestimonial} className="mb-12 max-w-xl mx-auto">
-          <textarea
+    {/* Testimonial Submission Form */}
+    {auth.currentUser ? (
+      <form onSubmit={handleAddTestimonial} className="mb-12 max-w-xl mx-auto">
+        <textarea
           value={testimonialContent}
           onChange={(e) => setTestimonialContent(e.target.value)}
           placeholder="Share your experience with SafeVoice..."
@@ -412,74 +503,41 @@ export default function Home() {
           rows={4}
           required
           style={{ fontFamily: "'Montserrat', 'Nunito', sans-serif" }}
-          ></textarea>
-          <button
+        ></textarea>
+        <button
           type="submit"
           className="mt-4 bg-pink-500 text-white px-6 py-2 rounded-md hover:bg-pink-600 focus:outline-none focus:ring-2 focus:ring-pink-500 focus:ring-offset-2 transition-colors duration-200"
           disabled={loading}
           style={{ fontFamily: "'Montserrat', 'Nunito', sans-serif" }}
-          >
+        >
           {loading ? 'Submitting...' : 'Give Your Review'}
-          </button>
-        </form>
-        ) : (
-        <div className="mb-12 max-w-xl mx-auto text-center">
-          <p className="text-gray-600 dark:text-gray-300 mb-2">Please sign in to share your experience</p>
-          <button
+        </button>
+      </form>
+    ) : (
+      <div className="mb-12 max-w-xl mx-auto flex items-center justify-center gap-4">
+        <p className="text-gray-600 dark:text-gray-300 whitespace-nowrap">
+          Please sign in to share your experience
+        </p>
+        <button
           onClick={() => navigate('/auth')}
-          className="bg-pink-500 text-white px-6 py-2 rounded-md hover:bg-pink-600"
+          className="bg-pink-500 text-white px-6 py-2 rounded-md hover:bg-pink-600 whitespace-nowrap flex-shrink-0"
           style={{ fontFamily: "'Montserrat', 'Nunito', sans-serif" }}
-          >
+        >
           Sign In
-          </button>
-        </div>
-        )}
-
-        {testimonials.length > 0 ? (
-        testimonials.length > 3 ? ( // Only use Slider if more than 3 testimonials
-          <Slider {...testimonialSliderSettings}>
-          {testimonials.map((testimonial) => (
-            <div key={testimonial.id} className="px-2 sm:px-3">
-            <div
-              className="bg-white dark:bg-gray-700 rounded-lg shadow-md p-6 h-full flex flex-col justify-between transform transition-transform duration-300 hover:scale-105"
-              style={{ fontFamily: "'Montserrat', 'Nunito', sans-serif" }}
-            >
-              <p className="text-gray-600 dark:text-gray-300 mb-4 font-normal text-sm italic">
-              "{testimonial.content}"
-              </p>
-              <p className="text-gray-800 dark:text-gray-200 font-semibold text-xs text-right">
-              By Anonymous_{testimonial.author_id?.slice(0, 8) || 'User'}
-              </p>
-            </div>
-            </div>
-          ))}
-          </Slider>
-        ) : (
-          // Fallback for 1-3 testimonials
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-          {testimonials.map((testimonial) => (
-            <div key={testimonial.id} className="px-2 sm:px-3">
-            <div
-              className="bg-white dark:bg-gray-700 rounded-lg shadow-md p-6 h-full flex flex-col justify-between transform transition-transform duration-300 hover:scale-105"
-              style={{ fontFamily: "'Montserrat', 'Nunito', sans-serif" }}
-            >
-              <p className="text-gray-600 dark:text-gray-300 mb-4 font-normal text-sm italic">
-              "{testimonial.content}"
-              </p>
-              <p className="text-gray-800 dark:text-gray-200 font-semibold text-xs text-right">
-              By Anonymous_{testimonial.author_id?.slice(0, 8) || 'User'}
-              </p>
-            </div>
-            </div>
-          ))}
-          </div>
-        )
-        ) : (
-        <p className="text-center text-gray-500 dark:text-gray-400">No testimonials yet. Be the first to share your experience!</p>
-        )}
+        </button>
       </div>
-      </div>
+    )}
 
+    {/* Dynamic Rotating Testimonials Banner */}
+    {testimonials.length > 0 ? (
+      <TestimonialsBanner testimonials={testimonials} />
+    ) : (
+      <p className="text-center text-gray-500 dark:text-gray-400">
+        No testimonials yet. Be the first to share your experience!
+      </p>
+    )}
+  </div>
+</div>
       {/* About Section */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
       <div className="text-center">
