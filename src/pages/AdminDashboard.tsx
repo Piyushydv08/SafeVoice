@@ -27,7 +27,7 @@ const db = getFirestore();
 interface NGORequest {
   id: string;
   name: string;
-  description:string;
+  description: string;
   contact: string;
   email: string;
   registration_number: string;
@@ -53,6 +53,7 @@ interface Story {
   content: string;
   author_id: string;
   reportCount?: number;
+  risk_level?: string;
   created_at: Timestamp;
 }
 
@@ -104,31 +105,38 @@ export default function AdminDashboard() {
 
       const requestsList = requestsSnapshot.docs.map(
         doc =>
-          ({
-            id: doc.id,
-            ...doc.data(),
-          } as NGORequest)
+        ({
+          id: doc.id,
+          ...doc.data(),
+        } as NGORequest)
       );
       setPendingNGOs(requestsList);
-      
+
       const approvedList = approvedSnapshot.docs.map(
         doc =>
-          ({
-            id: doc.id,
-            ...doc.data(),
-          } as ApprovedNGO)
-        );
-        setApprovedNGOs(approvedList);
+        ({
+          id: doc.id,
+          ...doc.data(),
+        } as ApprovedNGO)
+      );
+      setApprovedNGOs(approvedList);
 
       // Process stories and fetch report counts for each
-      const storiesList = storiesSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Story));
-      const storiesWithReportCounts = await Promise.all(
-        storiesList.map(async (story) => {
-          const reportsQuery = query(collection(db, 'reports'), where('story_id', '==', story.id));
-          const reportSnap = await getDocs(reportsQuery);
-          return { ...story, reportCount: reportSnap.size };
-        })
-      );
+      const storiesList = storiesSnapshot.docs.map(doc => ({
+        id: doc.id,
+        ...doc.data(),
+        risk_level: doc.data().risk_level || 'LOW',
+      } as Story));
+
+      const riskOrder: Record<string, number> = { HIGH: 0, MEDIUM: 1, LOW: 2 };
+
+      storiesWithReportCounts.sort((a, b) => {
+        const riskA = riskOrder[a.risk_level || 'LOW'] ?? 2;
+        const riskB = riskOrder[b.risk_level || 'LOW'] ?? 2;
+        if (riskA !== riskB) return riskA - riskB;
+        if (b.reportCount !== a.reportCount) return (b.reportCount ?? 0) - (a.reportCount ?? 0);
+        return b.created_at.seconds - a.created_at.seconds;
+      });
 
       // Sort stories by report count descending, then by creation date
       storiesWithReportCounts.sort((a, b) => {
@@ -146,7 +154,7 @@ export default function AdminDashboard() {
 
   const handleApprove = async (ngo: NGORequest) => {
     if (!window.confirm(`Are you sure you want to approve ${ngo.name}?`)) return;
-    
+
     const user = auth.currentUser;
     if (!user || !user.email) {
       toast.error("Could not identify approving admin.");
@@ -196,12 +204,12 @@ export default function AdminDashboard() {
     if (!window.confirm(`Are you sure you want to DELETE the approved NGO "${ngoName}"? This action cannot be undone.`)) return;
 
     try {
-        await deleteDoc(doc(db, 'ngos', ngoId));
-        toast.success(`${ngoName} has been deleted.`);
-        setApprovedNGOs(prev => prev.filter(item => item.id !== ngoId));
+      await deleteDoc(doc(db, 'ngos', ngoId));
+      toast.success(`${ngoName} has been deleted.`);
+      setApprovedNGOs(prev => prev.filter(item => item.id !== ngoId));
     } catch (error) {
-        console.error('Error deleting approved NGO: ', error);
-        toast.error('Failed to delete NGO.');
+      console.error('Error deleting approved NGO: ', error);
+      toast.error('Failed to delete NGO.');
     }
   };
 
@@ -325,8 +333,21 @@ export default function AdminDashboard() {
             {stories.map(story => (
               <div key={story.id} className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6 border border-gray-100 dark:border-gray-700">
                 <div className="flex justify-between items-start">
-                  <div>
-                    <h3 className="text-lg font-semibold text-gray-800 dark:text-white mb-2">{story.title}</h3>
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-2 mb-2 flex-wrap">
+                      <h3 className="text-lg font-semibold text-gray-800 dark:text-white">{story.title}</h3>
+                      {story.risk_level === 'HIGH' && (
+                        <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-bold bg-red-100 dark:bg-red-900 text-red-700 dark:text-red-300 border border-red-300 dark:border-red-700">
+                          <span className="h-2 w-2 rounded-full bg-red-500 animate-pulse inline-block" />
+                          High Risk
+                        </span>
+                      )}
+                      {story.risk_level === 'MEDIUM' && (
+                        <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-semibold bg-yellow-100 dark:bg-yellow-900 text-yellow-700 dark:text-yellow-300 border border-yellow-300 dark:border-yellow-700">
+                          Medium Risk
+                        </span>
+                      )}
+                    </div>
                     <p className="text-gray-600 dark:text-gray-300 text-sm mb-3 max-h-24 overflow-y-auto">{story.content}</p>
                   </div>
                   {story.reportCount && story.reportCount > 0 && (
