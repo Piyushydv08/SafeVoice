@@ -1,22 +1,5 @@
 // netlify/functions/correct-grammar.js
-const { GoogleGenerativeAI } = require('@google/generative-ai');
-
-// Supported languages (for future use or extension)
-const SUPPORTED_LANGUAGES = [
-  { code: 'en', name: 'English' },
-  { code: 'hi', name: 'Hindi' },
-  { code: 'es', name: 'Spanish' },
-  { code: 'fr', name: 'French' },
-  { code: 'mr', name: 'Marathi' },
-  { code: 'bn', name: 'Bengali' },
-  { code: 'ta', name: 'Tamil' },
-  { code: 'te', name: 'Telugu' },
-  { code: 'kn', name: 'Kannada' },
-  { code: 'ml', name: 'Malayalam' },
-  { code: 'gu', name: 'Gujarati' },
-  { code: 'pa', name: 'Punjabi' },
-  // Add more languages as needed
-];
+const { enhanceGrammar } = require('./utils/ai-service.js');
 
 exports.handler = async function(event, context) {
   // Define allowed origins. For production, you should restrict this to your frontend's URL.
@@ -69,13 +52,7 @@ exports.handler = async function(event, context) {
       };
     }
 
-    const genAI = new GoogleGenerativeAI(GEMINI_API_KEY);
-    const model = genAI.getGenerativeModel({ model: 'gemini-2.5-flash-lite' });
-    const prompt = `Correct the grammar and spelling mistakes in the following text. Preserve the original meaning and tone. Only output the corrected text, without any introductory phrases like "Here is the corrected text:":\n\n"${content}"`;
-
-    const result = await model.generateContent(prompt);
-    const response = result?.response;
-    const correctedContent = response?.text()?.trim() || content;
+    const correctedContent = await enhanceGrammar(content);
 
     return {
       statusCode: 200,
