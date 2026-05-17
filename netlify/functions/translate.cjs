@@ -1,5 +1,5 @@
 // netlify/functions/translate.js
-const { translateText } = require('./utils/ai-service.js');
+const { translateText } = require('./utils/ai-service.cjs');
 
 exports.handler = async function(event, context) {
   // Define allowed origins. For production, you should restrict this to your frontend's URL.

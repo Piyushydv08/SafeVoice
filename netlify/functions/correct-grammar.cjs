@@ -1,5 +1,5 @@
 // netlify/functions/correct-grammar.js
-const { enhanceGrammar } = require('./utils/ai-service.js');
+const { enhanceGrammar } = require('./utils/ai-service.cjs');
 
 exports.handler = async function(event, context) {
   // Define allowed origins. For production, you should restrict this to your frontend's URL.
