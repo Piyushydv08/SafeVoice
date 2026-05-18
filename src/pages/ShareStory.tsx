@@ -383,12 +383,15 @@ export default function ShareStory() {
 
     try {
       // Add a new document to Firestore
+      const riskLevel = await classifyPostRisk(title, storyText);
+
       await addDoc(collection(db, 'stories'), {
         title,
         content: storyText,
         tags: selectedTags,
         author_id: user.uid,
         media_urls: mediaUrls,
+        risk_level: riskLevel,
         created_at: serverTimestamp(),
       });
 
@@ -693,8 +696,8 @@ export default function ShareStory() {
                   type="button"
                   onClick={() => toggleTag(tag)}
                   className={`px-3 py-1 rounded-full text-sm font-medium transition-colors ${selectedTags.includes(tag)
-                      ? 'bg-pink-500 text-white shadow'
-                      : 'bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-600'
+                    ? 'bg-pink-500 text-white shadow'
+                    : 'bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-600'
                     }`}
                 >
                   {tag}
@@ -830,6 +833,21 @@ export default function ShareStory() {
       </div>
     </div>
   );
+}
+
+async function classifyPostRisk(title: string, content: string): Promise<string> {
+  try {
+    const response = await fetch('/.netlify/functions/classify-crisis', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ title, content }),
+    });
+    if (!response.ok) return 'LOW';
+    const data = await response.json();
+    return data.riskLevel || 'LOW';
+  } catch {
+    return 'LOW';
+  }
 }
 
 // Add a helper function to upload files
