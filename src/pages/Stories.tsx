@@ -79,6 +79,7 @@ export default function Stories() {
   const [loadingTranslations, setLoadingTranslations] = useState<{ [storyId: string]: boolean }>({});
   const [expandedStoryId, setExpandedStoryId] = useState<string | null>(null);
   const [sortOption, setSortOption] = useState<'newest' | 'oldest' | 'likes'>('newest');
+  const [searchTerm, setSearchTerm] = useState('');
 
   useEffect(() => {
     fetchStories();
@@ -293,19 +294,64 @@ export default function Stories() {
 
   // --- Sorting Handler ---
   function getSortedStories(stories: Story[]) {
-    let filtered = stories.filter(story =>
-      selectedTags.length === 0 || selectedTags.some(tag => story.tags?.includes(tag))
+
+  let filtered = stories.filter((story) => {
+
+    const matchesTags =
+      selectedTags.length === 0 ||
+      selectedTags.some(tag =>
+        story.tags?.includes(tag)
+      );
+
+    const matchesSearch =
+      story.title
+        .toLowerCase()
+        .includes(searchTerm.toLowerCase())
+
+      ||
+
+      story.content
+        .toLowerCase()
+        .includes(searchTerm.toLowerCase())
+
+      ||
+
+      story.tags?.some(tag =>
+        tag.toLowerCase()
+          .includes(searchTerm.toLowerCase())
+      );
+
+    return matchesTags && matchesSearch;
+  });
+
+  if (sortOption === 'likes') {
+
+    filtered = filtered.sort(
+      (a, b) =>
+        (b.reactionsCount ?? 0) -
+        (a.reactionsCount ?? 0)
     );
-    if (sortOption === 'likes') {
-      filtered = filtered.sort((a, b) => (b.reactionsCount ?? 0) - (a.reactionsCount ?? 0));
-    } else if (sortOption === 'oldest') {
-      filtered = filtered.sort((a, b) => new Date(a.created_at).getTime() - new Date(b.created_at).getTime());
-    } else {
-      // newest
-      filtered = filtered.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
-    }
-    return filtered;
+
+  } else if (sortOption === 'oldest') {
+
+    filtered = filtered.sort(
+      (a, b) =>
+        new Date(a.created_at).getTime() -
+        new Date(b.created_at).getTime()
+    );
+
+  } else {
+
+    filtered = filtered.sort(
+      (a, b) =>
+        new Date(b.created_at).getTime() -
+        new Date(a.created_at).getTime()
+    );
   }
+
+  return filtered;
+}
+
 
   return (
     <div className='bg-white dark:bg-gray-900 min-h-screen'>
@@ -315,8 +361,41 @@ export default function Stories() {
         {/* Filter Controls */}
         <div className="mb-8 p-4 bg-gray-50 dark:bg-gray-800 rounded-lg shadow-sm flex flex-col md:flex-row md:items-center md:justify-between gap-4">
           <div>
-            <h2 className="text-lg font-medium text-gray-700 dark:text-gray-300 mb-2 md:mb-0 text-center md:text-left">Filter by tags:</h2>
-            <div className="flex flex-wrap gap-2">
+          <div className="mb-4">
+
+            <input
+              type="text"
+              placeholder="Search stories by title, content, or tags..."
+              value={searchTerm}
+              onChange={(e) =>
+              setSearchTerm(e.target.value)
+              }
+              className="
+                w-full
+                px-4
+                py-2
+                rounded-lg
+                border
+                border-gray-300
+                dark:border-gray-600
+                bg-white
+                dark:bg-gray-700
+                text-gray-900
+                dark:text-white
+                placeholder-gray-500
+                dark:placeholder-gray-400
+                focus:outline-none
+                focus:ring-2
+                focus:ring-pink-500
+              "
+            />
+            <p className="text-sm text-gray-500 dark:text-gray-400 mt-2">
+              {getSortedStories(stories).length} stories found
+            </p>
+            
+          </div>
+          <h2 className="text-lg font-medium text-gray-700 dark:text-gray-300 mb-2 md:mb-0 text-center md:text-left">Filter by tags:</h2>
+          <div className="flex flex-wrap gap-2">
               {availableTags.map((tag) => (
                 <button
                   key={tag}
@@ -520,7 +599,7 @@ export default function Stories() {
         )}
 
         {!loading && stories.length === 0 && (
-          <p className="text-center text-gray-500 dark:text-gray-400 mt-12 text-lg">No stories found matching your criteria.</p>
+          <p className="text-center text-gray-500 dark:text-gray-400 mt-12 text-lg">No stories found matching your search or selected filters.</p>
         )}
       </div>
     </div>
