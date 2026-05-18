@@ -1,49 +1,107 @@
 import { FaXTwitter, FaLinkedin, FaDiscord, FaGithub } from "react-icons/fa6";
-import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
-import { Heart } from 'lucide-react';
+import React, { useState } from "react";
+import { Link } from "react-router-dom";
+import { Heart } from "lucide-react";
+import { toast } from "react-hot-toast";
+import { doc, setDoc, serverTimestamp } from "firebase/firestore";
+import { db } from "../lib/firebase";
+import { getErrorMessage } from "../utils/errorHandler";
+import { withRetry } from "../utils/withRetry";
+import { Spinner } from "./Spinner";
 
 export default function Footer() {
-  const [email, setEmail] = useState('');
+  const [email, setEmail] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [validationError, setValidationError] = useState("");
 
-  const handleSubscribe = (e: React.FormEvent) => {
+  const validateEmail = (val: string) => {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!val) return "";
+    if (!emailRegex.test(val)) return "Please enter a valid email address.";
+    return "";
+  };
+
+  const handleEmailChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const val = e.target.value;
+    setEmail(val);
+    setValidationError(validateEmail(val));
+  };
+
+  const handleSubscribe = async (e: React.FormEvent) => {
     e.preventDefault();
-    // TODO: Add backend logic (Netlify function or Firebase) to save email
-    toast.success(`Subscribed with: ${email}`);
-    setEmail('');
+
+    // Final check before submission
+    const err = validateEmail(email);
+
+    if (err || !email) {
+      setValidationError(err || "Email is required.");
+      return;
+    }
+
+    setLoading(true);
+    try {
+      await withRetry(async () => {
+        const subscriberRef = doc(
+          db,
+          "newsletter_subscribers",
+          email.toLowerCase(),
+        );
+
+        await setDoc(
+          subscriberRef,
+          {
+            email: email.toLowerCase(),
+            subscribedAt: serverTimestamp(),
+            source: "footer_form",
+          },
+          { merge: true },
+        );
+      });
+
+      toast.success(`Subscribed successfully with: ${email}`);
+
+      setEmail("");
+      setValidationError("");
+    } catch (error: any) {
+      console.error("Subscription error:", error);
+
+      toast.error(getErrorMessage(error));
+    } finally {
+      setLoading(false);
+    }
   };
 
   const quickLinks = [
-    { to: '/', label: 'Home' },
-    { to: '/stories', label: 'Stories' },
-    { to: '/share-story', label: 'Share Story' },
-    { to: '/resources', label: 'Resources' },
-    { to: '/faqs', label: 'FAQs' },
-    { to: '/about', label: 'About' },
-    { to: '/PrivacyPolicy', label: 'Privacy Policy' },
-    { to: '/termsandconditions', label: 'Terms and Conditions' },
+    { to: "/", label: "Home" },
+    { to: "/stories", label: "Stories" },
+    { to: "/share-story", label: "Share Story" },
+    { to: "/resources", label: "Resources" },
+    { to: "/faqs", label: "FAQs" },
+    { to: "/about", label: "About" },
+    { to: "/PrivacyPolicy", label: "Privacy Policy" },
+    { to: "/termsandconditions", label: "Terms and Conditions" },
   ];
 
   const socials = [
     {
-      href: 'https://x.com/piyushydv011?t=8VKvJiRHuwFIWstbcXji3Q&s=09',
+      href: "https://x.com/piyushydv011?t=8VKvJiRHuwFIWstbcXji3Q&s=09",
       icon: <FaXTwitter />,
-      label: 'X (Twitter)',
+      label: "X (Twitter)",
     },
     {
-      href: 'https://www.linkedin.com/in/piyush-yadav-b513a0288',
+      href: "https://www.linkedin.com/in/piyush-yadav-b513a0288",
       icon: <FaLinkedin />,
-      label: 'LinkedIn',
+      label: "LinkedIn",
     },
     {
-      href: 'https://discord.gg/bdRJz6q2',
+      href: "https://discord.gg/bdRJz6q2",
       icon: <FaDiscord />,
-      label: 'Discord',
+      label: "Discord",
     },
     {
-      href: 'https://github.com/Piyushydv08',
+      href: "https://github.com/Piyushydv08",
       icon: <FaGithub />,
-      label: 'GitHub',
+      label: "GitHub",
     },
   ];
 
@@ -56,10 +114,8 @@ export default function Footer() {
 
         <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
           <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-10">
-
             {/* ── Brand, Social & Newsletter ── */}
             <div className="col-span-1 md:col-span-1 lg:col-span-2 space-y-8">
-
               {/* Brand & Social */}
               <div>
                 <div className="flex items-center mb-3">
@@ -76,7 +132,8 @@ export default function Footer() {
                   Your story. Your strength. Your Safe Voice.
                 </p>
                 <p className="footer-muted text-sm mb-5">
-                  A safe space for women to share their stories and find support.
+                  A safe space for women to share their stories and find
+                  support.
                 </p>
 
                 {/* Social icons */}
@@ -102,37 +159,57 @@ export default function Footer() {
                   Subscribe to Our Newsletter
                 </h3>
                 <div className="max-w-sm">
-                  <form onSubmit={handleSubscribe} className="flex flex-col space-y-2">
-                    <input
-                      type="email"
-                      placeholder="Enter your email"
-                      value={email}
-                      onChange={(e) => setEmail(e.target.value)}
-                      required
-                      className="newsletter-input"
-                    />
+                  <form
+                    onSubmit={handleSubscribe}
+                    className="flex flex-col space-y-2"
+                  >
+                    <div>
+                      <input
+                        type="email"
+                        placeholder="Enter your email"
+                        value={email}
+                        onChange={handleEmailChange}
+                        disabled={loading}
+                        required
+                        className={`newsletter-input ${validationError ? "!border-red-500 focus:!ring-red-500" : ""}`}
+                      />
+                      {validationError && (
+                        <p className="mt-1 text-xs text-red-500">
+                          {validationError}
+                        </p>
+                      )}
+                    </div>
+
                     <div className="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-2">
                       <button
                         type="submit"
-                        className="footer-subscribe-btn flex-1"
+                        disabled={loading || !!validationError || !email}
+                        className="footer-subscribe-btn flex-1 flex justify-center items-center disabled:opacity-60 disabled:cursor-not-allowed"
                       >
-                        Subscribe
+                        {loading ? <Spinner size="sm" /> : "Subscribe"}
                       </button>
                       <button
                         type="button"
-                        onClick={() => setEmail('')}
-                        className="footer-nothanks-btn flex-1"
+                        disabled={loading}
+                        onClick={() => {
+                          setEmail("");
+                          setValidationError("");
+                        }}
+                        className="footer-nothanks-btn flex-1 disabled:opacity-50"
                       >
                         No Thanks
                       </button>
                     </div>
                   </form>
                   <p className="footer-muted text-xs mt-2">
-                    By subscribing, you agree to our{' '}
-                    <Link to="/termsandconditions" className="footer-policy-link">
+                    By subscribing, you agree to our{" "}
+                    <Link
+                      to="/termsandconditions"
+                      className="footer-policy-link"
+                    >
                       Terms of Service
-                    </Link>{' '}
-                    and{' '}
+                    </Link>{" "}
+                    and{" "}
                     <Link to="/PrivacyPolicy" className="footer-policy-link">
                       Privacy Policy
                     </Link>
@@ -144,7 +221,9 @@ export default function Footer() {
 
             {/* ── Quick Links ── */}
             <div className="col-span-1">
-              <h3 className="footer-heading text-base font-semibold mb-4">Quick Links</h3>
+              <h3 className="footer-heading text-base font-semibold mb-4">
+                Quick Links
+              </h3>
               <ul className="space-y-2 text-sm">
                 {quickLinks.map(({ to, label }) => (
                   <li key={to}>
@@ -158,20 +237,19 @@ export default function Footer() {
 
             {/* ── Contact ── */}
             <div className="col-span-1">
-              <h3 className="footer-heading text-base font-semibold mb-4">Contact</h3>
+              <h3 className="footer-heading text-base font-semibold mb-4">
+                Contact
+              </h3>
               <ul className="space-y-3 text-sm">
                 <li className="footer-muted break-words">
                   <span className="block sm:inline">Email: </span>
-                  <span className="block sm:inline">safevoiceforwomen@gmail.com</span>
+                  <span className="block sm:inline">
+                    safevoiceforwomen@gmail.com
+                  </span>
                 </li>
-                <li className="footer-muted">
-                  Emergency: 1800-SAFE-NOW
-                </li>
+                <li className="footer-muted">Emergency: 1800-SAFE-NOW</li>
                 <li>
-                  <Link
-                    to="/contact"
-                    className="footer-contact-btn"
-                  >
+                  <Link to="/contact" className="footer-contact-btn">
                     Contact Us →
                   </Link>
                 </li>
@@ -185,7 +263,8 @@ export default function Footer() {
               © {new Date().getFullYear()} SafeVoice. All rights reserved.
             </p>
             <p className="footer-muted text-xs flex items-center gap-1">
-              Made with <Heart className="h-3 w-3 text-pink-500 inline" /> for a safer world
+              Made with <Heart className="h-3 w-3 text-pink-500 inline" /> for a
+              safer world
             </p>
           </div>
         </div>
@@ -366,7 +445,7 @@ export default function Footer() {
           transition: all 0.25s ease;
           cursor: pointer;
         }
-        .footer-subscribe-btn:hover {
+        .footer-subscribe-btn:hover:not(:disabled) {
           background: linear-gradient(135deg, #db2777, #be185d);
           transform: translateY(-2px);
           box-shadow: 0 8px 22px rgba(236, 72, 153, 0.48);
@@ -374,7 +453,7 @@ export default function Footer() {
         .dark .footer-subscribe-btn {
           background: linear-gradient(135deg, #db2777, #9d174d);
         }
-        .dark .footer-subscribe-btn:hover {
+        .dark .footer-subscribe-btn:hover:not(:disabled) {
           background: linear-gradient(135deg, #ec4899, #db2777);
         }
 
@@ -391,7 +470,7 @@ export default function Footer() {
           transition: all 0.25s ease;
           cursor: pointer;
         }
-        .footer-nothanks-btn:hover {
+        .footer-nothanks-btn:hover:not(:disabled) {
           background: rgba(107, 114, 128, 0.22);
           color: #374151;
           transform: translateY(-1px);
@@ -401,7 +480,7 @@ export default function Footer() {
           border: 1px solid rgba(255, 255, 255, 0.12);
           color: #9ca3af;
         }
-        .dark .footer-nothanks-btn:hover {
+        .dark .footer-nothanks-btn:hover:not(:disabled) {
           background: rgba(255, 255, 255, 0.12);
           color: #d1d5db;
         }
