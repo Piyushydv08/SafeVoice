@@ -8,7 +8,7 @@ export const Spinner = ({ size = "md" }: { size?: "sm" | "md" | "lg" }) => {
     return (
         <div className="flex justify-center items-center">
             <div
-                className={`animate-spin rounded-full border-solid border-white border-t-pink-200${sizeClasses[size]}`}
+                className={`animate-spin rounded-full border-solid border-white border-t-pink-200 ${sizeClasses[size]}`}
             />
         </div>
     );
