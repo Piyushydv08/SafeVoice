@@ -1,4 +1,3 @@
-import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { ThemeProvider } from './context/ThemeContext';
 import { Toaster } from 'react-hot-toast';
@@ -18,6 +17,9 @@ import BackToTop from './components/BackToTop';
 import PrivacyPolicy from './pages/Privacypolicy';
 import Termsandconditions from './pages/termsandconditions';
 import ContactPage from './pages/ContactPage';
+import NotFound from './pages/NotFound';
+
+
 
 function App() {
   return (
@@ -26,7 +28,7 @@ function App() {
         <ScrollToTop />
         {/* // Global back-to-top button available across all pages */}
         <BackToTop />
-        <div className="min-h-screen bg-gray-50">
+        <div className="min-h-screen bg-gray-50 dark:bg-gray-900 transition-colors duration-200">
           <Navbar />
           <main>
             <Routes>
@@ -42,6 +44,7 @@ function App() {
               <Route path="/PrivacyPolicy" element={<PrivacyPolicy />} />
               <Route path="/termsandconditions" element={<Termsandconditions />} />
               <Route path="/contact" element={<ContactPage />} />
+              <Route path="*" element={<NotFound />} />
             </Routes>
           </main>
           <Footer />

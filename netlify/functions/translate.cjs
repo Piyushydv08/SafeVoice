@@ -1,21 +1,5 @@
 // netlify/functions/translate.js
-const { GoogleGenerativeAI } = require('@google/generative-ai');
-
-const SUPPORTED_LANGUAGES = [
-  { code: 'en', name: 'English' },
-  { code: 'hi', name: 'Hindi' },
-  { code: 'es', name: 'Spanish' },
-  { code: 'fr', name: 'French' },
-  { code: 'mr', name: 'Marathi' },
-  { code: 'bn', name: 'Bengali' },
-  { code: 'ta', name: 'Tamil' },
-  { code: 'te', name: 'Telugu' },
-  { code: 'kn', name: 'Kannada' },
-  { code: 'ml', name: 'Malayalam' },
-  { code: 'gu', name: 'Gujarati' },
-  { code: 'pa', name: 'Punjabi' },
-  // Add more languages as needed
-];
+const { translateText } = require('./utils/ai-service.cjs');
 
 exports.handler = async function(event, context) {
   // Define allowed origins. For production, you should restrict this to your frontend's URL.
@@ -68,26 +52,24 @@ exports.handler = async function(event, context) {
       };
     }
     const effectiveTitle = title && typeof title === 'string' ? title : '';
-    const genAI = new GoogleGenerativeAI(GEMINI_API_KEY);
-    const model = genAI.getGenerativeModel({ model: 'gemini-2.5-flash-lite' });
-    const targetLangName = SUPPORTED_LANGUAGES.find(l => l.code === targetLang)?.name || targetLang;
-    const contentPrompt = `Translate the following story content accurately to ${targetLangName}. Output only the translated content:\n"${content}"`;
-    const titlePrompt = effectiveTitle ? `Translate the following story title accurately to ${targetLangName}. Output only the translated title:\n"${effectiveTitle}"` : null;
-    const promises = [model.generateContent(contentPrompt)];
-    if (titlePrompt) promises.unshift(model.generateContent(titlePrompt));
+
+    const promises = [translateText(content, targetLang, false)];
+    if (effectiveTitle) {
+      promises.unshift(translateText(effectiveTitle, targetLang, true));
+    }
+
     const results = await Promise.all(promises);
+
     let translatedTitle = effectiveTitle;
     let translatedContent = content;
-    let titleIndex = -1;
-    let contentIndex = -1;
-    if (titlePrompt) {
-      titleIndex = 0;
-      contentIndex = 1;
-      translatedTitle = results[titleIndex]?.response?.text()?.trim() || effectiveTitle;
+
+    if (effectiveTitle) {
+      translatedTitle = results[0] || effectiveTitle;
+      translatedContent = results[1] || content;
     } else {
-      contentIndex = 0;
+      translatedContent = results[0] || content;
     }
-    translatedContent = results[contentIndex]?.response?.text()?.trim() || content;
+
     return {
       statusCode: 200,
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },

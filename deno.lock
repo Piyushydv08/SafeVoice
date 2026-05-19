@@ -34,7 +34,7 @@
         "npm:globals@^15.9.0",
         "npm:i@~0.3.7",
         "npm:lucide-react@0.344",
-        "npm:nodemailer@^7.0.9",
+        "npm:nodemailer@^8.0.7",
         "npm:postcss@^8.4.35",
         "npm:react-dom@^18.3.1",
         "npm:react-hot-toast@^2.4.1",
