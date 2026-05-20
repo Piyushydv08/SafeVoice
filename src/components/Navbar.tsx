@@ -5,7 +5,11 @@ import { auth } from '../lib/firebase';
 import { onAuthStateChanged } from 'firebase/auth';
 import { toast } from 'react-hot-toast';
 import { useTheme } from '../context/ThemeContext';
-
+import {
+  useLanguage,
+  SUPPORTED_LANGUAGES,
+} from '../context/LanguageContext';
+import { useTranslation } from '../hooks/useTranslation';
 const ADMIN_EMAILS = ['safevoiceforwomen@gmail.com', 'piyushydv011@gmail.com', 'aditiraj0205@gmail.com'];
 
 export default function Navbar() {
@@ -15,7 +19,8 @@ export default function Navbar() {
   const navigate = useNavigate();
   const location = useLocation();
   const { theme, toggleTheme } = useTheme();
-
+  const { language, setLanguage } = useLanguage();
+  const { t } = useTranslation();
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (currentUser) => setUser(currentUser));
     return () => unsubscribe();
@@ -53,14 +58,14 @@ export default function Navbar() {
     setIsMenuOpen(false);
   };
 
-  const navLinks = [
-    { to: '/', label: 'Home' },
-    { to: '/stories', label: 'Stories' },
-    { to: '/share-story', label: 'Share Story' },
-    { to: '/resources', label: 'Resources' },
-    { to: '/faqs', label: 'FAQs' },
-    { to: '/about', label: 'About' },
-  ];
+ const navLinks = [
+  { to: '/', label: t('home') },
+  { to: '/stories', label: t('stories') },
+  { to: '/share-story', label: t('shareStory') },
+  { to: '/resources', label: t('resources') },
+  { to: '/faqs', label: t('faqs') },
+  { to: '/about', label: t('about') },
+];
 
   return (
     <>
@@ -88,7 +93,7 @@ export default function Navbar() {
                     SafeVoice
                   </span>
                   <p className="text-xs text-gray-500 dark:text-gray-400 hidden md:block italic font-light leading-none mt-0.5">
-                    Your story. Your strength.
+                    {t('yourStoryYourStrength')}
                   </p>
                 </div>
               </Link>
@@ -106,6 +111,25 @@ export default function Navbar() {
                   {label}
                 </Link>
               ))}
+              {/* Language Selector */}
+<div className="relative">
+  <select
+    value={language}
+    onChange={(e) => setLanguage(e.target.value)}
+    className="bg-white/60 dark:bg-white/10 border border-pink-200 dark:border-pink-400/20 text-pink-700 dark:text-pink-200 rounded-xl px-3 py-2 text-sm backdrop-blur-md shadow-sm focus:outline-none focus:ring-2 focus:ring-pink-400 dark:focus:ring-pink-500 transition-all"
+    aria-label="Select language"
+  >
+    {SUPPORTED_LANGUAGES.map((lang) => (
+      <option
+        key={lang.code}
+        value={lang.code}
+        className="text-black"
+      >
+        {lang.label}
+      </option>
+    ))}
+  </select>
+</div>
 
               {/* Theme Toggle for Desktop */}
               <button
@@ -124,7 +148,7 @@ export default function Navbar() {
                       onClick={handleLinkClick}
                       className={`admin-link px-3 py-2 text-sm ${location.pathname === '/admin' ? 'active-admin' : ''}`}
                     >
-                      Admin
+                      {t('admin')}
                     </Link>
                   )}
                   <span className="user-badge text-xs xl:text-sm max-w-[100px] xl:max-w-[120px] truncate">
@@ -134,7 +158,7 @@ export default function Navbar() {
                     onClick={handleSignOut}
                     className="sign-btn text-sm whitespace-nowrap"
                   >
-                    Sign Out
+                    {t('signOut')}
                   </button>
                 </div>
               ) : (
@@ -143,7 +167,7 @@ export default function Navbar() {
                   onClick={handleLinkClick}
                   className={`sign-btn text-sm xl:text-base whitespace-nowrap ${location.pathname === '/auth' ? 'ring-2 ring-pink-400 dark:ring-pink-500' : ''}`}
                 >
-                  Sign In
+                  {t('signIn')}
                 </Link>
               )}
             </div>
@@ -190,6 +214,25 @@ export default function Navbar() {
               </Link>
             ))}
           </div>
+          {/* Mobile Language Selector */}
+<div className="px-4 pt-3">
+  <select
+    value={language}
+    onChange={(e) => setLanguage(e.target.value)}
+    className="w-full bg-white/60 dark:bg-white/10 border border-pink-200 dark:border-pink-400/20 text-pink-700 dark:text-pink-200 rounded-xl px-4 py-3 text-base backdrop-blur-md shadow-sm focus:outline-none focus:ring-2 focus:ring-pink-400 dark:focus:ring-pink-500 transition-all"
+    aria-label="Select language"
+  >
+    {SUPPORTED_LANGUAGES.map((lang) => (
+      <option
+        key={lang.code}
+        value={lang.code}
+        className="text-black"
+      >
+        {lang.label}
+      </option>
+    ))}
+  </select>
+</div>
 
           {/* User Section */}
           <div className="px-4 pt-2 pb-5 space-y-3 border-t border-pink-200/40 dark:border-white/10">
@@ -205,7 +248,7 @@ export default function Navbar() {
                         : 'text-amber-600 dark:text-amber-400 hover:bg-amber-50/60 dark:hover:bg-amber-900/30'
                     }`}
                   >
-                    Admin
+                   {t('admin')}
                   </Link>
                 )}
 
@@ -219,7 +262,7 @@ export default function Navbar() {
                   onClick={handleSignOut}
                   className="sign-btn w-full text-base py-3"
                 >
-                  Sign Out
+                  {t('signOut')}
                 </button>
               </>
             ) : (
@@ -230,7 +273,7 @@ export default function Navbar() {
                   location.pathname === '/auth' ? 'ring-2 ring-pink-300 dark:ring-pink-500' : ''
                 }`}
               >
-                Sign In
+                {t('signIn')}
               </Link>
             )}
           </div>
