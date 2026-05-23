@@ -39,3 +39,41 @@
     @apply flex-col gap-2;
   }
 }
+
+/* -- Adding Layerbase to Match Scrollbar -- */
+@layer base {
+  body {
+    @apply bg-white text-black;
+  }
+
+  .dark body {
+    @apply bg-gray-900 text-white;
+  }
+}
+
+/* -- Customized Scrollbar --*/
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+/* -- Light & Dark Theme -- */
+::-webkit-scrollbar-thumb {
+  background-color: #ec4899;
+  border-radius: 10px;
+  border: 2px solid transparent;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background-color: #db2777;
+}
+
+/* -- Firefox Support -- */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: #ec4899 transparent;
+}
