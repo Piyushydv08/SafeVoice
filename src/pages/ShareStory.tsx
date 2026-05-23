@@ -97,6 +97,7 @@ export default function ShareStory() {
   const [recordedAudio, setRecordedAudio] = useState<Blob | null>(null);
   const [audioURL, setAudioURL] = useState<string | null>(null);
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
+  const mediaStreamRef = useRef<MediaStream | null>(null);
   const audioChunksRef = useRef<Blob[]>([]);
 
   // AI Tag Suggestion state
@@ -130,6 +131,7 @@ export default function ShareStory() {
   const handleStartRecording = async () => {
     try {
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      mediaStreamRef.current = stream;
       const mediaRecorder = new window.MediaRecorder(stream);
       mediaRecorderRef.current = mediaRecorder;
       audioChunksRef.current = [];
@@ -154,6 +156,12 @@ export default function ShareStory() {
     if (mediaRecorderRef.current && isRecording) {
       mediaRecorderRef.current.stop();
       setIsRecording(false);
+      
+      // Stop the microphone stream tracks to turn off recording indicator
+      if (mediaStreamRef.current) {
+        mediaStreamRef.current.getTracks().forEach(track => track.stop());
+        mediaStreamRef.current = null;
+      }
     }
   };
 
@@ -177,6 +185,18 @@ export default function ShareStory() {
 
   useEffect(() => {
     fetchMyStories();
+  }, []);
+
+  // Cleanup active audio streams on unmount to prevent privacy leaks
+  useEffect(() => {
+    return () => {
+      if (mediaRecorderRef.current && mediaRecorderRef.current.state !== 'inactive') {
+        mediaRecorderRef.current.stop();
+      }
+      if (mediaStreamRef.current) {
+        mediaStreamRef.current.getTracks().forEach(track => track.stop());
+      }
+    };
   }, []);
 
   const fetchMyStories = async () => {
