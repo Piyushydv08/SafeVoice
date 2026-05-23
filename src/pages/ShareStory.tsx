@@ -68,6 +68,12 @@ const ensureProfileExists = async (user: User) => {
   }
 };
 
+// Supports both legacy plain-URL strings and new { url, type } objects
+interface MediaItem {
+  url: string;
+  type: string;
+}
+
 // Add this interface near the top of your file
 interface Story {
   id: string;
@@ -75,9 +81,24 @@ interface Story {
   content: string;
   tags?: string[];
   author_id: string;
-  media_urls?: string[];
+  media_urls?: (string | MediaItem)[];
   created_at: any; // Or use proper Timestamp type
   reactionsCount?: number;
+}
+
+// Normalise a media entry to { url, type } regardless of storage format
+function resolveMediaItem(entry: string | MediaItem): MediaItem {
+  if (typeof entry === 'string') {
+    const fileName = decodeURIComponent(entry.split('/o/')[1]?.split('?')[0] ?? '');
+    const ext = fileName.split('.').pop()?.toLowerCase() ?? '';
+    const extToMime: Record<string, string> = {
+      jpg: 'image/jpeg', jpeg: 'image/jpeg', png: 'image/png', gif: 'image/gif', webp: 'image/webp',
+      mp4: 'video/mp4', webm: 'video/webm', ogg: 'video/ogg',
+      mp3: 'audio/mpeg', wav: 'audio/wav',
+    };
+    return { url: entry, type: extToMime[ext] ?? '' };
+  }
+  return entry;
 }
 
 export default function ShareStory() {
@@ -365,13 +386,13 @@ export default function ShareStory() {
     let storyText = content;
     // No audio transcription: if no text, storyText remains empty
 
-    let mediaUrls: string[] = [];
+    let mediaUrls: MediaItem[] = [];
     if (mediaFiles && mediaFiles.length > 0) {
       for (const file of mediaFiles) {
         try {
-          // Upload to Firebase Storage
+          // Upload to Firebase Storage and store MIME type alongside URL
           const downloadURL = await uploadMediaFile(file, user.uid);
-          mediaUrls.push(downloadURL);
+          mediaUrls.push({ url: downloadURL, type: file.type });
         } catch (error) {
           console.error('Error uploading media:', error);
           toast.error('Failed to upload media. Please try again.');
@@ -747,12 +768,12 @@ export default function ShareStory() {
 
                   {/* Display media if available */}
                   {story.media_urls && story.media_urls.length > 0 && (
-                    <div className="mt-4 space-y-3 border-t border-gray-200 dark:border-gray-700 pt-4"> {/* Added border-top */}
-                      {story.media_urls.map((url: string, index: number) => {
-                        // ... media rendering logic (same as before) ...
-                        const isImage = url.match(/\.(jpeg|jpg|gif|png)$/i);
-                        const isVideo = url.match(/\.(mp4|webm|ogg)$/i);
-                        const isAudio = url.match(/\.(mp3|wav|ogg)$/i);
+                    <div className="mt-4 space-y-3 border-t border-gray-200 dark:border-gray-700 pt-4">
+                      {story.media_urls.map((entry, index) => {
+                        const { url, type } = resolveMediaItem(entry);
+                        const isImage = type.startsWith('image/');
+                        const isVideo = type.startsWith('video/');
+                        const isAudio = type.startsWith('audio/');
 
                         return (
                           <div key={index} className="relative rounded-md overflow-hidden border border-gray-200 dark:border-gray-600">
@@ -760,21 +781,18 @@ export default function ShareStory() {
                               <img
                                 src={url}
                                 alt={`Media ${index + 1}`}
-                                className="w-full max-h-80 object-contain bg-gray-50 dark:bg-gray-900" // Adjusted max-height
+                                className="w-full max-h-80 object-contain bg-gray-50 dark:bg-gray-900"
                               />
                             )}
                             {isVideo && (
-                              <video
-                                controls
-                                className="w-full max-h-80 object-contain bg-black" // Adjusted max-height
-                              >
-                                <source src={url} type="video/mp4" />
+                              <video controls className="w-full max-h-80 object-contain bg-black">
+                                <source src={url} type={type} />
                                 Your browser does not support the video tag.
                               </video>
                             )}
                             {isAudio && (
                               <audio controls className="w-full p-2 bg-gray-50 dark:bg-gray-700">
-                                <source src={url} type="audio/mpeg" />
+                                <source src={url} type={type} />
                                 Your browser does not support the audio element.
                               </audio>
                             )}
