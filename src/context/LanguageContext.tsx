@@ -176,7 +176,13 @@ export const LanguageProvider = ({
   const setLanguage = (lang: string) => {
     setLanguageState(lang);
     localStorage.setItem('safevoice-language', lang);
-  };
+  };const t = (key: string): string => {
+  return (
+    translations[language as keyof typeof translations]?.[
+      key as keyof typeof translations.en
+    ] || key
+  );
+};
 
   return (
     <LanguageContext.Provider
