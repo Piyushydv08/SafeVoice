@@ -14,6 +14,7 @@ import AdminDashboard from './pages/AdminDashboard';
 import FAQs from './pages/FAQs';
 import ScrollToTop from './components/ScrollToTop';
 import BackToTop from './components/BackToTop';
+import QuickExit from './components/QuickExit';
 import PrivacyPolicy from './pages/Privacypolicy';
 import Termsandconditions from './pages/termsandconditions';
 import ContactPage from './pages/ContactPage';
@@ -28,6 +29,7 @@ function App() {
         <ScrollToTop />
         {/* // Global back-to-top button available across all pages */}
         <BackToTop />
+        <QuickExit />
         <div className="min-h-screen bg-gray-50 dark:bg-gray-900 transition-colors duration-200">
           <Navbar />
           <main>
