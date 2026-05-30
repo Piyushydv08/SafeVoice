@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Heart, MessageCircle, Flag, Loader2 } from 'lucide-react';
+import { Heart, MessageCircle, Flag, Loader2, X } from 'lucide-react';
 import { toast } from 'react-hot-toast';
 import { auth } from '../lib/firebase';
 import {
@@ -54,17 +54,67 @@ const SUPPORTED_LANGUAGES = [
   // Add more languages as needed
 ];
 
+// Supports both legacy plain-URL strings and new { url, type } objects
+interface MediaItem {
+  url: string;
+  type: string;
+}
+
 // Define the structure of a Story for better type safety
 interface Story {
   id: string;
   title: string;
   content: string;
   tags?: string[];
-  media_urls?: string[];
+  media_urls?: (string | MediaItem)[];
   created_at: any;
   author_id: string;
   reactionsCount: number;
+  risk_level?: string;
 }
+
+// Normalise a media entry to { url, type } regardless of storage format
+function resolveMediaItem(entry: string | MediaItem): MediaItem {
+  if (typeof entry === 'string') {
+    const fileName = decodeURIComponent(entry.split('/o/')[1]?.split('?')[0] ?? '');
+    const ext = fileName.split('.').pop()?.toLowerCase() ?? '';
+    const extToMime: Record<string, string> = {
+      jpg: 'image/jpeg', jpeg: 'image/jpeg', png: 'image/png', gif: 'image/gif', webp: 'image/webp',
+      mp4: 'video/mp4', webm: 'video/webm', ogg: 'video/ogg',
+      mp3: 'audio/mpeg', wav: 'audio/wav',
+    };
+    return { url: entry, type: extToMime[ext] ?? '' };
+  }
+  return entry;
+}
+
+
+const RISK_BADGE: Record<string, { label: string; classes: string }> = {
+  HIGH: {
+    label: 'Needs Support',
+    classes: 'bg-red-100 dark:bg-red-900 text-red-700 dark:text-red-300 border border-red-300 dark:border-red-700',
+  },
+  MEDIUM: {
+    label: 'Emotional Support',
+    classes: 'bg-yellow-100 dark:bg-yellow-900 text-yellow-700 dark:text-yellow-300 border border-yellow-300 dark:border-yellow-700',
+  },
+  LOW: {
+    label: 'General',
+    classes: 'bg-green-100 dark:bg-green-900 text-green-700 dark:text-green-300 border border-green-300 dark:border-green-700',
+  },
+};
+
+function RiskBadge({ level }: { level?: string }) {
+  const key = level && level in RISK_BADGE ? level : 'LOW';
+  const badge = RISK_BADGE[key];
+  return (
+    <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-semibold ${badge.classes}`}>
+      {key === 'HIGH' && <span className="mr-1 h-2 w-2 rounded-full bg-red-500 animate-pulse inline-block" />}
+      {badge.label}
+    </span>
+  );
+}
+
 
 export default function Stories() {
   const [stories, setStories] = useState<Story[]>([]);
@@ -79,6 +129,10 @@ export default function Stories() {
   const [loadingTranslations, setLoadingTranslations] = useState<{ [storyId: string]: boolean }>({});
   const [expandedStoryId, setExpandedStoryId] = useState<string | null>(null);
   const [sortOption, setSortOption] = useState<'newest' | 'oldest' | 'likes'>('newest');
+  const [searchTerm, setSearchTerm] = useState('');
+  
+  // Added state for handling the popup modal selection
+  const [selectedStoryForPopup, setSelectedStoryForPopup] = useState<Story | null>(null);
 
   useEffect(() => {
     fetchStories();
@@ -112,7 +166,8 @@ export default function Stories() {
           media_urls: storyData.media_urls || [],
           created_at: storyData.created_at,
           author_id: storyData.author_id || '',
-          reactionsCount: reactionsSnapshot.size
+          reactionsCount: reactionsSnapshot.size,
+          risk_level: storyData.risk_level || 'LOW',
         });
       }
 
@@ -187,6 +242,11 @@ export default function Stories() {
       setStories(prevStories => prevStories.map(s =>
         s.id === storyId ? { ...s, reactionsCount: (s.reactionsCount || 0) + 1 } : s
       ));
+      
+      // Keep the modal counter updated if it's currently showing this story
+      if (selectedStoryForPopup && selectedStoryForPopup.id === storyId) {
+        setSelectedStoryForPopup(prev => prev ? { ...prev, reactionsCount: (prev.reactionsCount || 0) + 1 } : null);
+      }
     } catch (error) {
       console.error('Error adding reaction:', error);
       toast.error('Failed to add reaction.');
@@ -293,19 +353,69 @@ export default function Stories() {
 
   // --- Sorting Handler ---
   function getSortedStories(stories: Story[]) {
-    let filtered = stories.filter(story =>
-      selectedTags.length === 0 || selectedTags.some(tag => story.tags?.includes(tag))
+
+  let filtered = stories.filter((story) => {
+
+    const matchesTags =
+      selectedTags.length === 0 ||
+      selectedTags.some(tag =>
+        story.tags?.includes(tag)
+      );
+
+    const matchesSearch =
+      story.title
+        .toLowerCase()
+        .includes(searchTerm.toLowerCase())
+
+      ||
+
+      story.content
+        .toLowerCase()
+        .includes(searchTerm.toLowerCase())
+
+      ||
+
+      story.tags?.some(tag =>
+        tag.toLowerCase()
+          .includes(searchTerm.toLowerCase())
+      );
+
+    return matchesTags && matchesSearch;
+  });
+
+  if (sortOption === 'likes') {
+
+    filtered = filtered.sort(
+      (a, b) =>
+        (b.reactionsCount ?? 0) -
+        (a.reactionsCount ?? 0)
     );
-    if (sortOption === 'likes') {
-      filtered = filtered.sort((a, b) => (b.reactionsCount ?? 0) - (a.reactionsCount ?? 0));
-    } else if (sortOption === 'oldest') {
-      filtered = filtered.sort((a, b) => new Date(a.created_at).getTime() - new Date(b.created_at).getTime());
-    } else {
-      // newest
-      filtered = filtered.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
-    }
-    return filtered;
+
+  } else if (sortOption === 'oldest') {
+
+    filtered = filtered.sort(
+      (a, b) =>
+        new Date(a.created_at).getTime() -
+        new Date(b.created_at).getTime()
+    );
+
+  } else {
+
+    filtered = filtered.sort(
+      (a, b) =>
+        new Date(b.created_at).getTime() -
+        new Date(a.created_at).getTime()
+    );
   }
+
+  return filtered;
+}
+
+  // Helper variables for popup content translation rendering
+  const popupTargetLang = selectedStoryForPopup ? (targetLanguages[selectedStoryForPopup.id] || 'original') : 'original';
+  const popupTranslation = selectedStoryForPopup ? translatedStories[selectedStoryForPopup.id]?.[popupTargetLang] : null;
+  const popupDisplayTitle = selectedStoryForPopup && popupTargetLang !== 'original' && popupTranslation ? popupTranslation.title : selectedStoryForPopup?.title;
+  const popupDisplayContent = selectedStoryForPopup && popupTargetLang !== 'original' && popupTranslation ? popupTranslation.content : selectedStoryForPopup?.content;
 
   return (
     <div className='bg-white dark:bg-gray-900 min-h-screen'>
@@ -315,8 +425,41 @@ export default function Stories() {
         {/* Filter Controls */}
         <div className="mb-8 p-4 bg-gray-50 dark:bg-gray-800 rounded-lg shadow-sm flex flex-col md:flex-row md:items-center md:justify-between gap-4">
           <div>
-            <h2 className="text-lg font-medium text-gray-700 dark:text-gray-300 mb-2 md:mb-0 text-center md:text-left">Filter by tags:</h2>
-            <div className="flex flex-wrap gap-2">
+          <div className="mb-4">
+
+            <input
+              type="text"
+              placeholder="Search stories by title, content, or tags..."
+              value={searchTerm}
+              onChange={(e) =>
+              setSearchTerm(e.target.value)
+              }
+              className="
+                w-full
+                px-4
+                py-2
+                rounded-lg
+                border
+                border-gray-300
+                dark:border-gray-600
+                bg-white
+                dark:bg-gray-700
+                text-gray-900
+                dark:text-white
+                placeholder-gray-500
+                dark:placeholder-gray-400
+                focus:outline-none
+                focus:ring-2
+                focus:ring-pink-500
+              "
+            />
+            <p className="text-sm text-gray-500 dark:text-gray-400 mt-2">
+              {getSortedStories(stories).length} stories found
+            </p>
+            
+          </div>
+          <h2 className="text-lg font-medium text-gray-700 dark:text-gray-300 mb-2 md:mb-0 text-center md:text-left">Filter by tags:</h2>
+          <div className="flex flex-wrap gap-2">
               {availableTags.map((tag) => (
                 <button
                   key={tag}
@@ -328,8 +471,8 @@ export default function Stories() {
                     )
                   }
                   className={`px-3 py-1 rounded-full text-sm font-medium transition-colors ${selectedTags.includes(tag)
-                      ? 'bg-pink-500 text-white hover:bg-pink-600 shadow'
-                      : 'bg-white dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-600 border border-gray-300 dark:border-gray-600'
+                    ? 'bg-pink-500 text-white hover:bg-pink-600 shadow'
+                    : 'bg-white dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-600 border border-gray-300 dark:border-gray-600'
                     }`}
                 >
                   {tag}
@@ -381,9 +524,13 @@ export default function Stories() {
               const shouldTruncate = displayContent.length > 400 && !isExpanded;
 
               return (
-                <div key={story.id} className="bg-white dark:bg-gray-800 rounded-lg shadow-lg overflow-hidden flex flex-col transition-shadow hover:shadow-xl">
+                <div 
+                  key={story.id} 
+                  onClick={() => setSelectedStoryForPopup(story)}
+                  className="bg-white dark:bg-gray-800 rounded-lg shadow-lg overflow-hidden flex flex-col transition-shadow hover:shadow-xl cursor-pointer"
+                >
                   {/* Card Header with Language Selector */}
-                  <div className="p-4 border-b border-gray-100 dark:border-gray-700 flex justify-between items-center">
+                  <div className="p-4 border-b border-gray-100 dark:border-gray-700 flex justify-between items-center" onClick={(e) => e.stopPropagation()}>
                     <h2 className="text-xl font-semibold text-gray-800 dark:text-white flex-grow mr-2 truncate">{displayTitle}</h2>
                     <div className="flex items-center flex-shrink-0">
                       {isLoading && <Loader2 className="animate-spin mr-2 h-4 w-4 text-gray-500 dark:text-gray-400" />}
@@ -402,6 +549,9 @@ export default function Stories() {
                     </div>
                   </div>
 
+                  <div className="px-4 pt-2 pb-1">
+                    <RiskBadge level={story.risk_level} />
+                  </div>   
                   {/* Card Body */}
                   <div className="p-4 flex-grow">
                     <p className="text-gray-700 dark:text-gray-300 mb-4 text-sm leading-relaxed">
@@ -410,18 +560,13 @@ export default function Stories() {
                         : displayContent}
                       {shouldTruncate && (
                         <button
-                          onClick={() => setExpandedStoryId(story.id)}
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setSelectedStoryForPopup(story);
+                          }}
                           className="ml-2 text-pink-600 hover:text-pink-700 dark:text-pink-400 dark:hover:text-pink-300 font-semibold transition-colors duration-200"
                         >
                           Read More
-                        </button>
-                      )}
-                      {isExpanded && displayContent.length > 400 && (
-                        <button
-                          onClick={() => setExpandedStoryId(null)}
-                          className="ml-2 text-purple-600 hover:text-purple-700 dark:text-purple-400 dark:hover:text-purple-300 font-semibold transition-colors duration-200"
-                        >
-                          Show Less
                         </button>
                       )}
                     </p>
@@ -429,10 +574,11 @@ export default function Stories() {
                     {/* Media Display - only show when expanded */}
                     {isExpanded && story.media_urls && story.media_urls.length > 0 && (
                       <div className="mb-4 space-y-3">
-                        {story.media_urls.map((url: string, index: number) => {
-                          const isImage = url.match(/\.(jpeg|jpg|gif|png)$/i);
-                          const isVideo = url.match(/\.(mp4|webm|ogg)$/i);
-                          const isAudio = url.match(/\.(mp3|wav|ogg)$/i);
+                        {story.media_urls.map((entry, index) => {
+                          const { url, type } = resolveMediaItem(entry);
+                          const isImage = type.startsWith('image/');
+                          const isVideo = type.startsWith('video/');
+                          const isAudio = type.startsWith('audio/');
 
                           return (
                             <div key={index} className="relative rounded-md overflow-hidden border border-gray-200 dark:border-gray-600">
@@ -444,17 +590,14 @@ export default function Stories() {
                                 />
                               )}
                               {isVideo && (
-                                <video
-                                  controls
-                                  className="w-full max-h-64 object-contain bg-black"
-                                >
-                                  <source src={url} type="video/mp4" />
+                                <video controls className="w-full max-h-64 object-contain bg-black">
+                                  <source src={url} type={type} />
                                   Your browser does not support the video tag.
                                 </video>
                               )}
                               {isAudio && (
                                 <audio controls className="w-full p-2 bg-gray-50 dark:bg-gray-700">
-                                  <source src={url} type="audio/mpeg" />
+                                  <source src={url} type={type} />
                                   Your browser does not support the audio element.
                                 </audio>
                               )}
@@ -478,7 +621,7 @@ export default function Stories() {
                   </div>
 
                   {/* Card Footer - Actions */}
-                  <div className="p-4 bg-gray-50 dark:bg-gray-700 border-t border-gray-100 dark:border-gray-600 flex items-center justify-between text-sm text-gray-500 dark:text-gray-400">
+                  <div className="p-4 bg-gray-50 dark:bg-gray-700 border-t border-gray-100 dark:border-gray-600 flex items-center justify-between text-sm text-gray-500 dark:text-gray-400" onClick={(e) => e.stopPropagation()}>
                     <div className="flex items-center space-x-4">
                       {/* Like Button */}
                       <button
@@ -520,9 +663,128 @@ export default function Stories() {
         )}
 
         {!loading && stories.length === 0 && (
-          <p className="text-center text-gray-500 dark:text-gray-400 mt-12 text-lg">No stories found matching your criteria.</p>
+          <p className="text-center text-gray-500 dark:text-gray-400 mt-12 text-lg">No stories found matching your search or selected filters.</p>
         )}
       </div>
+
+      {/* --- Detailed Story Popup Modal Section --- */}
+      {selectedStoryForPopup && (
+        <div 
+          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm transition-opacity"
+          onClick={() => setSelectedStoryForPopup(null)}
+        >
+          <div 
+            className="bg-white dark:bg-gray-800 w-full max-w-2xl rounded-2xl shadow-2xl flex flex-col overflow-hidden transform transition-all animate-in fade-in zoom-in-95 duration-200 max-h-[85vh]"
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* Modal Header */}
+            <div className="p-6 border-b border-gray-100 dark:border-gray-700 flex justify-between items-start">
+              <div>
+                <div className="mb-2">
+                  <RiskBadge level={selectedStoryForPopup.risk_level} />
+                </div>
+                <h2 className="text-2xl font-bold text-gray-900 dark:text-white leading-tight">
+                  {popupDisplayTitle}
+                </h2>
+              </div>
+              <button 
+                onClick={() => setSelectedStoryForPopup(null)}
+                className="p-1 rounded-full text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+              >
+                <X size={24} />
+              </button>
+            </div>
+
+            {/* Modal Body (Scrollable Container) */}
+            <div className="p-6 overflow-y-auto space-y-4 flex-grow">
+              <p className="text-gray-700 dark:text-gray-300 text-base leading-relaxed whitespace-pre-wrap">
+                {popupDisplayContent}
+              </p>
+
+              {/* Media Display Inside Popup */}
+              {selectedStoryForPopup.media_urls && selectedStoryForPopup.media_urls.length > 0 && (
+                <div className="mt-4 space-y-3">
+                  {selectedStoryForPopup.media_urls.map((url: string, index: number) => {
+                    const isImage = url.match(/\.(jpeg|jpg|gif|png)$/i);
+                    const isVideo = url.match(/\.(mp4|webm|ogg)$/i);
+                    const isAudio = url.match(/\.(mp3|wav|ogg)$/i);
+
+                    return (
+                      <div key={index} className="relative rounded-lg overflow-hidden border border-gray-200 dark:border-gray-600 bg-gray-50 dark:bg-gray-900">
+                        {isImage && (
+                          <img
+                            src={url}
+                            alt={`Media ${index + 1}`}
+                            className="w-full max-h-96 object-contain mx-auto"
+                          />
+                        )}
+                        {isVideo && (
+                          <video controls className="w-full max-h-96 object-contain bg-black mx-auto">
+                            <source src={url} type="video/mp4" />
+                            Your browser does not support the video tag.
+                          </video>
+                        )}
+                        {isAudio && (
+                          <audio controls className="w-full p-4">
+                            <source src={url} type="audio/mpeg" />
+                            Your browser does not support the audio element.
+                          </audio>
+                        )}
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
+
+              {/* Tags inside Popup */}
+              <div className="flex flex-wrap gap-2 pt-2">
+                {(selectedStoryForPopup.tags || []).map((tag: string) => (
+                  <span
+                    key={tag}
+                    className="bg-pink-100 dark:bg-pink-900 text-pink-700 dark:text-pink-300 px-3 py-1 rounded-full text-xs font-semibold"
+                  >
+                    {tag}
+                  </span>
+                ))}
+              </div>
+            </div>
+
+            {/* Modal Footer Controls */}
+            <div className="p-4 bg-gray-50 dark:bg-gray-700 border-t border-gray-100 dark:border-gray-600 flex items-center justify-between text-sm text-gray-500 dark:text-gray-400">
+              <div className="flex items-center space-x-6">
+                <button
+                  onClick={() => handleReaction(selectedStoryForPopup.id, 'heart')}
+                  className="flex items-center space-x-2 text-pink-600 hover:text-pink-700 dark:text-pink-400 dark:hover:text-pink-300 transition-colors group text-base"
+                  title="Like"
+                >
+                  <Heart size={22} className="group-hover:fill-current" />
+                  <span className="font-bold">{selectedStoryForPopup.reactionsCount || 0}</span>
+                </button>
+                <button
+                  onClick={handleSupport}
+                  className="flex items-center space-x-2 text-blue-600 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300 transition-colors group text-base"
+                  title="Send Support"
+                >
+                  <MessageCircle size={22} className="group-hover:fill-current" />
+                  <span className="font-medium text-sm">Send Support</span>
+                </button>
+              </div>
+              <div className="flex items-center space-x-4">
+                <span className="text-xs italic">
+                  By Anon_{typeof selectedStoryForPopup.author_id === 'string' ? selectedStoryForPopup.author_id.slice(0, 6) : '...'}
+                </span>
+                <button
+                  onClick={() => handleReport(selectedStoryForPopup.id)}
+                  className="text-gray-400 hover:text-red-600 dark:hover:text-red-400 transition-colors"
+                  title="Report story"
+                >
+                  <Flag size={18} />
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

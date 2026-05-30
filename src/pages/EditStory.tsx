@@ -21,6 +21,29 @@ import {
 const db = getFirestore();
 const storage = getStorage();
 
+// Supports both legacy plain-URL strings and new { url, type } objects
+interface MediaItem {
+  url: string;
+  type: string;
+}
+
+// Normalise a media entry to { url, type } regardless of storage format
+function resolveMediaItem(entry: string | MediaItem): MediaItem {
+  if (typeof entry === 'string') {
+    const fileName = decodeURIComponent(entry.split('/o/')[1]?.split('?')[0] ?? '');
+    const ext = fileName.split('.').pop()?.toLowerCase() ?? '';
+    const extToMime: Record<string, string> = {
+      jpg: 'image/jpeg', jpeg: 'image/jpeg', png: 'image/png', gif: 'image/gif', webp: 'image/webp',
+      mp4: 'video/mp4', webm: 'video/webm', ogg: 'video/ogg',
+      mp3: 'audio/mpeg', wav: 'audio/wav',
+    };
+    return { url: entry, type: extToMime[ext] ?? '' };
+  }
+  return entry;
+}
+
+const MAX_CHARS = 5000;
+
 const TAGS = [
   'Workplace Harassment',
   'Domestic Violence',
@@ -42,7 +65,7 @@ export default function EditStory() {
   const [content, setContent] = useState(story?.content || '');
   const [tags, setTags] = useState<string[]>(story?.tags || []);
   const [mediaFiles, setMediaFiles] = useState<FileList | null>(null); // New media files
-  const [existingMediaUrls, setExistingMediaUrls] = useState<string[]>(story?.media_urls || []); // Existing media URLs
+  const [existingMediaUrls, setExistingMediaUrls] = useState<(string | MediaItem)[]>(story?.media_urls || []); // Existing media URLs
   const [loading, setLoading] = useState(false);
 
   // Check authentication
@@ -97,7 +120,7 @@ export default function EditStory() {
       return;
     }
 
-    let updatedMediaUrls = [...existingMediaUrls]; // Start with existing media URLs
+    let updatedMediaUrls: (string | MediaItem)[] = [...existingMediaUrls]; // Start with existing media URLs
 
     try {
       // Upload new media files if any
@@ -116,11 +139,11 @@ export default function EditStory() {
             continue;
           }
 
-          // Upload to Firebase Storage
+          // Upload to Firebase Storage and store MIME type alongside URL
           const storageRef = ref(storage, `story-media/${user.uid}/${story.id}/${Date.now()}-${file.name}`);
           await uploadBytes(storageRef, file);
           const downloadURL = await getDownloadURL(storageRef);
-          updatedMediaUrls.push(downloadURL);
+          updatedMediaUrls.push({ url: downloadURL, type: file.type });
         }
       }
 
@@ -152,25 +175,16 @@ export default function EditStory() {
 
   const handleRemoveMedia = async (url: string) => {
     try {
-      // Extract the path from the Firebase Storage URL
-      const urlPath = url.split('?')[0]; // Remove query parameters
-      const path = urlPath.split('firebase.storage.googleapis.com')[1];
-      
-      if (path) {
-        // Create a reference to the file
-        const fileRef = ref(storage, path);
-        
-        // Delete the file from Firebase Storage
+      const pathMatch = url.match(/o\/(.+)\?/);
+      if (pathMatch && pathMatch[1]) {
+        const path = decodeURIComponent(pathMatch[1]);
         try {
-          await deleteObject(fileRef);
+          await deleteObject(ref(storage, path));
         } catch (deleteError) {
           console.error('Error deleting file from storage:', deleteError);
-          // Continue anyway to update the UI
         }
       }
-      
-      // Update the UI regardless of whether the file was deleted
-      setExistingMediaUrls((prev) => prev.filter((mediaUrl) => mediaUrl !== url));
+      setExistingMediaUrls((prev) => prev.filter((entry) => resolveMediaItem(entry).url !== url));
     } catch (error) {
       console.error('Error processing media URL:', error);
       toast.error('Failed to remove media. Please try again.');
@@ -207,6 +221,24 @@ export default function EditStory() {
             className="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 shadow-sm focus:border-pink-500 focus:ring-pink-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
             required
           />
+          <div className="mt-1 flex flex-wrap justify-between items-center text-xs gap-2">
+            <div className="text-gray-500 dark:text-gray-400 min-h-[1rem]">
+              {content.length < 50 && (
+                <span>Too short for AI suggestions</span>
+              )}
+            </div>
+            <div
+              className={
+                content.length >= MAX_CHARS
+                  ? 'text-red-600 dark:text-red-400 font-semibold'
+                  : content.length >= MAX_CHARS - 500
+                  ? 'text-yellow-600 dark:text-yellow-400 font-medium'
+                  : 'text-gray-500 dark:text-gray-400'
+              }
+            >
+              {content.length} / {MAX_CHARS}
+            </div>
+          </div>
         </div>
 
         <div>
@@ -251,32 +283,38 @@ export default function EditStory() {
               Existing Media
             </label>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-              {existingMediaUrls.map((url, index) => (
-                <div key={index} className="relative">
-                  {url.match(/\.(jpeg|jpg|gif|png)$/i) && (
-                    <img src={url} alt={`Media ${index + 1}`} className="w-full rounded-md bg-gray-50 dark:bg-gray-700" />
-                  )}
-                  {url.match(/\.(mp4|webm|ogg)$/i) && (
-                    <video controls className="w-full rounded-md bg-black">
-                      <source src={url} type="video/mp4" />
-                      Your browser does not support the video tag.
-                    </video>
-                  )}
-                  {url.match(/\.(mp3|wav|ogg)$/i) && (
-                    <audio controls className="w-full bg-gray-50 dark:bg-gray-700 rounded-md">
-                      <source src={url} type="audio/mpeg" />
-                      Your browser does not support the audio element.
-                    </audio>
-                  )}
-                  <button
-                    type="button"
-                    onClick={() => handleRemoveMedia(url)}
-                    className="absolute top-2 right-2 bg-red-500 text-white rounded-full p-1 hover:bg-red-600 transition-colors"
-                  >
-                    ✕
-                  </button>
-                </div>
-              ))}
+              {existingMediaUrls.map((entry, index) => {
+                const { url, type } = resolveMediaItem(entry);
+                const isImage = type.startsWith('image/');
+                const isVideo = type.startsWith('video/');
+                const isAudio = type.startsWith('audio/');
+                return (
+                  <div key={index} className="relative">
+                    {isImage && (
+                      <img src={url} alt={`Media ${index + 1}`} className="w-full rounded-md bg-gray-50 dark:bg-gray-700" />
+                    )}
+                    {isVideo && (
+                      <video controls className="w-full rounded-md bg-black">
+                        <source src={url} type={type} />
+                        Your browser does not support the video tag.
+                      </video>
+                    )}
+                    {isAudio && (
+                      <audio controls className="w-full bg-gray-50 dark:bg-gray-700 rounded-md">
+                        <source src={url} type={type} />
+                        Your browser does not support the audio element.
+                      </audio>
+                    )}
+                    <button
+                      type="button"
+                      onClick={() => handleRemoveMedia(url)}
+                      className="absolute top-2 right-2 bg-red-500 text-white rounded-full p-1 hover:bg-red-600 transition-colors"
+                    >
+                      ✕
+                    </button>
+                  </div>
+                );
+              })}
             </div>
           </div>
         )}

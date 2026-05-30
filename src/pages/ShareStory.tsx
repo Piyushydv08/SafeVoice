@@ -32,6 +32,8 @@ import {
 const db = getFirestore();
 const storage = getStorage();
 
+const MAX_CHARS = 5000;
+
 const TAGS = [
   'Workplace Harassment',
   'Domestic Violence',
@@ -68,6 +70,12 @@ const ensureProfileExists = async (user: User) => {
   }
 };
 
+// Supports both legacy plain-URL strings and new { url, type } objects
+interface MediaItem {
+  url: string;
+  type: string;
+}
+
 // Add this interface near the top of your file
 interface Story {
   id: string;
@@ -75,9 +83,24 @@ interface Story {
   content: string;
   tags?: string[];
   author_id: string;
-  media_urls?: string[];
+  media_urls?: (string | MediaItem)[];
   created_at: any; // Or use proper Timestamp type
   reactionsCount?: number;
+}
+
+// Normalise a media entry to { url, type } regardless of storage format
+function resolveMediaItem(entry: string | MediaItem): MediaItem {
+  if (typeof entry === 'string') {
+    const fileName = decodeURIComponent(entry.split('/o/')[1]?.split('?')[0] ?? '');
+    const ext = fileName.split('.').pop()?.toLowerCase() ?? '';
+    const extToMime: Record<string, string> = {
+      jpg: 'image/jpeg', jpeg: 'image/jpeg', png: 'image/png', gif: 'image/gif', webp: 'image/webp',
+      mp4: 'video/mp4', webm: 'video/webm', ogg: 'video/ogg',
+      mp3: 'audio/mpeg', wav: 'audio/wav',
+    };
+    return { url: entry, type: extToMime[ext] ?? '' };
+  }
+  return entry;
 }
 
 export default function ShareStory() {
@@ -97,6 +120,7 @@ export default function ShareStory() {
   const [recordedAudio, setRecordedAudio] = useState<Blob | null>(null);
   const [audioURL, setAudioURL] = useState<string | null>(null);
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
+  const mediaStreamRef = useRef<MediaStream | null>(null);
   const audioChunksRef = useRef<Blob[]>([]);
 
   // AI Tag Suggestion state
@@ -130,6 +154,7 @@ export default function ShareStory() {
   const handleStartRecording = async () => {
     try {
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      mediaStreamRef.current = stream;
       const mediaRecorder = new window.MediaRecorder(stream);
       mediaRecorderRef.current = mediaRecorder;
       audioChunksRef.current = [];
@@ -154,6 +179,12 @@ export default function ShareStory() {
     if (mediaRecorderRef.current && isRecording) {
       mediaRecorderRef.current.stop();
       setIsRecording(false);
+      
+      // Stop the microphone stream tracks to turn off recording indicator
+      if (mediaStreamRef.current) {
+        mediaStreamRef.current.getTracks().forEach(track => track.stop());
+        mediaStreamRef.current = null;
+      }
     }
   };
 
@@ -177,6 +208,18 @@ export default function ShareStory() {
 
   useEffect(() => {
     fetchMyStories();
+  }, []);
+
+  // Cleanup active audio streams on unmount to prevent privacy leaks
+  useEffect(() => {
+    return () => {
+      if (mediaRecorderRef.current && mediaRecorderRef.current.state !== 'inactive') {
+        mediaRecorderRef.current.stop();
+      }
+      if (mediaStreamRef.current) {
+        mediaStreamRef.current.getTracks().forEach(track => track.stop());
+      }
+    };
   }, []);
 
   const fetchMyStories = async () => {
@@ -365,13 +408,13 @@ export default function ShareStory() {
     let storyText = content;
     // No audio transcription: if no text, storyText remains empty
 
-    let mediaUrls: string[] = [];
+    let mediaUrls: MediaItem[] = [];
     if (mediaFiles && mediaFiles.length > 0) {
       for (const file of mediaFiles) {
         try {
-          // Upload to Firebase Storage
+          // Upload to Firebase Storage and store MIME type alongside URL
           const downloadURL = await uploadMediaFile(file, user.uid);
-          mediaUrls.push(downloadURL);
+          mediaUrls.push({ url: downloadURL, type: file.type });
         } catch (error) {
           console.error('Error uploading media:', error);
           toast.error('Failed to upload media. Please try again.');
@@ -383,12 +426,15 @@ export default function ShareStory() {
 
     try {
       // Add a new document to Firestore
+      const riskLevel = await classifyPostRisk(title, storyText);
+
       await addDoc(collection(db, 'stories'), {
         title,
         content: storyText,
         tags: selectedTags,
         author_id: user.uid,
         media_urls: mediaUrls,
+        risk_level: riskLevel,
         created_at: serverTimestamp(),
       });
 
@@ -577,6 +623,24 @@ export default function ShareStory() {
               className="block w-full rounded-md border-gray-300 dark:border-gray-600 shadow-sm focus:border-pink-500 focus:ring-pink-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
               required
             />
+            <div className="mt-1 flex flex-wrap justify-between items-center text-xs gap-2">
+              <div className="text-gray-500 dark:text-gray-400 min-h-[1rem]">
+                {content.length < 50 && (
+                  <span>Too short for AI suggestions</span>
+                )}
+              </div>
+              <div
+                className={
+                  content.length >= MAX_CHARS
+                    ? 'text-red-600 dark:text-red-400 font-semibold'
+                    : content.length >= MAX_CHARS - 500
+                    ? 'text-yellow-600 dark:text-yellow-400 font-medium'
+                    : 'text-gray-500 dark:text-gray-400'
+                }
+              >
+                {content.length} / {MAX_CHARS}
+              </div>
+            </div>
           </div>
 
 
@@ -693,8 +757,8 @@ export default function ShareStory() {
                   type="button"
                   onClick={() => toggleTag(tag)}
                   className={`px-3 py-1 rounded-full text-sm font-medium transition-colors ${selectedTags.includes(tag)
-                      ? 'bg-pink-500 text-white shadow'
-                      : 'bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-600'
+                    ? 'bg-pink-500 text-white shadow'
+                    : 'bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-600'
                     }`}
                 >
                   {tag}
@@ -744,12 +808,12 @@ export default function ShareStory() {
 
                   {/* Display media if available */}
                   {story.media_urls && story.media_urls.length > 0 && (
-                    <div className="mt-4 space-y-3 border-t border-gray-200 dark:border-gray-700 pt-4"> {/* Added border-top */}
-                      {story.media_urls.map((url: string, index: number) => {
-                        // ... media rendering logic (same as before) ...
-                        const isImage = url.match(/\.(jpeg|jpg|gif|png)$/i);
-                        const isVideo = url.match(/\.(mp4|webm|ogg)$/i);
-                        const isAudio = url.match(/\.(mp3|wav|ogg)$/i);
+                    <div className="mt-4 space-y-3 border-t border-gray-200 dark:border-gray-700 pt-4">
+                      {story.media_urls.map((entry, index) => {
+                        const { url, type } = resolveMediaItem(entry);
+                        const isImage = type.startsWith('image/');
+                        const isVideo = type.startsWith('video/');
+                        const isAudio = type.startsWith('audio/');
 
                         return (
                           <div key={index} className="relative rounded-md overflow-hidden border border-gray-200 dark:border-gray-600">
@@ -757,21 +821,18 @@ export default function ShareStory() {
                               <img
                                 src={url}
                                 alt={`Media ${index + 1}`}
-                                className="w-full max-h-80 object-contain bg-gray-50 dark:bg-gray-900" // Adjusted max-height
+                                className="w-full max-h-80 object-contain bg-gray-50 dark:bg-gray-900"
                               />
                             )}
                             {isVideo && (
-                              <video
-                                controls
-                                className="w-full max-h-80 object-contain bg-black" // Adjusted max-height
-                              >
-                                <source src={url} type="video/mp4" />
+                              <video controls className="w-full max-h-80 object-contain bg-black">
+                                <source src={url} type={type} />
                                 Your browser does not support the video tag.
                               </video>
                             )}
                             {isAudio && (
                               <audio controls className="w-full p-2 bg-gray-50 dark:bg-gray-700">
-                                <source src={url} type="audio/mpeg" />
+                                <source src={url} type={type} />
                                 Your browser does not support the audio element.
                               </audio>
                             )}
@@ -830,6 +891,21 @@ export default function ShareStory() {
       </div>
     </div>
   );
+}
+
+async function classifyPostRisk(title: string, content: string): Promise<string> {
+  try {
+    const response = await fetch('/.netlify/functions/classify-crisis', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ title, content }),
+    });
+    if (!response.ok) return 'LOW';
+    const data = await response.json();
+    return data.riskLevel || 'LOW';
+  } catch {
+    return 'LOW';
+  }
 }
 
 // Add a helper function to upload files

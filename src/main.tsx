@@ -5,9 +5,12 @@ import './index.css';
 
 // Import the Firebase configuration to ensure it's initialized before rendering
 import './lib/firebase';
+import { ErrorBoundary } from './components/errorBoundary.tsx';
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
-    <App />
+    <ErrorBoundary>
+      <App />
+    </ErrorBoundary>
   </StrictMode>
 );

@@ -3,8 +3,8 @@ import { Link } from "react-router-dom";
 
 export default function About() {
   return (
-    <div className="bg-white dark:bg-gray-900">
-      <div className="max-w-7xl mx-auto mt-16 px-4 sm:px-6 lg:px-8 py-12">
+    <div className="bg-gray-50 dark:bg-gray-900 min-h-screen transition-colors duration-200">
+      <div className="max-w-7xl mx-auto pt-24 pb-16 px-4 sm:px-6 lg:px-8">
         {/* Header */}
         <div className="text-center mb-20">
        {/* Improved responsive heading for better viewing across devices */}
