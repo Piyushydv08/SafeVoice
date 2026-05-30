@@ -54,17 +54,38 @@ const SUPPORTED_LANGUAGES = [
   // Add more languages as needed
 ];
 
+// Supports both legacy plain-URL strings and new { url, type } objects
+interface MediaItem {
+  url: string;
+  type: string;
+}
+
 // Define the structure of a Story for better type safety
 interface Story {
   id: string;
   title: string;
   content: string;
   tags?: string[];
-  media_urls?: string[];
+  media_urls?: (string | MediaItem)[];
   created_at: any;
   author_id: string;
   reactionsCount: number;
   risk_level?: string;
+}
+
+// Normalise a media entry to { url, type } regardless of storage format
+function resolveMediaItem(entry: string | MediaItem): MediaItem {
+  if (typeof entry === 'string') {
+    const fileName = decodeURIComponent(entry.split('/o/')[1]?.split('?')[0] ?? '');
+    const ext = fileName.split('.').pop()?.toLowerCase() ?? '';
+    const extToMime: Record<string, string> = {
+      jpg: 'image/jpeg', jpeg: 'image/jpeg', png: 'image/png', gif: 'image/gif', webp: 'image/webp',
+      mp4: 'video/mp4', webm: 'video/webm', ogg: 'video/ogg',
+      mp3: 'audio/mpeg', wav: 'audio/wav',
+    };
+    return { url: entry, type: extToMime[ext] ?? '' };
+  }
+  return entry;
 }
 
 
@@ -549,6 +570,42 @@ export default function Stories() {
                         </button>
                       )}
                     </p>
+
+                    {/* Media Display - only show when expanded */}
+                    {isExpanded && story.media_urls && story.media_urls.length > 0 && (
+                      <div className="mb-4 space-y-3">
+                        {story.media_urls.map((entry, index) => {
+                          const { url, type } = resolveMediaItem(entry);
+                          const isImage = type.startsWith('image/');
+                          const isVideo = type.startsWith('video/');
+                          const isAudio = type.startsWith('audio/');
+
+                          return (
+                            <div key={index} className="relative rounded-md overflow-hidden border border-gray-200 dark:border-gray-600">
+                              {isImage && (
+                                <img
+                                  src={url}
+                                  alt={`Media ${index + 1}`}
+                                  className="w-full max-h-64 object-contain bg-gray-50 dark:bg-gray-700"
+                                />
+                              )}
+                              {isVideo && (
+                                <video controls className="w-full max-h-64 object-contain bg-black">
+                                  <source src={url} type={type} />
+                                  Your browser does not support the video tag.
+                                </video>
+                              )}
+                              {isAudio && (
+                                <audio controls className="w-full p-2 bg-gray-50 dark:bg-gray-700">
+                                  <source src={url} type={type} />
+                                  Your browser does not support the audio element.
+                                </audio>
+                              )}
+                            </div>
+                          );
+                        })}
+                      </div>
+                    )}
 
                     {/* Tags */}
                     <div className="flex flex-wrap gap-2">
