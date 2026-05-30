@@ -32,6 +32,8 @@ import {
 const db = getFirestore();
 const storage = getStorage();
 
+const MAX_CHARS = 5000;
+
 const TAGS = [
   'Workplace Harassment',
   'Domestic Violence',
@@ -621,6 +623,24 @@ export default function ShareStory() {
               className="block w-full rounded-md border-gray-300 dark:border-gray-600 shadow-sm focus:border-pink-500 focus:ring-pink-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
               required
             />
+            <div className="mt-1 flex flex-wrap justify-between items-center text-xs gap-2">
+              <div className="text-gray-500 dark:text-gray-400 min-h-[1rem]">
+                {content.length < 50 && (
+                  <span>Too short for AI suggestions</span>
+                )}
+              </div>
+              <div
+                className={
+                  content.length >= MAX_CHARS
+                    ? 'text-red-600 dark:text-red-400 font-semibold'
+                    : content.length >= MAX_CHARS - 500
+                    ? 'text-yellow-600 dark:text-yellow-400 font-medium'
+                    : 'text-gray-500 dark:text-gray-400'
+                }
+              >
+                {content.length} / {MAX_CHARS}
+              </div>
+            </div>
           </div>
 
 
