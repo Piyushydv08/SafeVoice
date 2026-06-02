@@ -148,15 +148,11 @@ export default function Stories() {
       const querySnapshot = await getDocs(q);
 
       const fetchedStories: Story[] = [];
+      const storyIds: string[] = [];
 
       // Process each story document
       for (const doc of querySnapshot.docs) {
         const storyData = doc.data();
-
-        // Get reaction count
-        const reactionsRef = collection(db, 'reactions');
-        const reactionsQuery = query(reactionsRef, where('story_id', '==', doc.id));
-        const reactionsSnapshot = await getDocs(reactionsQuery);
 
         fetchedStories.push({
           id: doc.id,
@@ -166,9 +162,44 @@ export default function Stories() {
           media_urls: storyData.media_urls || [],
           created_at: storyData.created_at,
           author_id: storyData.author_id || '',
-          reactionsCount: reactionsSnapshot.size,
+          reactionsCount: 0,
           risk_level: storyData.risk_level || 'LOW',
         });
+        storyIds.push(doc.id);
+      }
+
+      // Collect reactions counts in-memory if there are stories
+      const reactionsCountMap: Record<string, number> = {};
+      if (storyIds.length > 0) {
+        const chunks: string[][] = [];
+        for (let i = 0; i < storyIds.length; i += 30) {
+          chunks.push(storyIds.slice(i, i + 30));
+        }
+
+        for (const chunk of chunks) {
+          try {
+            const reactionsRef = collection(db, 'reactions');
+            const reactionsQuery = query(
+              reactionsRef,
+              where('story_id', 'in', chunk)
+            );
+            const reactionsSnapshot = await getDocs(reactionsQuery);
+            reactionsSnapshot.docs.forEach(reactionDoc => {
+              const data = reactionDoc.data();
+              const storyId = data.story_id;
+              if (storyId) {
+                reactionsCountMap[storyId] = (reactionsCountMap[storyId] || 0) + 1;
+              }
+            });
+          } catch (err) {
+            console.error('Error batch-fetching reactions chunk:', err);
+          }
+        }
+      }
+
+      // Merge counts back into stories
+      for (const story of fetchedStories) {
+        story.reactionsCount = reactionsCountMap[story.id] || 0;
       }
 
       setStories(fetchedStories);

@@ -192,6 +192,7 @@ export default function Home() {
 
       const querySnapshot = await getDocs(q);
       const storiesData: Story[] = [];
+      const storyIds: string[] = [];
 
       for (const doc of querySnapshot.docs) {
         const storyData = {
@@ -199,20 +200,42 @@ export default function Home() {
           ...doc.data(),
           reactionsCount: 0
         } as Story;
-
-        const reactionsRef = collection(db, 'reactions');
-        const reactionsQuery = query(
-          reactionsRef,
-          where('story_id', '==', doc.id)
-        );
-
-        const reactionsSnapshot = await getDocs(reactionsQuery);
-        const storyReactions = reactionsSnapshot.docs.filter(
-          reactionDoc => reactionDoc.data().story_id === doc.id
-        );
-
-        storyData.reactionsCount = storyReactions.length;
         storiesData.push(storyData);
+        storyIds.push(doc.id);
+      }
+
+      // Collect reactions counts in-memory if there are stories
+      const reactionsCountMap: Record<string, number> = {};
+      if (storyIds.length > 0) {
+        const chunks: string[][] = [];
+        for (let i = 0; i < storyIds.length; i += 30) {
+          chunks.push(storyIds.slice(i, i + 30));
+        }
+
+        for (const chunk of chunks) {
+          try {
+            const reactionsRef = collection(db, 'reactions');
+            const reactionsQuery = query(
+              reactionsRef,
+              where('story_id', 'in', chunk)
+            );
+            const reactionsSnapshot = await getDocs(reactionsQuery);
+            reactionsSnapshot.docs.forEach(reactionDoc => {
+              const data = reactionDoc.data();
+              const storyId = data.story_id;
+              if (storyId) {
+                reactionsCountMap[storyId] = (reactionsCountMap[storyId] || 0) + 1;
+              }
+            });
+          } catch (err) {
+            console.error('Error batch-fetching reactions chunk:', err);
+          }
+        }
+      }
+
+      // Merge counts back into stories
+      for (const story of storiesData) {
+        story.reactionsCount = reactionsCountMap[story.id] || 0;
       }
 
       storiesData.sort((a, b) => (b.reactionsCount ?? 0) - (a.reactionsCount ?? 0));
