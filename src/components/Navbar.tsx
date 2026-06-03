@@ -1,11 +1,12 @@
 import { useEffect, useState } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
-import { Heart, Menu, X, Moon, Sun } from 'lucide-react';
+import { Heart, Menu, X, Moon, Sun, EyeOff, LogOut } from 'lucide-react';
 import { auth, db } from '../lib/firebase';
 import { onAuthStateChanged } from 'firebase/auth';
 import { doc, getDoc } from 'firebase/firestore';
 import { toast } from 'react-hot-toast';
 import { useTheme } from '../context/ThemeContext';
+import { useSafety } from '../context/SafetyContext';
 
 export default function Navbar() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -15,6 +16,7 @@ export default function Navbar() {
   const navigate = useNavigate();
   const location = useLocation();
   const { theme, toggleTheme } = useTheme();
+  const { toggleDisguise, quickExit } = useSafety();
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
@@ -128,6 +130,27 @@ export default function Navbar() {
                 {theme === 'light' ? <Moon size={18} /> : <Sun size={18} />}
               </button>
 
+              {/* Safety: Disguise & Quick Exit for Desktop */}
+              <button
+                onClick={toggleDisguise}
+                className="theme-toggle-btn p-2 rounded-xl transition-all duration-300 flex items-center justify-center gap-1 hover:text-amber-500 hover:border-amber-400"
+                aria-label="Toggle Disguise Mode (Escape)"
+                title="Toggle Disguise Mode (Escape)"
+              >
+                <EyeOff size={18} />
+                <span className="text-xs font-semibold hidden xl:inline">Disguise</span>
+              </button>
+
+              <button
+                onClick={quickExit}
+                className="p-2 rounded-xl transition-all duration-300 flex items-center justify-center gap-1 bg-red-500 hover:bg-red-600 text-white border border-red-600 hover:shadow-lg shadow-red-500/20"
+                aria-label="Emergency Quick Exit"
+                title="Emergency Quick Exit"
+              >
+                <LogOut size={18} />
+                <span className="text-xs font-bold hidden xl:inline">Quick Exit</span>
+              </button>
+
               {user ? (
                 <div className="flex items-center space-x-1 xl:space-x-2 ml-1">
                   {isAdmin && (
@@ -160,8 +183,28 @@ export default function Navbar() {
               )}
             </div>
 
-            {/* Mobile: Theme Toggle + Hamburger */}
+            {/* Mobile: Safety Actions + Theme Toggle + Hamburger */}
             <div className="custom-lg:hidden flex items-center space-x-1">
+              {/* Disguise Button for Mobile */}
+              <button
+                onClick={toggleDisguise}
+                className="theme-toggle-btn p-2 rounded-xl transition-all duration-300 hover:text-amber-500"
+                aria-label="Toggle Disguise Mode"
+                title="Toggle Disguise Mode"
+              >
+                <EyeOff size={18} />
+              </button>
+
+              {/* Quick Exit Button for Mobile */}
+              <button
+                onClick={quickExit}
+                className="p-2 rounded-xl transition-all duration-300 bg-red-500 text-white border border-red-600 shadow-sm"
+                aria-label="Emergency Quick Exit"
+                title="Emergency Quick Exit"
+              >
+                <LogOut size={18} />
+              </button>
+
               <button
                 onClick={toggleTheme}
                 className="theme-toggle-btn p-2 rounded-xl transition-all duration-300"
@@ -201,6 +244,28 @@ export default function Navbar() {
                 {label}
               </Link>
             ))}
+          </div>
+
+          {/* Safety Controls Section */}
+          <div className="px-4 py-3 border-t border-pink-200/40 dark:border-white/10 space-y-2">
+            <p className="text-xs font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider mb-1">Safety Options</p>
+            <button
+              onClick={toggleDisguise}
+              className="w-full flex items-center justify-between px-4 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 text-amber-600 dark:text-amber-400 bg-amber-500/10 border border-amber-500/20"
+            >
+              <span className="flex items-center gap-2">
+                <EyeOff size={16} />
+                <span>Camouflage Disguise</span>
+              </span>
+              <span className="text-xs opacity-75 font-mono bg-amber-500/20 px-1.5 py-0.5 rounded">Esc</span>
+            </button>
+            <button
+              onClick={quickExit}
+              className="w-full flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-bold text-white bg-red-500 hover:bg-red-600 border border-red-600 shadow-md transition-all duration-200"
+            >
+              <LogOut size={16} />
+              <span>Instant Emergency Exit</span>
+            </button>
           </div>
 
           {/* User Section */}
