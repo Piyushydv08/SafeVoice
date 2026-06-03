@@ -4,7 +4,7 @@ import { toast } from 'react-hot-toast';
 import { auth } from '../lib/firebase';
 import { Edit, Trash2, CheckSquare, Loader2, Sparkles } from 'lucide-react';
 import { User } from 'firebase/auth';
-
+import { useLanguage, SUPPORTED_LANGUAGES } from '../context/LanguageContext';
 // Firebase imports
 import {
   getFirestore,
@@ -78,6 +78,7 @@ interface MediaItem {
 
 // Add this interface near the top of your file
 interface Story {
+  language?: string;
   id: string;
   title: string;
   content: string;
@@ -106,9 +107,9 @@ function resolveMediaItem(entry: string | MediaItem): MediaItem {
 export default function ShareStory() {
   const [title, setTitle] = useState('');
   const [content, setContent] = useState('');
-  const [selectedTags, setSelectedTags] = useState<string[]>([]);
   const [mediaFiles, setMediaFiles] = useState<File[]>([]);
   const [loading, setLoading] = useState(false);
+  const [selectedTags, setSelectedTags] = useState<string[]>([]);
   const [myStories, setMyStories] = useState<Story[]>([]);
   const [correctedStories, setCorrectedStories] = useState<{ [storyId: string]: string }>({});
   const [loadingCorrection, setLoadingCorrection] = useState<{ [storyId: string]: boolean }>({});
@@ -205,6 +206,7 @@ export default function ShareStory() {
   };
 
   const navigate = useNavigate();
+  const { language, setLanguage } = useLanguage();
 
   useEffect(() => {
     fetchMyStories();
@@ -245,6 +247,7 @@ export default function ShareStory() {
         // Properly cast the document data to match the Story interface
         const data = doc.data();
         return {
+          language: data.language || 'en',
           id: doc.id,
           title: data.title || '',
           content: data.content || '',
@@ -429,14 +432,17 @@ export default function ShareStory() {
       const riskLevel = await classifyPostRisk(title, storyText);
 
       await addDoc(collection(db, 'stories'), {
-        title,
-        content: storyText,
-        tags: selectedTags,
-        author_id: user.uid,
-        media_urls: mediaUrls,
-        risk_level: riskLevel,
-        created_at: serverTimestamp(),
-      });
+  title,
+  content: storyText,
+  language,
+  tags: selectedTags,
+  author_id: user.uid,
+  media_urls: mediaUrls,
+  risk_level: riskLevel,
+  translated_content: {},
+  translated_titles: {},
+  created_at: serverTimestamp(),
+});
 
       toast.success('Your story has been shared successfully');
 
@@ -578,6 +584,28 @@ export default function ShareStory() {
         {/* Form for sharing a new story */}
         <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-8">Share Your Story</h1>
         <form onSubmit={handleSubmit} className="space-y-6 bg-white dark:bg-gray-800 p-6 rounded-lg shadow mb-12">
+        {/* Language Selection */}
+<div>
+  <label
+    htmlFor="language"
+    className="block text-sm font-medium text-gray-700 dark:text-gray-300"
+  >
+    Story Language
+  </label>
+
+  <select
+    id="language"
+    value={language}
+    onChange={(e) => setLanguage(e.target.value)}
+    className="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 shadow-sm focus:border-pink-500 focus:ring-pink-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+  >
+    {SUPPORTED_LANGUAGES.map((lang) => (
+      <option key={lang.code} value={lang.code}>
+        {lang.label}
+      </option>
+    ))}
+  </select>
+</div>
           {/* Title Input */}
           <div>
             <label htmlFor="title" className="block text-sm font-medium text-gray-700 dark:text-gray-300">

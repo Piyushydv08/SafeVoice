@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { Heart, MessageCircle, Flag, Loader2, X } from 'lucide-react';
 import { toast } from 'react-hot-toast';
 import { auth } from '../lib/firebase';
+import { useLanguage, SUPPORTED_LANGUAGES } from '../context/LanguageContext';
 import {
   getFirestore,
   collection,
@@ -37,22 +38,6 @@ const SUPPORT_MESSAGES = [
   "Your journey matters"
 ];
 
-// Define supported languages for translation
-const SUPPORTED_LANGUAGES = [
-  { code: 'en', name: 'English' },
-  { code: 'hi', name: 'Hindi' },
-  { code: 'es', name: 'Spanish' },
-  { code: 'fr', name: 'French' },
-  { code: 'mr', name: 'Marathi' },
-  { code: 'bn', name: 'Bengali' },
-  { code: 'ta', name: 'Tamil' },
-  { code: 'te', name: 'Telugu' },
-  { code: 'kn', name: 'Kannada' },
-  { code: 'ml', name: 'Malayalam' },
-  { code: 'gu', name: 'Gujarati' },
-  { code: 'pa', name: 'Punjabi' },
-  // Add more languages as needed
-];
 
 // Supports both legacy plain-URL strings and new { url, type } objects
 interface MediaItem {
@@ -125,6 +110,7 @@ export default function Stories() {
   const [translatedStories, setTranslatedStories] = useState<{ [storyId: string]: { [langCode: string]: { title: string; content: string } } }>({});
   // State to track the selected language for each story: { storyId: langCode }
   const [targetLanguages, setTargetLanguages] = useState<{ [storyId: string]: string }>({});
+  const { language } = useLanguage();
   // State to track loading status for translation: { storyId: boolean }
   const [loadingTranslations, setLoadingTranslations] = useState<{ [storyId: string]: boolean }>({});
   const [expandedStoryId, setExpandedStoryId] = useState<string | null>(null);
@@ -426,16 +412,16 @@ export default function Stories() {
 
     filtered = filtered.sort(
       (a, b) =>
-        new Date(a.created_at).getTime() -
-        new Date(b.created_at).getTime()
+        new Date(a.created_at?.seconds * 1000 || 0).getTime()-
+        new Date(b.created_at?.seconds * 1000 || 0).getTime()
     );
 
   } else {
 
     filtered = filtered.sort(
       (a, b) =>
-        new Date(b.created_at).getTime() -
-        new Date(a.created_at).getTime()
+        new Date(b.created_at?.seconds * 1000 || 0).getTime() -
+        new Date(a.created_at?.seconds * 1000 || 0).getTime()
     );
   }
 
@@ -546,7 +532,8 @@ export default function Stories() {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
             {getSortedStories(stories).map((story) => {
               // Determine content to display based on selected language
-              const currentTargetLang = targetLanguages[story.id] || 'original';
+             const currentTargetLang =
+       targetLanguages[story.id] || 'original';
               const translation = translatedStories[story.id]?.[currentTargetLang];
               const displayTitle = currentTargetLang !== 'original' && translation ? translation.title : story.title;
               const displayContent = currentTargetLang !== 'original' && translation ? translation.content : story.content;
@@ -574,7 +561,9 @@ export default function Stories() {
                       >
                         <option value="original">Original</option>
                         {SUPPORTED_LANGUAGES.map(lang => (
-                          <option key={lang.code} value={lang.code}>{lang.name}</option>
+                          <option key={lang.code} value={lang.code}>
+  {lang.label}
+</option>
                         ))}
                       </select>
                     </div>

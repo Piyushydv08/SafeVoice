@@ -18,12 +18,13 @@ import PrivacyPolicy from './pages/Privacypolicy';
 import Termsandconditions from './pages/termsandconditions';
 import ContactPage from './pages/ContactPage';
 import NotFound from './pages/NotFound';
-
+import { LanguageProvider } from './context/LanguageContext';
 
 
 function App() {
   return (
-    <ThemeProvider>
+    <LanguageProvider>
+  <ThemeProvider>
       <Router>
         <ScrollToTop />
         {/* // Global back-to-top button available across all pages */}
@@ -51,7 +52,8 @@ function App() {
           <Toaster position="top-center" />
         </div>
       </Router>
-    </ThemeProvider>
+      </ThemeProvider>
+</LanguageProvider>
   );
 }
 
