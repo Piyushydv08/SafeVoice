@@ -495,7 +495,7 @@ export default function Resources() {
                <a
                   key={item.title}
                   href={`tel:${primaryNumber}`}
-                  className="group relative overflow-hidden rounded-3xl border border-pink-200 bg-white p-7 text-center shadow-md transition-all duration-300 hover:-translate-y-2 hover:border-pink-400 hover:shadow-2xl dark:border-pink-900 dark:bg-gray-800"
+                  className="group relative flex h-full flex-col overflow-hidden rounded-3xl border border-pink-200 bg-white p-7 text-center shadow-md transition-all duration-300 hover:-translate-y-2 hover:border-pink-400 hover:shadow-2xl dark:border-pink-900 dark:bg-gray-800"
                 >
                   {/* Top glow */}
                   <div className="absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-pink-500 to-rose-500 opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
@@ -521,7 +521,7 @@ export default function Resources() {
                   </p>
 
                   {/* CTA */}
-                  <div className="mt-6">
+                  <div className="mt-auto pt-6">
                     <div className="flex items-center justify-center gap-2 rounded-xl border border-pink-300 py-3 font-semibold text-pink-600 transition-all duration-300 group-hover:bg-pink-600 group-hover:text-white dark:border-pink-700">
                       <Phone className="h-4 w-4" />
                       Call Now
