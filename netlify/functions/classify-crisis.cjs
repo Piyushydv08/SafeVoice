@@ -69,25 +69,42 @@ Post to analyze:
 ${textToAnalyze}
 """
  
-Respond with ONLY one word: LOW, MEDIUM, or HIGH. No explanation, no punctuation, nothing else.`;
+Respond ONLY with a raw JSON object formatted exactly like this, with no markdown formatting or code blocks:
+{
+  "riskLevel": "HIGH",
+  "reason": "Brief explanation of why this risk level was chosen"
+}`;
 
         const result = await model.generateContent(prompt);
-        const rawText = result?.response?.text()?.trim().toUpperCase() || 'LOW';
+        let rawText = result?.response?.text()?.trim() || '';
+
+        // Safely strip potential markdown code blocks
+        if (rawText.startsWith('```')) {
+            rawText = rawText.replace(/^```(json)?\n?/, '').replace(/\n?```$/, '').trim();
+        }
+
+        let parsedResult = { riskLevel: 'LOW', reason: '' };
+        try {
+            parsedResult = JSON.parse(rawText);
+        } catch (parseError) {
+            console.error('Failed to parse JSON from AI:', rawText);
+        }
 
         const VALID_LEVELS = ['LOW', 'MEDIUM', 'HIGH'];
-        const riskLevel = VALID_LEVELS.includes(rawText) ? rawText : 'LOW';
+        const riskLevel = VALID_LEVELS.includes(parsedResult.riskLevel?.toUpperCase()) ? parsedResult.riskLevel.toUpperCase() : 'LOW';
+        const reason = parsedResult.reason || '';
 
         return {
             statusCode: 200,
             headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-            body: JSON.stringify({ riskLevel }),
+            body: JSON.stringify({ riskLevel, reason }),
         };
     } catch (error) {
         console.error('Crisis classification error:', error);
         return {
             statusCode: 500,
             headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-            body: JSON.stringify({ error: 'Classification failed', riskLevel: 'LOW' }),
+            body: JSON.stringify({ error: 'Classification failed', riskLevel: 'LOW', reason: '' }),
         };
     }
 };
