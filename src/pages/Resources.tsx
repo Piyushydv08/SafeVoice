@@ -512,10 +512,12 @@ export default function Resources() {
         </section>
 
         <section className="grid gap-8 md:grid-cols-2">
-          <div className="rounded-3xl bg-pink-900 p-8 text-white shadow-2xl">
-            <div className="mb-6 flex items-center gap-3 border-b border-pink-700 pb-3">
-              <Shield className="h-8 w-8 text-pink-300" />
-              <h2 className="text-2xl font-bold">Personal Safety Hub</h2>
+          <div className="rounded-3xl border border-pink-200 bg-pink-50 p-8 shadow-2xl dark:border-gray-700 dark:bg-gray-800">
+            <div className="mb-6 flex items-center gap-3 border-b border-pink-300 pb-3 dark:border-gray-700">
+              <Shield className="h-8 w-8 text-rose-600 dark:text-rose-400" />
+              <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
+                Personal Safety Hub
+              </h2>
             </div>
 
             <div className="space-y-4">
