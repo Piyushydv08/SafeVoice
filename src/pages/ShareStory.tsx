@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-hot-toast';
 import { auth } from '../lib/firebase';
-import { Edit, Trash2, CheckSquare, Loader2, Sparkles } from 'lucide-react';
+import { Edit, Trash2, CheckSquare, Loader2, Sparkles, Copy } from 'lucide-react';
 import { User } from 'firebase/auth';
 
 // Firebase imports
@@ -368,6 +368,19 @@ export default function ShareStory() {
         }
       }
     });
+  };
+
+  const handleCopyStory = async (text: string) => {
+    if (!navigator.clipboard) {
+      toast.error('Clipboard API not available');
+      return;
+    }
+    try {
+      await navigator.clipboard.writeText(text);
+      toast.success('Story copied to clipboard!');
+    } catch (err) {
+      toast.error('Failed to copy story.');
+    }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -850,7 +863,15 @@ export default function ShareStory() {
                       <span>Reactions: {story.reactionsCount}</span>
                     </div>
                     {/* Action Buttons */}
-                    <div className="flex items-center space-x-3"> {/* Adjusted spacing */}
+                    <div className="flex flex-wrap items-center gap-3">
+                      {/* Copy Button */}
+                      <button
+                        onClick={() => handleCopyStory(displayContent)}
+                        className="inline-flex items-center text-teal-600 hover:text-teal-800 dark:text-teal-400 dark:hover:text-teal-300"
+                        title="Copy Story"
+                      >
+                        <Copy size={16} className="mr-1" /> Copy
+                      </button>
                       {/* Grammar Fix Button (for existing stories) */}
                       <button
                         onClick={() => handleGrammarFix(story.id, story.content)}
