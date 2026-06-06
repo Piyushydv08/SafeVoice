@@ -5,6 +5,7 @@ import {
   collection,
   getDocs,
   doc,
+  getDoc,
   addDoc,
   deleteDoc,
   serverTimestamp,
@@ -17,10 +18,6 @@ import {
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-hot-toast';
 import { CheckCircle, XCircle, Shield, Mail, Trash2, Flag } from 'lucide-react';
-
-// --- Authorization ---
-// Only users signed in with these emails can see this page.
-const ADMIN_EMAILS = ['safevoiceforwomen@gmail.com', 'piyushydv011@gmail.com', 'aditiraj0205@gmail.com'];
 
 const db = getFirestore();
 
@@ -67,10 +64,23 @@ export default function AdminDashboard() {
 
   // Check authorization and fetch data
   useEffect(() => {
-    const unsubscribe = auth.onAuthStateChanged(user => {
-      if (user && ADMIN_EMAILS.includes(user.email || '')) {
-        setIsAuthorized(true);
-        fetchAllAdminData();
+    const unsubscribe = auth.onAuthStateChanged(async (user) => {
+      if (user && user.email) {
+        try {
+          const docRef = doc(db, 'admins', user.email.toLowerCase());
+          const docSnap = await getDoc(docRef);
+          if (docSnap.exists()) {
+            setIsAuthorized(true);
+            fetchAllAdminData();
+          } else {
+            setIsAuthorized(false);
+            setLoading(false);
+          }
+        } catch (error) {
+          console.error("Error checking admin status:", error);
+          setIsAuthorized(false);
+          setLoading(false);
+        }
       } else {
         setIsAuthorized(false);
         setLoading(false);

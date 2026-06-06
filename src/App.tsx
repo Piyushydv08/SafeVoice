@@ -1,5 +1,7 @@
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { ThemeProvider } from './context/ThemeContext';
+import { SafetyProvider, useSafety } from './context/SafetyContext';
+import DisguiseView from './components/DisguiseView';
 import { Toaster } from 'react-hot-toast';
 import Navbar from './components/Navbar';
 import Home from './pages/Home';
@@ -21,14 +23,20 @@ import NotFound from './pages/NotFound';
 
 
 
-function App() {
+function AppContent() {
+  const { isDisguised } = useSafety();
+
   return (
-    <ThemeProvider>
-      <Router>
-        <ScrollToTop />
-        {/* // Global back-to-top button available across all pages */}
-        <BackToTop />
-        <div className="min-h-screen bg-gray-50 dark:bg-gray-900 transition-colors duration-200">
+    <Router>
+      <ScrollToTop />
+      {/* // Global back-to-top button available across all pages */}
+      <BackToTop />
+      <div className="min-h-screen bg-gray-50 dark:bg-gray-900 transition-colors duration-200">
+        {isDisguised && <DisguiseView />}
+        <div 
+          aria-hidden={isDisguised ? 'true' : undefined}
+          style={isDisguised ? { display: 'none' } : undefined}
+        >
           <Navbar />
           <main>
             <Routes>
@@ -48,9 +56,19 @@ function App() {
             </Routes>
           </main>
           <Footer />
-          <Toaster position="top-center" />
         </div>
-      </Router>
+        <Toaster position="top-center" />
+      </div>
+    </Router>
+  );
+}
+
+function App() {
+  return (
+    <ThemeProvider>
+      <SafetyProvider>
+        <AppContent />
+      </SafetyProvider>
     </ThemeProvider>
   );
 }
