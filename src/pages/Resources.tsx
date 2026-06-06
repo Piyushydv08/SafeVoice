@@ -113,56 +113,7 @@ const SAFETY_GUIDE: SafetySection[] = [
     ],
   },
 ];
- const QUICK_HELPLINES = [
-  {
-    icon: Phone,
-    title: "Women's Helpline",
-    number: "1091 / 181",
-    description: "24/7 support for women in distress",
-  },
-  {
-    icon: AlertTriangle,
-    title: "Emergency Response",
-    number: "112",
-    description: "National emergency assistance",
-  },
-  {
-    icon: Heart,
-    title: "Child Helpline",
-    number: "1098",
-    description: "Support for children in need",
-  },
-  {
-    icon: Globe,
-    title: "Cyber Crime Helpline",
-    number: "1930",
-    description: "Report cyber fraud, online harassment, and digital abuse",
-  },
-  {
-    icon: Heart,
-    title: "Ambulance Services",
-    number: "108",
-    description: "Emergency medical assistance",
-  },
-  {
-    icon: Shield,
-    title: "Police",
-    number: "100",
-    description: "Immediate law enforcement assistance",
-  },
-  {
-    icon: AlertTriangle,
-    title: "Fire Services",
-    number: "101",
-    description: "Fire and rescue emergency services",
-  },
-  {
-    icon: Heart,
-    title: "Kiran Mental Health Helpline",
-    number: "1800-599-0019",
-    description: "24/7 mental health and emotional support",
-  },
-];
+import { QUICK_HELPLINES } from "../utils/constants";
 function Accordion({
   title,
   children,
@@ -570,10 +521,12 @@ export default function Resources() {
         </section>
 
         <section className="grid gap-8 md:grid-cols-2">
-          <div className="rounded-3xl bg-pink-900 p-8 text-white shadow-2xl">
-            <div className="mb-6 flex items-center gap-3 border-b border-pink-700 pb-3">
-              <Shield className="h-8 w-8 text-pink-300" />
-              <h2 className="text-2xl font-bold">Personal Safety Hub</h2>
+          <div className="rounded-3xl border border-pink-200 bg-pink-50 p-8 shadow-2xl dark:border-gray-700 dark:bg-gray-800">
+            <div className="mb-6 flex items-center gap-3 border-b border-pink-300 pb-3 dark:border-gray-700">
+              <Shield className="h-8 w-8 text-rose-600 dark:text-rose-400" />
+              <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
+                Personal Safety Hub
+              </h2>
             </div>
 
             <div className="space-y-4">
