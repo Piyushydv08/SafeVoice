@@ -435,59 +435,117 @@ export default function Resources() {
 
   return (
     <div className="min-h-screen bg-gray-100 pb-24 pt-16 dark:bg-gray-900">
-      <div className="mx-auto max-w-7xl space-y-20 px-6">
-        <header className="pt-8 text-center">
-          <h1 className="mb-4 text-5xl font-extrabold md:text-6xl">
-            <span className="bg-gradient-to-r from-pink-600 to-rose-700 bg-clip-text text-transparent">
-              Verified Support Network
-            </span>
-          </h1>
-          <p className="mx-auto max-w-3xl text-lg leading-8 text-gray-600 dark:text-gray-300">
-            Find verified NGOs, emergency helplines, legal information, and
-            practical safety guidance.
-          </p>
-        </header>
-        <section>
-  <h2 className="mb-6 text-3xl font-bold text-gray-900 dark:text-white">
-    Quick Access Helplines ⚡
-  </h2>
+      <div className="mx-auto max-w-7xl space-y-12 px-6">
+        <header className="py-12 text-center">
+  <h1 className="mb-4 text-6xl font-extrabold">
+    <span className="bg-gradient-to-r from-pink-600 to-rose-600 bg-clip-text text-transparent">
+      Verified Support Network
+    </span>
+  </h1>
 
-  {/* Responsive grid for 8 helpline cards */}
-  <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
-    {QUICK_HELPLINES.map((item) => {
-      const Icon = item.icon;
+  <p className="mx-auto max-w-3xl text-xl text-gray-600 dark:text-gray-300">
+    Find verified NGOs, emergency helplines, legal information,
+    and practical safety guidance.
+  </p>
 
-      // Extract the first number for clickable tel links
-      // Example: "1091 / 181" -> "1091"
-      const primaryNumber = item.number
-        .split(" /")[0]
-        .replace(/[^0-9+]/g, "");
+  <div className="mt-10 flex flex-wrap justify-center gap-6">
 
-      return (
-        <a
-          key={item.title}
-          href={`tel:${primaryNumber}`}
-          className="rounded-3xl border border-pink-200 bg-white p-6 text-center shadow-lg transition hover:-translate-y-1 hover:shadow-2xl dark:border-pink-900 dark:bg-gray-800"
-        >
-          <Icon className="mx-auto mb-4 h-10 w-10 text-pink-600 dark:text-pink-400" />
+    <div className="flex items-center gap-3 rounded-2xl border border-pink-200 bg-white px-8 py-4">
+      <Shield className="h-5 w-5 text-pink-600" />
+      <span className="font-semibold text-gray-700">
+        Government Verified
+      </span>
+    </div>
 
-          <h3 className="text-xl font-bold text-gray-900 dark:text-white">
-            {item.title}
-          </h3>
+    <div className="flex items-center gap-3 rounded-2xl border border-pink-200 bg-white px-8 py-4">
+      <Zap className="h-5 w-5 text-pink-600" />
+      <span className="font-semibold text-gray-700">
+        24/7 Available
+      </span>
+    </div>
 
-          {/* Slightly smaller text to fit longer numbers */}
-          <p className="mt-2 break-words text-2xl font-extrabold text-pink-600 dark:text-pink-400">
-            {item.number}
-          </p>
+    <div className="flex items-center gap-3 rounded-2xl border border-pink-200 bg-white px-8 py-4">
+      <Users className="h-5 w-5 text-pink-600" />
+      <span className="font-semibold text-gray-700">
+        Nationwide Support
+      </span>
+    </div>
 
-          <p className="mt-2 text-sm text-gray-500 dark:text-gray-400">
-            {item.description}
-          </p>
-        </a>
-      );
-    })}
   </div>
-</section>
+</header>
+
+
+        <section>
+          <h2 className="mb-6 text-3xl font-bold text-gray-900 dark:text-white">
+            Quick Access Helplines ⚡
+          </h2>
+
+          {/* Responsive grid for 8 helpline cards */}
+          <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
+            {QUICK_HELPLINES.map((item) => {
+              const Icon = item.icon;
+
+              // Extract the first number for clickable tel links
+              // Example: "1091 / 181" -> "1091"
+              const primaryNumber = item.number
+                .split(" /")[0]
+                .replace(/[^0-9+]/g, "");
+
+              return (
+               <a
+                  key={item.title}
+                  href={`tel:${primaryNumber}`}
+                  className="group relative flex h-full flex-col overflow-hidden rounded-3xl border border-pink-200 bg-white p-7 text-center shadow-md transition-all duration-300 hover:-translate-y-2 hover:border-pink-400 hover:shadow-2xl dark:border-pink-900 dark:bg-gray-800"
+                >
+                  {/* Top glow */}
+                  <div className="absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-pink-500 to-rose-500 opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
+
+                  {/* Icon circle */}
+                  <div className="mx-auto mb-5 flex h-20 w-20 items-center justify-center rounded-full bg-pink-50 transition-transform duration-300 group-hover:scale-110 dark:bg-pink-900/20">
+                    <Icon className="h-10 w-10 text-pink-600 dark:text-pink-400" />
+                  </div>
+
+                  {/* Title */}
+                  <h3 className="text-2xl font-bold text-gray-900 dark:text-white">
+                    {item.title}
+                  </h3>
+
+                  {/* Number */}
+                  <p className="mt-3 text-4xl font-extrabold tracking-tight text-pink-600 dark:text-pink-400">
+                    {item.number}
+                  </p>
+
+                  {/* Description */}
+                  <p className="mt-4 min-h-[56px] text-sm leading-6 text-gray-500 dark:text-gray-400">
+                    {item.description}
+                  </p>
+
+                  {/* CTA */}
+                  <div className="mt-auto pt-6">
+                    <div className="flex items-center justify-center gap-2 rounded-xl border border-pink-300 py-3 font-semibold text-pink-600 transition-all duration-300 group-hover:bg-pink-600 group-hover:text-white dark:border-pink-700">
+                      <Phone className="h-4 w-4" />
+                      Call Now
+                    </div>
+                  </div>
+              </a>
+              );
+            })}
+          </div>
+    </section>
+
+        <div className="rounded-2xl border border-pink-200 bg-gradient-to-r from-pink-50 to-rose-50 p-5 text-center shadow-md">
+        <div className="flex items-center justify-center gap-3">
+          <Shield className="h-6 w-6 text-pink-600" />
+          <p className="text-sm md:text-base">
+            <span className="font-bold">
+              Your safety matters.
+            </span>{" "}
+            These services are confidential, free, and available 24/7.
+            Don't hesitate to reach out.
+          </p>
+          <Heart className="h-5 w-5 text-pink-600" />
+        </div>
+      </div>
 
         <section>
           <h2 className="mb-6 text-3xl font-bold text-gray-900 dark:text-white">
