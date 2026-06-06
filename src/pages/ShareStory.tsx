@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-hot-toast';
 import { auth } from '../lib/firebase';
 import { Edit, Trash2, CheckSquare, Loader2, Sparkles, Copy } from 'lucide-react';
+import { EmergencyModal } from '../components/EmergencyModal';
 import { User } from 'firebase/auth';
 
 // Firebase imports
@@ -104,6 +105,7 @@ function resolveMediaItem(entry: string | MediaItem): MediaItem {
 }
 
 export default function ShareStory() {
+  const [showEmergencyModal, setShowEmergencyModal] = useState(false);
   const [title, setTitle] = useState('');
   const [content, setContent] = useState('');
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
@@ -439,7 +441,7 @@ export default function ShareStory() {
 
     try {
       // Add a new document to Firestore
-      const riskLevel = await classifyPostRisk(title, storyText);
+      const classification = await classifyPostRisk(title, storyText);
 
       await addDoc(collection(db, 'stories'), {
         title,
@@ -447,11 +449,17 @@ export default function ShareStory() {
         tags: selectedTags,
         author_id: user.uid,
         media_urls: mediaUrls,
-        risk_level: riskLevel,
+        risk_level: classification.riskLevel,
+        risk_reason: classification.reason,
+        classified_at: new Date().toISOString(),
         created_at: serverTimestamp(),
       });
 
-      toast.success('Your story has been shared successfully');
+      if (classification.riskLevel === 'HIGH') {
+        setShowEmergencyModal(true);
+      } else {
+        toast.success('Your story has been shared successfully');
+      }
 
       // Fetch the updated stories list
       fetchMyStories();
@@ -910,22 +918,37 @@ export default function ShareStory() {
           </ul>
         )}
       </div>
+      <EmergencyModal 
+        isOpen={showEmergencyModal} 
+        onClose={() => {
+          setShowEmergencyModal(false);
+          toast.success('Your story has been shared successfully');
+        }} 
+      />
     </div>
   );
 }
 
-async function classifyPostRisk(title: string, content: string): Promise<string> {
+interface CrisisClassification {
+  riskLevel: string;
+  reason: string;
+}
+
+async function classifyPostRisk(title: string, content: string): Promise<CrisisClassification> {
   try {
     const response = await fetch('/.netlify/functions/classify-crisis', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ title, content }),
     });
-    if (!response.ok) return 'LOW';
+    if (!response.ok) return { riskLevel: 'LOW', reason: '' };
     const data = await response.json();
-    return data.riskLevel || 'LOW';
+    return {
+      riskLevel: data.riskLevel || 'LOW',
+      reason: data.reason || ''
+    };
   } catch {
-    return 'LOW';
+    return { riskLevel: 'LOW', reason: '' };
   }
 }
 
