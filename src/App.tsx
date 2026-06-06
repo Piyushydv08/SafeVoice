@@ -1,3 +1,4 @@
+import React, { useState, useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { ThemeProvider } from './context/ThemeContext';
 import { Toaster } from 'react-hot-toast';
@@ -18,12 +19,32 @@ import PrivacyPolicy from './pages/Privacypolicy';
 import Termsandconditions from './pages/termsandconditions';
 import ContactPage from './pages/ContactPage';
 import NotFound from './pages/NotFound';
-
-
+import { LoadingScreen } from './components/LoadingScreen';
 
 function App() {
+  const [isLoading, setIsLoading] = useState(true);
+  const [isFading, setIsFading] = useState(false);
+
+  useEffect(() => {
+    // Start fading out after 600ms
+    const fadeTimer = setTimeout(() => {
+      setIsFading(true);
+    }, 600);
+
+    // Completely remove from DOM after 1000ms
+    const removeTimer = setTimeout(() => {
+      setIsLoading(false);
+    }, 1000);
+
+    return () => {
+      clearTimeout(fadeTimer);
+      clearTimeout(removeTimer);
+    };
+  }, []);
+
   return (
     <ThemeProvider>
+      {isLoading && <LoadingScreen isFading={isFading} />}
       <Router>
         <ScrollToTop />
         {/* // Global back-to-top button available across all pages */}
