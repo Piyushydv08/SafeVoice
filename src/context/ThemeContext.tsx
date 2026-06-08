@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
 
-type Theme = 'light' | 'dark';
+type Theme = 'light' | 'rose' | 'dark';
 
 interface ThemeContextType {
   theme: Theme;
@@ -15,7 +15,7 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     // Check if user has a theme preference in localStorage
     const savedTheme = localStorage.getItem('theme') as Theme;
-    if (savedTheme) {
+    if (savedTheme === 'light' || savedTheme === 'rose' || savedTheme === 'dark') {
       setTheme(savedTheme);
     } else if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
       // Or use system preference
@@ -26,11 +26,16 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     // Update document class and localStorage when theme changes
     document.documentElement.classList.toggle('dark', theme === 'dark');
+    document.documentElement.classList.toggle('rose', theme === 'rose');
     localStorage.setItem('theme', theme);
   }, [theme]);
 
   const toggleTheme = () => {
-    setTheme(prev => prev === 'light' ? 'dark' : 'light');
+    setTheme(prev => {
+      if (prev === 'light') return 'rose';
+      if (prev === 'rose') return 'dark';
+      return 'light';
+    });
   };
 
   return (

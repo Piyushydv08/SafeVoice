@@ -15,6 +15,12 @@ export default function Navbar() {
   const navigate = useNavigate();
   const location = useLocation();
   const { theme, toggleTheme } = useTheme();
+  const nextThemeLabel = theme === 'light' ? 'rose comfort' : theme === 'rose' ? 'dark' : 'light';
+  const themeIcon = theme === 'light'
+    ? <Heart size={18} />
+    : theme === 'rose'
+      ? <Moon size={18} />
+      : <Sun size={18} />;
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (currentUser) => setUser(currentUser));
@@ -111,9 +117,10 @@ export default function Navbar() {
               <button
                 onClick={toggleTheme}
                 className="theme-toggle-btn p-2 rounded-xl transition-all duration-300"
-                aria-label={`Switch to ${theme === 'light' ? 'dark' : 'light'} mode`}
+                aria-label={`Switch to ${nextThemeLabel} mode`}
+                title={`Switch to ${nextThemeLabel} mode`}
               >
-                {theme === 'light' ? <Moon size={18} /> : <Sun size={18} />}
+                {themeIcon}
               </button>
 
               {user ? (
@@ -153,9 +160,10 @@ export default function Navbar() {
               <button
                 onClick={toggleTheme}
                 className="theme-toggle-btn p-2 rounded-xl transition-all duration-300"
-                aria-label={`Switch to ${theme === 'light' ? 'dark' : 'light'} mode`}
+                aria-label={`Switch to ${nextThemeLabel} mode`}
+                title={`Switch to ${nextThemeLabel} mode`}
               >
-                {theme === 'light' ? <Moon size={18} /> : <Sun size={18} />}
+                {themeIcon}
               </button>
 
               <button
