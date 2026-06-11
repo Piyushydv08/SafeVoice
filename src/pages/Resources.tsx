@@ -25,6 +25,7 @@ import {
   collection,
   deleteDoc,
   doc,
+  getDoc,
   getDocs,
   getFirestore,
   query,
@@ -33,12 +34,6 @@ import {
 } from "firebase/firestore";
 
 const db = getFirestore();
-
-const ADMIN_EMAILS = [
-  "safevoiceforwomen@gmail.com",
-  "piyushydv011@gmail.com",
-  "aditiraj0205@gmail.com",
-];
 
 interface NGO {
   id: string;
@@ -236,6 +231,7 @@ export default function Resources() {
   const navigate = useNavigate();
 
   const [user, setUser] = useState(auth.currentUser);
+  const [isAdmin, setIsAdmin] = useState(false);
   const [ngos, setNGOs] = useState<NGO[]>([]);
   const [loadingNGOs, setLoadingNGOs] = useState(true);
 
@@ -251,13 +247,23 @@ export default function Resources() {
   const [loadingRequest, setLoadingRequest] = useState(false);
 
   useEffect(() => {
-    const unsubscribe = auth.onAuthStateChanged(setUser);
+    const unsubscribe = auth.onAuthStateChanged(async (currentUser) => {
+      setUser(currentUser);
+      if (currentUser && currentUser.email) {
+        try {
+          const docRef = doc(db, "admins", currentUser.email.toLowerCase());
+          const docSnap = await getDoc(docRef);
+          setIsAdmin(docSnap.exists());
+        } catch (error) {
+          console.error("Error checking admin status:", error);
+          setIsAdmin(false);
+        }
+      } else {
+        setIsAdmin(false);
+      }
+    });
     return () => unsubscribe();
   }, []);
-
-  const isAdmin = !!(
-    user && ADMIN_EMAILS.includes(user.email || "")
-  );
 
   useEffect(() => {
     const fetchNGOs = async () => {

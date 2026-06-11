@@ -1,0 +1,66 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Helper function to check if the current user is an admin
+    function isAdmin() {
+      return request.auth != null &&
+             request.auth.token.email != null &&
+             exists(/databases/$(database)/documents/admins/$(request.auth.token.email.toLowerCase()));
+    }
+
+    // Rules for the admins collection
+    match /admins/{email} {
+      allow read: if request.auth != null && (request.auth.token.email.toLowerCase() == email.toLowerCase() || isAdmin());
+      allow write: if isAdmin();
+    }
+
+    // Rules for user profiles
+    match /profiles/{userId} {
+      allow read: if request.auth != null;
+      allow create, update: if request.auth != null && request.auth.uid == userId;
+      allow delete: if isAdmin();
+    }
+
+    // Rules for stories
+    match /stories/{storyId} {
+      allow read: if true;
+      allow create: if request.auth != null;
+      allow update: if request.auth != null && (request.auth.uid == resource.data.author_id || isAdmin());
+      allow delete: if isAdmin();
+    }
+
+    // Rules for reactions
+    match /reactions/{reactionId} {
+      allow read: if true;
+      allow create, update: if request.auth != null;
+      allow delete: if request.auth != null && (request.auth.uid == resource.data.user_id || isAdmin());
+    }
+
+    // Rules for reports
+    match /reports/{reportId} {
+      allow read: if isAdmin();
+      allow create: if request.auth != null;
+      allow update, delete: if isAdmin();
+    }
+
+    // Rules for ngos
+    match /ngos/{ngoId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    // Rules for ngo_requests
+    match /ngo_requests/{requestId} {
+      allow read: if isAdmin();
+      allow create: if request.auth != null;
+      allow update, delete: if isAdmin();
+    }
+
+    // Rules for testimonials
+    match /testimonials/{testimonialId} {
+      allow read: if true;
+      allow create: if request.auth != null;
+      allow update, delete: if isAdmin();
+    }
+  }
+}
